@@ -1,0 +1,28 @@
+{
+  "name": "mihawk",
+  "version": "0.0.1",
+  "description": "A simple async api mock server tool, no render template",
+  "main": "mockServer.js",
+  "bin": {
+    "mihawk": "./bin/bin.js"
+  },
+  "scripts": {
+    "test": "node --harmony mockServer.js 9090"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Froguard/mihawk.git"
+  },
+  "author": "froguard",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "koa": "^1.2.4",
+    "koa-bodyparser": "^2.3.0",
+    "lodash": "^4.17.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Froguard/mihawk/issues"
+  },
+  "homepage": "https://github.com/Froguard/mihawk#readme"
+}
