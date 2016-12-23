@@ -1,6 +1,6 @@
 ## simple tiny mockServer(just data-mock)
 
-- 只mock-data，而不mock页面，即返回的response中body多为json，而不会包含html代码
+- 只mock-data，而不mock页面，即返回的response中body多为json，而不会包含html代码，当然，理论上返回任何东西都可以，包括下载文件。需要手动在对应请求的处理js中写逻辑
 - 支持通过js动态二次修改返还的json数据，当js不存在是，不修改json，直接返还源数据
 - 支持在js中查询与请求相关的一些数据，比如querystring，request.body
 - js中可以控制改变statusCode，headers等
