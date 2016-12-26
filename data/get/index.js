@@ -32,10 +32,6 @@ function dateFormat(dt,fmt) {
 function getMockData(ctx,originData){
 
     let query = ctx.query || {};//url queryString
-    let reqBody = ctx.request.body || {};// post or form or other data
-
-    console.log("QueryString为：\r\n",JSON.stringify(query,null,2));
-    console.log("request-body为：\r\n",JSON.stringify(reqBody,null,2));
 
     originData.data += "" + dateFormat(new Date());
 

@@ -1,5 +1,5 @@
 /**
- * mock数据的服务，用以模拟后端接口
+ * mock数据的服务，用以模拟后端java的接口
  * 开发调试时候用
  * @type {Application}
  * 备注：
@@ -31,6 +31,8 @@ const port = runTimePort || 8888;
 const dPath = "./data";
 const comApiDealJsPath = path.resolve(path.join(cwd,dPath,"./comApiData.js")).replace(/\\/g,"/");
 const comApiDealJsonPath = path.join(cwd,dPath,"./comApiData.json").replace(/\\/g,"/");
+let hasWarnComApiJs = false;
+let hasWarnComApiJson = false;
 
 // config
 // 方便使用post类型的请求数据挂载到this.request.body
@@ -45,6 +47,9 @@ app.use(function *(next){
         theUrl = this.url,
         reqUrl = `${theMethod} ${theUrl}`;//用以输出到控制台
 
+	 // print out req url
+    console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));	
+		
     // mockData
     let mockData = {
         statusCode: 200,
@@ -69,7 +74,7 @@ app.use(function *(next){
         
         //比如chrome在ajax跨域时候，会首先发一个options请求（同时headers会带上本域origin）作为嗅探请求，如果服务器准许（服务器响应access control allow origin的值包含当前域），那么说明被允许跨域，就再重新发一次
 		if(methodName==="options"){
-			console.log(colors.magenta("处理一个options请求嗅探"));
+			console.log(colors.cyan("-  Sniffer: " )+colors.gray(reqUrl));//请求嗅探
 			this.type = 'json';
 			this.status = 200;
 			this.body = "接收到请求嗅探，准许跨域请求";	//此时请确保headers头米面设置好了准许跨域的设置！！！
@@ -105,7 +110,7 @@ app.use(function *(next){
     // format
     jsPath = jsPath.replace(/\\/g,"/");
     jsonPath = jsonPath.replace(/\\/g,"/");
-
+   	
     // get common data
     let comApiDataDeal = false;
     let comApiData = false;
@@ -114,16 +119,18 @@ app.use(function *(next){
     try{
         comApiDataDeal = require(comApiDealJsPath);
     }catch(e1){
-        console.log(colors.yellow(e1));
-        comApiDataDeal = require('./data/comApiData');
+        !hasWarnComApiJs && console.log(colors.yellow(e1));
+        hasWarnComApiJs = true;
+		comApiDataDeal = require('./data/comApiData');
     }
     // get common json data
     let comJsonData;
     try{
         comJsonData = JSON.parse(fs.readFileSync(comApiDealJsonPath, 'utf8')) || {};
     }catch(e2){
-        console.log(colors.yellow(e2));
-        comJsonData = {};
+        !hasWarnComApiJson && console.log(colors.yellow(e2));
+        hasWarnComApiJson = true;
+		comJsonData = {};
     }
     // do common js deal
     if(comApiDataDeal){
@@ -133,7 +140,6 @@ app.use(function *(next){
             console.log(colors.yellow(e3));
             comApiData = false;
         }
-
     }else{
         comApiData = comJsonData;
     }
@@ -155,7 +161,11 @@ app.use(function *(next){
     }catch(e){
         customDeal = false;
     }
-    if(customDeal){
+	// print out mock file
+	console.log(colors.cyan(`- MockFile: ${path.join(cwd,dPath).replace(/\\/g,"/")}`)
+        + (!customDeal ? colors.cyan(jsonPath) : (colors.cyan(jsPath.split(".js")[0]) + colors.yellow(".js"))));
+    // deal originData via custom js
+	if(customDeal){
         let afterDeal = customDeal(this, custom || {});
         if(afterDeal){ custom = afterDeal; }
     }else{
@@ -165,13 +175,8 @@ app.use(function *(next){
             if(isAsync){ custom = { "body": custom }; }
         }
     }
-    // print out
-    console.log(
-          colors.cyan(`-  MockUrl: ${reqUrl}\r\n`)
-        + colors.cyan(`- MockFile: ${path.join(cwd,dPath).replace(/\\/g,"/")}`)
-        + (!customDeal ? colors.cyan(jsonPath) : (colors.cyan(jsPath.split(".js")[0]) + colors.yellow(".js")))
-    );
-    // response
+	
+	// response
     if(!!custom){
         // combine mock data
         if(isAsync && comApiData){
