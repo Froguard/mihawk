@@ -37,6 +37,7 @@ const comApiDealJsonPath = path.join(cwd,dPath,"./comApiData.json").replace(/\\/
 let hasWarnComApiJs = false;
 let hasWarnComApiJson = false;
 
+// 遍历data文件夹，抓取可用mock的请求，并记录
 // json-toy
 const jsonToy = require('json-toy');
 const dir2Json = require('json-toy/lib/cli/walk-dir');
@@ -55,11 +56,10 @@ if(existsSync(_dPath)){
             if(!~mockUrlsSet.indexOf(cpStr)){//不加入重复的
                 mockUrlsSet.push(cpStr);
             }
-
         }
     },"ROOT");
 }else{
-    mockUrlsSet.push("GET /index");
+    mockUrlsSet.push("GET /index (It's a default url :-(  Because you have no directory './data')");
 }
 
 
