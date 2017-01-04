@@ -88,8 +88,9 @@ function getMockData(ctx,originData){
     let query = ctx.query || {};//url queryString
     let reqBody = ctx.request.body || {};// post or form or other data
 
-    console.log("QueryString为：\r\n",JSON.stringify(query,null,2));
-    console.log("request-body为：\r\n",JSON.stringify(reqBody,null,2));
+    // 可以直接使用JSON5进行解析最新的json标准！
+    console.log("QueryString为：\r\n",JSON5.stringify(query,null,2));
+    console.log("request-body为：\r\n",JSON5.stringify(reqBody,null,2));
 
     return {
         // statusCode: 200,

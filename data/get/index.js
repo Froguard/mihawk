@@ -32,6 +32,12 @@ function dateFormat(dt,fmt) {
 function getMockData(ctx,originData){
 
     let query = ctx.query || {};//url queryString
+    console.log("QueryString:",JSON5.stringify(query,null,2));
+
+    let payload = ctx.request.body || {};// payload data
+    console.log("Payload Data:",JSON5.stringify(payload,null,2));
+
+
 
     originData.data += "" + dateFormat(new Date());
 
