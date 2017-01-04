@@ -5,6 +5,7 @@
 - 支持在js中查询与请求相关的一些数据，比如querystring，request.body
 - js中可以控制改变statusCode，headers等
 - 支持跨域使用
+- mock数据采用json5解析，所以json中支持注释
 
 
 ### 使用

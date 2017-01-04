@@ -21,7 +21,8 @@ const _ = require("lodash");
 const colors = require("colors");
 const app = koa();
 const cwd = process.cwd();
-
+let JSON5 = require('json5');
+global.JSON5 = JSON5;
 
 
 //port
@@ -126,7 +127,11 @@ app.use(function *(next){
     // get common json data
     let comJsonData;
     try{
-        comJsonData = JSON.parse(fs.readFileSync(comApiDealJsonPath, 'utf8')) || {};
+        try{
+            comJsonData = JSON.parse(fs.readFileSync(comApiDealJsonPath, 'utf8')) || {};
+        }catch(err){
+            comJsonData = JSON5.parse(fs.readFileSync(comApiDealJsonPath, 'utf8')) || {};
+        }
     }catch(e2){
         !hasWarnComApiJson && console.log(colors.yellow(e2));
         hasWarnComApiJson = true;
@@ -147,7 +152,11 @@ app.use(function *(next){
     // get orginData via *.json file
     let custom = null;
     try{
-        custom = JSON.parse(fs.readFileSync(path.join(cwd,dPath,jsonPath), 'utf8'));
+        try{
+            custom = JSON.parse(fs.readFileSync(path.join(cwd,dPath,jsonPath), 'utf8'));
+        }catch(err2){
+            custom = JSON5.parse(fs.readFileSync(path.join(cwd,dPath,jsonPath), 'utf8'));
+        }
     }catch(e){
         console.log(colors.red.bold("MockError:\r\n",e.message));
         custom = false;
@@ -248,5 +257,21 @@ server.on('listening', function () {
 
 // start
 server.listen(port);
+
+/*
+var https = require('https');
+var enforceHttps = require('koa-sslify');
+app = koa();
+// Force HTTPS on all page
+app.use(enforceHttps());
+
+// SSL options
+var options = {
+    key: fs.readFileSync('./ssl/server.key'),  //ssl文件路径
+    cert: fs.readFileSync('./ssl/server.pem')  //ssl文件路径
+};
+let server2 = https.createServer(options, app.callback());
+server2.listen(443);
+*/
 
 module.exports = {};
