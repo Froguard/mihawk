@@ -21,6 +21,8 @@ const _ = require("lodash");
 const colors = require("colors");
 const app = koa();
 const cwd = process.cwd();
+
+// json5
 let JSON5 = require('json5');
 global.JSON5 = JSON5;
 
@@ -34,6 +36,32 @@ const comApiDealJsPath = path.resolve(path.join(cwd,dPath,"./comApiData.js")).re
 const comApiDealJsonPath = path.join(cwd,dPath,"./comApiData.json").replace(/\\/g,"/");
 let hasWarnComApiJs = false;
 let hasWarnComApiJson = false;
+
+// json-toy
+const jsonToy = require('json-toy');
+const dir2Json = require('json-toy/lib/cli/walk-dir');
+// const Type = require('json-toy/lib/typeOf');
+const existsSync = fs.existsSync || path.existsSync;
+let mockUrlsSet = [];
+var _dPath = path.join(cwd,dPath);
+if(existsSync(_dPath)){
+    let dirJson = dir2Json(_dPath);
+    jsonToy.travelJson(dirJson,function(key,val,curKeyPath,typeStr,isComplexObj,curDepth,isCircular){
+        if(!isComplexObj && curDepth>2){
+            let cp = curKeyPath.replace("ROOT.","").replace(/(.js|.json)$/g,"");
+            let cpStr = cp.split(".").map((it,index)=>{
+                return index===0 ? (it.toUpperCase()+" ") : it;
+            }).join("/");
+            if(!~mockUrlsSet.indexOf(cpStr)){//不加入重复的
+                mockUrlsSet.push(cpStr);
+            }
+
+        }
+    },"ROOT");
+}else{
+    mockUrlsSet.push("GET /index");
+}
+
 
 // config
 // 方便使用post类型的请求数据挂载到this.request.body
@@ -253,6 +281,7 @@ server.on('listening', function () {
     let bind = typeof addr === 'string' ? ('pipe ' + addr ) : ('port ' + addr.port);
     console.log(colors.green(`Start mock-server on ${bind} success! via port of `));
     console.log(`Mock Data directory: ${colors.gray(path.join(cwd,dPath).replace(/\\/g,"/"))}`);
+    console.log(`Mock Requests:\r\n  ${colors.gray(mockUrlsSet.join("\r\n  "))}`);
 });
 
 // start
