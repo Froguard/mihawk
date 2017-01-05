@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple async api mock server tool, no render template",
   "main": "mockServer.js",
   "bin": {
