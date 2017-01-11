@@ -21,6 +21,7 @@ const _ = require("lodash");
 const colors = require("colors");
 const app = koa();
 const cwd = process.cwd();
+const favicon = require('koa-favicon');
 
 // json5
 let JSON5 = require('json5');
@@ -64,6 +65,8 @@ if(existsSync(_dPath)){
 
 
 // config
+// favicon.ico
+app.use(favicon(path.join(__dirname, './data/favicon.ico')));
 // 方便使用post类型的请求数据挂载到this.request.body
 app.use(bodyParser());
 // 允许跨域，不在这里写，手动在headers里面设置三个属性进行实现了
@@ -78,10 +81,10 @@ app.use(function *(next){
 
 
     // favicon.ico
-    if("GET /favicon.ico" == reqUrl){
-        console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
-        return;
-    }
+    // if("GET /favicon.ico" == reqUrl){
+    //     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
+    //     return;
+    // }
 
 	 // print out req url
     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));
