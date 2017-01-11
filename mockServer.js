@@ -76,9 +76,17 @@ app.use(function *(next){
         theUrl = this.url,
         reqUrl = `${theMethod} ${theUrl}`;//用以输出到控制台
 
+
+    // favicon.ico
+    if("GET /favicon.ico" == reqUrl){
+        console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
+        return;
+    }
+
 	 // print out req url
-    console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));	
-		
+    console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));
+
+
     // mockData
     let mockData = {
         statusCode: 200,
@@ -87,16 +95,6 @@ app.use(function *(next){
         },
         body: null
     };
-    // headers
-	// 允许跨域
-	this.set('Access-Control-Allow-Origin','*');
-	this.set('Access-Control-Allow-Methods','POST,GET,PUT,DELETE,HEAD,OPTIONS');//*
-	this.set('Access-Control-Allow-Headers','Content-Type,Content-Length,Authorization,Accept,X-Requested-With');//*
-	// 禁掉缓存
-	this.set("Pragma", "No-cache");
-	this.set("Cache-Control", "No-cache");
-	this.cookies.set("Expires", 0);
-	
 	
     let methodName = this.method.toLowerCase();
     if(!~['get','post','put','delete'].indexOf(methodName)){//不属于这几种时
@@ -117,9 +115,6 @@ app.use(function *(next){
         jsPath = filePath,  // => "/get(put|post|delete)/**/*.js"
         jsonPath = filePath;// => "/get(put|post|delete)/**/*.json"
 
-    // favicon.ico
-    if("/get/favicon.ico" == filePath){ return; }
-
     // 是否为异步接口: 目前只能处理非页面请求，返回非页面数据，如json
     let isAsync = true;
 
@@ -136,15 +131,15 @@ app.use(function *(next){
         jsPath += filePath.substr(-3)!='.js'?'.js':'';
         jsonPath += filePath.substr(-5)!='.json'?'.json':'';
     }
-    // format
+    // 3.格式化路径
     jsPath = jsPath.replace(/\\/g,"/");
     jsonPath = jsonPath.replace(/\\/g,"/");
    	
-    // get common data
+    // 4.获取【公共的API格式】
     let comApiDataDeal = false;
     let comApiData = false;
     delete require.cache[comApiDealJsPath];// 确保每次运行都是执行最新的js
-    // get common js deal
+    // 4.1 获取【公共的API数据js处理文件中的处理函数】以进行数据的二次处理
     try{
         comApiDataDeal = require(comApiDealJsPath);
     }catch(e1){
@@ -152,7 +147,7 @@ app.use(function *(next){
         hasWarnComApiJs = true;
 		comApiDataDeal = require('./data/comApiData');
     }
-    // get common json data
+    // 4.2 获取【公共的API数据】
     let comJsonData;
     try{
         try{
@@ -165,7 +160,7 @@ app.use(function *(next){
         hasWarnComApiJson = true;
 		comJsonData = {};
     }
-    // do common js deal
+    // 4.3 进行处理
     if(comApiDataDeal){
         try{
             comApiData = comApiDataDeal(this, comJsonData);
@@ -177,7 +172,8 @@ app.use(function *(next){
         comApiData = comJsonData;
     }
 
-    // get orginData via *.json file
+    // 5. 获取mock数据
+    // 5.1 查找对应的*.json文件
     let custom = null;
     try{
         try{
@@ -189,7 +185,7 @@ app.use(function *(next){
         console.log(colors.red.bold("MockError:\r\n",e.message));
         custom = false;
     }
-    // if need deal originData via custom js
+    // 5.2 查找对应的*.js文件，如果有的话，得到其中的处理函数，以便对mock数据进行二次处理
     let customDeal = null;
     try{
         let custDealJsPath = path.resolve(path.join(cwd,dPath,jsPath));
@@ -198,10 +194,10 @@ app.use(function *(next){
     }catch(e){
         customDeal = false;
     }
-	// print out mock file
+	// 打印
 	console.log(colors.cyan(`- MockFile: ${path.join(cwd,dPath).replace(/\\/g,"/")}`)
         + (!customDeal ? colors.cyan(jsonPath) : (colors.cyan(jsPath.split(".js")[0]) + colors.yellow(".js"))));
-    // deal originData via custom js
+    // 5.3 对mock数据进行二次梳理（如果有必要的话，即找到了自定义的js）
 	if(customDeal){
         let afterDeal = customDeal(this, custom || {});
         if(afterDeal){ custom = afterDeal; }
@@ -212,8 +208,18 @@ app.use(function *(next){
             if(isAsync){ custom = { "body": custom }; }
         }
     }
-	
-	// response
+
+    // 6.设置headers
+    // 允许跨域
+    this.set('Access-Control-Allow-Origin','*');
+    this.set('Access-Control-Allow-Methods','POST,GET,PUT,DELETE,HEAD,OPTIONS');//*
+    this.set('Access-Control-Allow-Headers','Content-Type,Content-Length,Authorization,Accept,X-Requested-With');//*
+    // 禁掉缓存
+    this.set("Pragma", "No-cache");
+    this.set("Cache-Control", "No-cache");
+    this.cookies.set("Expires", 0);
+
+	// 7.响应response
     if(!!custom){
         // combine mock data
         if(isAsync && comApiData){
@@ -230,10 +236,10 @@ app.use(function *(next){
         // status
         this.status = mockData.statusCode;
         if(mockData.statusCode==302){
-        //重定向
+        // mock重定向
             this.redirect(mockData.headers.location);
         }else if(mockData.download){
-        //文件下载
+        // mock文件下载
             // 要禁掉缓存，不然会发现下载功能在IE下面不行，找不到文件。opera,firefox,chrome没问题
             this.set("Pragma", "No-cache");
             this.set("Cache-Control", "No-cache");
@@ -241,14 +247,16 @@ app.use(function *(next){
             this.body = custom.body;//不可为mockData.body
             console.log(colors.cyan('- MockType: Download-File'));
         }else{
-        // 其他正常mock
+        // mock其他
             // body
             this.body = mockData.body;
         }
     }else{
         this.type = 'html';
         this.status = 404;
-        this.body = `404 File not found: The Mock-data('${filePath}.json|js') is not found!!!`;
+        var abPath = path.join(cwd,filePath) + ".json|js";
+        var str404Content = fs.readFileSync(path.join(__dirname,dPath,'404.html'),'utf-8');
+        this.body = str404Content.replace("`${abPath}`",abPath);
     }
 
     yield next;
