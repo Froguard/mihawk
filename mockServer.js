@@ -42,7 +42,7 @@ let hasWarnComApiJson = false;
 // json-toy
 const jsonToy = require('json-toy');
 const dir2Json = require('json-toy/lib/cli/walk-dir');
-// const Type = require('json-toy/lib/typeOf');
+const Type = require('json-toy/lib/typeOf');
 const existsSync = fs.existsSync || path.existsSync;
 let mockUrlsSet = [];
 var _dPath = path.join(cwd,dPath);
@@ -66,7 +66,7 @@ if(existsSync(_dPath)){
 
 // config
 // favicon.ico
-app.use(favicon(path.join(__dirname, './data/favicon.ico')));
+app.use(favicon(path.join(__dirname, './res/favicon.ico')));
 // 方便使用post类型的请求数据挂载到this.request.body
 app.use(bodyParser());
 // 允许跨域，不在这里写，手动在headers里面设置三个属性进行实现了
@@ -251,14 +251,18 @@ app.use(function *(next){
             console.log(colors.cyan('- MockType: Download-File'));
         }else{
         // mock其他
+            console.log(colors.cyan('- MockType: Api-async'));
             // body
             this.body = mockData.body;
         }
+        !Type.isObject.isEmpty(this.query) && console.log("Query String Parameters:\r\n"+JSON.stringify(this.query,null,2));
+        !Type.isObject.isEmpty(this.request.body) && console.log("Request Payload:\r\n"+JSON.stringify(this.request.body,null,2));
+
     }else{
         this.type = 'html';
         this.status = 404;
         var abPath = path.join(cwd,filePath) + ".json|js";
-        var str404Content = fs.readFileSync(path.join(__dirname,dPath,'404.html'),'utf-8');
+        var str404Content = fs.readFileSync(path.join(__dirname,'./res/404.html'),'utf-8');
         this.body = str404Content.replace("`${abPath}`",abPath);
     }
 
