@@ -60,7 +60,7 @@ if(existsSync(_dPath)){
         }
     },"ROOT");
 }else{
-    mockUrlsSet.push("GET /index (It's a default url :-(  Because you have no directory './data')");
+    mockUrlsSet.push("GET /index (It's a default url :-(  Because you have no data files in directory './data')");
 }
 
 
