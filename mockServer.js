@@ -64,13 +64,20 @@ if(existsSync(_dPath)){
 }
 
 
-// config
+/**
+ * config
+ */
+
 // favicon.ico
 app.use(favicon(path.join(__dirname, './res/favicon.ico')));
+
 // 方便使用post类型的请求数据挂载到this.request.body
 app.use(bodyParser());
+
 // 允许跨域，不在这里写，手动在headers里面设置三个属性进行实现了
 // app.use(cors());
+
+// main
 app.use(function *(next){
     // url
     let theMethod = this.method.toUpperCase(),
@@ -84,7 +91,7 @@ app.use(function *(next){
     this.set('Access-Control-Allow-Origin','*');
     this.set('Access-Control-Allow-Methods','POST,GET,PUT,DELETE,HEAD,OPTIONS');//*
     this.set('Access-Control-Allow-Headers','Content-Type,Content-Length,Authorization,Accept,X-Requested-With');//*
-    // 禁掉缓存
+    // 禁掉缓存，为了确保每次请求过去的数据都是最新的，方便mock时候debug
     this.set("Pragma", "No-cache");
     this.set("Cache-Control", "No-cache");
     this.cookies.set("Expires", 0);
@@ -98,19 +105,19 @@ app.use(function *(next){
         body: null
     };
 	
-    // favicon.ico
-    // if("GET /favicon.ico" == reqUrl){
-    //     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
-    //     return;
-    // }
+    // 已经使用了koa-favicon
+    //// favicon.ico 
+    //// if("GET /favicon.ico" == reqUrl){
+    ////     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
+    ////     return;
+    //// }
 
      // print out req url
     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));
     
-
+    // 0.请求处理嗅探
     let methodName = this.method.toLowerCase();
     if(!~['get','post','put','delete'].indexOf(methodName)){//不属于这几种时
-        
         //比如chrome在ajax跨域时候，会首先发一个options请求（同时headers会带上本域origin）作为嗅探请求，如果服务器准许（服务器响应access control allow origin的值包含当前域），那么说明被允许跨域，就再重新发一次
 		if(methodName==="options"){
 			console.log(colors.cyan("-  Sniffer: " )+colors.gray(reqUrl));//请求嗅探
@@ -219,9 +226,7 @@ app.use(function *(next){
         }else{
             if(isAsync){ custom = { "body": custom }; }
         }
-    }
-
-    
+    }    
 
 	// 7.响应response
     if(!!custom){
