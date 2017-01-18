@@ -79,16 +79,15 @@ app.use(function *(next){
         theUrl = this.url,
         reqUrl = `${theMethod} ${theUrl}`;//用以输出到控制台
 
-
-    // favicon.ico
-    // if("GET /favicon.ico" == reqUrl){
-    //     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
-    //     return;
-    // }
-
-	 // print out req url
-    console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));
-
+    // 设置headers，必须在所有操作之前，否则会使得跨域失效
+    // 允许跨域
+    this.set('Access-Control-Allow-Origin','*');
+    this.set('Access-Control-Allow-Methods','POST,GET,PUT,DELETE,HEAD,OPTIONS');//*
+    this.set('Access-Control-Allow-Headers','Content-Type,Content-Length,Authorization,Accept,X-Requested-With');//*
+    // 禁掉缓存
+    this.set("Pragma", "No-cache");
+    this.set("Cache-Control", "No-cache");
+    this.cookies.set("Expires", 0);
 
     // mockData
     let mockData = {
@@ -99,6 +98,16 @@ app.use(function *(next){
         body: null
     };
 	
+    // favicon.ico
+    // if("GET /favicon.ico" == reqUrl){
+    //     console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`) + colors.gray("skip it!"));
+    //     return;
+    // }
+
+     // print out req url
+    console.log("\r\n" + colors.cyan(`-  MockUrl: ${reqUrl}`));
+    
+
     let methodName = this.method.toLowerCase();
     if(!~['get','post','put','delete'].indexOf(methodName)){//不属于这几种时
         
@@ -212,15 +221,7 @@ app.use(function *(next){
         }
     }
 
-    // 6.设置headers
-    // 允许跨域
-    this.set('Access-Control-Allow-Origin','*');
-    this.set('Access-Control-Allow-Methods','POST,GET,PUT,DELETE,HEAD,OPTIONS');//*
-    this.set('Access-Control-Allow-Headers','Content-Type,Content-Length,Authorization,Accept,X-Requested-With');//*
-    // 禁掉缓存
-    this.set("Pragma", "No-cache");
-    this.set("Cache-Control", "No-cache");
-    this.cookies.set("Expires", 0);
+    
 
 	// 7.响应response
     if(!!custom){
@@ -261,7 +262,7 @@ app.use(function *(next){
     }else{
         this.type = 'html';
         this.status = 404;
-        var abPath = path.join(cwd,filePath) + ".json|js";
+        var abPath = path.join(cwd,dPath,filePath) + ".json|js";
         var str404Content = fs.readFileSync(path.join(__dirname,'./res/404.html'),'utf-8');
         this.body = str404Content.replace("`${abPath}`",abPath);
     }
