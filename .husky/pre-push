@@ -5,5 +5,5 @@
 echo ""
 echo -e "\x1b[1;35m[pre-push]\x1b[0m: Start git-hooks via husky@^8.0.3..."
 
-echo -e "\x1b[1;90m$ npx ts-node ./bin/index.ts pre-git-push\x1b[0m" 
-npx ts-node ./bin/index.ts pre-git-push
+echo -e "\x1b[1;90m$ npx frogagu pre-git-push\x1b[0m" 
+npx frogagu pre-git-push
