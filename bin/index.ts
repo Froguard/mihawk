@@ -36,7 +36,7 @@ const { name, version } = pkgInfo || {};
       // mihawk init
       case 'init':
       case 'initial':
-        callback = autoTest;
+        callback = init;
         break;
       // mihawk
       default:
