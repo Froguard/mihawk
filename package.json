@@ -1,31 +1,98 @@
 {
   "name": "mihawk",
-  "version": "0.0.2",
+  "version": "0.1.0-alpha",
   "description": "A simple async api mock server tool, no render template",
-  "main": "mockServer.js",
-  "bin": {
-    "mihawk": "./bin/bin.js"
+  "author": "Froguard <figure_wf@163.com>",
+  "engines": {
+    "node": ">=16.0.0"
   },
+  "files": [
+    "dist",
+    "!dist/.gitkeep"
+  ],
+  "bin": {
+    "mihawk": "dist/cjs/bin/index.js"
+  },
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
   "scripts": {
-    "test": "node --harmony mockServer.js 9090"
+    "dev": "nodemon --config './.nodemonrc.json' ./_example_/demo.ts",
+    "dev:bin": "ts-node ./bin/index.ts",
+    "-------------------build-------------------": "echo '------------------- build -------------------'",
+    "prebuild": "ts-node ./build/pre-build.ts",
+    "build": "run-p build:esm build:cjs build:types",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:types": "tsc --project tsconfig.type.json",
+    "postbuild": "ts-node ./build/post-build.ts",
+    "-------------------check-------------------": "echo '------------------- check -------------------'",
+    "pretest:cover": "rm -rf ./__coverage__",
+    "test:cover": "jest --coverage",
+    "test": "jest",
+    "lint:fix": "eslint --fix 'src/**/*.ts'",
+    "-------------------publish-----------------": "echo '------------------- publish -----------------'",
+    "prerelease": "npm rum build",
+    "release": "npm publish --regitry=https://registry.npmjs.org",
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^11.0.3",
+    "@types/ip": "^1.1.3",
+    "@types/minimist": "^1.2.5",
+    "@types/prompts": "^2.4.9",
+    "anymatch": "^3.1.3",
+    "color-cc": "^0.0.7",
+    "cosmiconfig": "^9.0.0",
+    "es-toolkit": "^1.16.0",
+    "free-dedupe": "^0.0.7",
+    "fs-extra": "^11.1.1",
+    "ip": "^2.0.1",
+    "json5": "^2.2.3",
+    "koa": "^1.2.4",
+    "koa-bodyparser": "^2.3.0",
+    "koa-favicon": "^1.2.1",
+    "minimist": "^1.2.8",
+    "open": "^10.1.0",
+    "package-json-type": "^1.0.3",
+    "prettier": "^3.0.3",
+    "prompts": "^2.4.2",
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^20.8.7",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.0.1",
+    "frogagu": "^0.0.0-rho",
+    "husky": "^8.0.3",
+    "jest": "^27.4.0",
+    "lint-staged": "^12.3.3",
+    "nodemon": "^2.0.15",
+    "npm-run-all": "^4.1.5",
+    "pinst": "^2.1.6",
+    "prettier": "^3.0.3",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.6.2",
+    "typescript": "^4.5.5"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:Froguard/mihawk.git"
   },
-  "author": "froguard",
-  "license": "ISC",
-  "dependencies": {
-    "colors": "^1.1.2",
-    "json-toy": "^1.0.8",
-    "json5": "^0.5.1",
-    "koa": "^1.2.4",
-    "koa-bodyparser": "^2.3.0",
-    "koa-favicon": "^1.2.1",
-    "lodash": "^4.17.2"
-  },
   "bugs": {
     "url": "https://github.com/Froguard/mihawk/issues"
   },
-  "homepage": "https://github.com/Froguard/mihawk#readme"
+  "homepage": "https://github.com/Froguard/mihawk#readme",
+  "license": "MIT"
 }

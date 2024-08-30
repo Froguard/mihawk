@@ -1,0 +1,8 @@
+/node_modules
+/tpl
+
+.eslintrc.js
+.prettierrc.js
+.lintstagedrc.js
+tsconfig.json
+tsconfig.*.json

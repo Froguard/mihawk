@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "ignore": ["tests/*.ts"],
+  "watch": ["./lib", "./*.ts"],
+  "execMap": {
+    "ts": "ts-node"
+  },
+  "env": {
+    "DEBUG": "TEST"
+  }
+}

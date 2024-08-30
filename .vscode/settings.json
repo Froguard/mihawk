@@ -1,0 +1,40 @@
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.detectIndentation": true,
+  "editor.guides.indentation": true,
+  "editor.insertSpaces": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.enable": true,
+  "eslint.format.enable": true,
+  "eslint.codeActionsOnSave.mode": "all",
+  "eslint.nodePath": "./node_modules",
+  "eslint.options": {
+    "overrideConfigFile": "./.eslintrc.js"
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "html"],
+  "eslint.probe": ["javascript", "javascriptreact", "typescript", "typescriptreact", "html", "vue", "markdown"],
+  "files.associations": {
+    "*.ts.ejs": "typescript",
+    "*.js.ejs": "javascript",
+    "*.json.ejs": "json",
+    "*.css.ejs": "css",
+    "*.xml.ejs": "xml",
+    "*.html.ejs": "html",
+    "*.xhtml.ejs": "xhtml",
+    "*.md.ejs": "markdown",
+    "*.json5": "json5"
+  },
+  "todo-tree.tree.showBadges": false,
+  "terminal.integrated.rightClickBehavior": "default",
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

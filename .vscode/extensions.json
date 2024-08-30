@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "katjanakosic.vscode-json5",
+    "maggie.eslint-rules-zh-plugin",
+    "kisstkondoros.vscode-gutter-preview",
+    "gruntfuggly.todo-tree",
+    "davidanson.vscode-markdownlint",
+    "necinc.elmmet",
+    "vscode-icons-team.vscode-icons",
+    "russell.any-rule",
+    "xabikos.javascriptsnippets",
+    "michelemelluso.gitignore",
+    "joy-yu.css-snippets",
+    "alibaba-cloud.tongyi-lingma"
+  ]
+}
