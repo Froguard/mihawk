@@ -82,7 +82,16 @@ function showPkgInfo() {
  * 显示帮助信息
  */
 function showHelp() {
-  console.log(['', `Usage: ${name} [options]`, 'Options:', '  -v, -V, --version  Show version information', '  -h, -H, --help     Display help for command', '\n'].join('\n'));
+  console.log(
+    [
+      '',
+      `Usage: ${name} [options]`,
+      'Options:',
+      '  -v, -V, --version  Show version information', //
+      '  -h, -H, --help     Display help for command',
+      '\n',
+    ].join('\n'),
+  );
 }
 
 /**
