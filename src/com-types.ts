@@ -15,7 +15,7 @@ export interface MihawkOptions {
    */
   https?: boolean;
   /**
-   * mock 目录
+   * mock 目录，默认为 `./mock`
    */
   mockDir?: string;
 }
