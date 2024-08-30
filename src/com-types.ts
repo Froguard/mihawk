@@ -16,17 +16,17 @@ export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
  */
 export interface MihawkOptions {
   /**
-   * 监听地址
+   * 监听地址，默认 `0.0.0.0`
    */
   host?: string;
 
   /**
-   * 监听端口
+   * 监听端口, 默认 8888
    */
   port?: number;
 
   /**
-   * 是否开启 https
+   * 是否开启 https，默认 false
    */
   https?: boolean;
 
@@ -36,7 +36,7 @@ export interface MihawkOptions {
   mockDir?: string;
 
   /**
-   * 是否自动创建 mock 文件
+   * 是否自动创建 mock 文件，默认 false
    */
   autoCreateMockFile?: boolean;
 
