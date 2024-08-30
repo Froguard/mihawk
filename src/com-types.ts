@@ -1,4 +1,17 @@
 /**
+ * koa 类型
+ */
+export type {
+  Context as KoaContext, //
+  Next as KoaNext,
+  Request as KoaRequest,
+  Response as KoaResponse,
+  Middleware as KoaMiddleware,
+} from 'koa';
+// koa-bodyparser options
+export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
+
+/**
  * mihawk options
  */
 export interface MihawkOptions {
@@ -6,18 +19,46 @@ export interface MihawkOptions {
    * 监听地址
    */
   host?: string;
+
   /**
    * 监听端口
    */
   port?: number;
+
   /**
    * 是否开启 https
    */
   https?: boolean;
+
   /**
    * mock 目录，默认为 `./mock`
    */
   mockDir?: string;
+
+  /**
+   * 是否自动创建 mock 文件
+   */
+  autoCreateMockFile?: boolean;
+
+  /**
+   * mock 逻辑文件类型，默认 js
+   */
+  mockLogicFileType?: 'none' | 'js' | 'javascript' | 'ts' | 'typescript';
+
+  /**
+   * mock 数据文件类型，默认 json
+   */
+  mockDataFileType?: 'json' | 'json5';
+
+  /**
+   * 日志打印，配置项
+   */
+  logConfig?: {
+    /**
+     * 指定路由对应日志忽略不打印
+     */
+    ignoreRoutes?: string[];
+  };
 }
 
 /**

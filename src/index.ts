@@ -1,7 +1,7 @@
 'use strict';
 import Colors from 'color-cc';
 import { LOG_FLAG } from './consts';
-import { MihawkOptions } from './com-types';
+import type { MihawkOptions } from './com-types';
 
 /**
  * mihawk
