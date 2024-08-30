@@ -38,6 +38,19 @@
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
   },
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/src/index.js",
+      "import": "./dist/esm/src/index.js",
+      "types": "./dist/types/src/index.d.ts"
+    },
+    "./com-types": {
+      "require": "./dist/cjs/src/com-types/index.js",
+      "import": "./dist/esm/src/com-types/index.js",
+      "types": "./dist/types/src/com-types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "@types/fs-extra": "^11.0.3",
     "@types/ip": "^1.1.3",
