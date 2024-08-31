@@ -5,12 +5,14 @@
  */
 import Colors from 'color-cc';
 import { LOG_FLAG } from '../src/consts';
-import { getCliArgs } from '../src/utils/cli-tool';
-import { pkgInfo, type SubCmdCallback } from './com';
+import { getCliArgs } from '../src/utils/cli';
+import { debugLog } from '../src/utils/debug';
+import { readPackageJson } from './com/project-root';
 import init from './sub-cmds/init';
+import type { SubCmdCallback } from '../src/com-types';
 
 //
-const { name, version } = pkgInfo || {};
+const { name, version } = readPackageJson() || {};
 
 /**
  * main logic
@@ -31,7 +33,7 @@ const { name, version } = pkgInfo || {};
     // mihawk $subCmd
     let callback: null | SubCmdCallback<any> = null;
     // find sub cmd callback
-    const subCmdName = _[0] || '';
+    const subCmdName = _?.[0]?.trim() || '';
     switch (subCmdName) {
       // mihawk init
       case 'init':
@@ -44,18 +46,18 @@ const { name, version } = pkgInfo || {};
     }
     if (typeof callback === 'function') {
       const newArgs = { ...args, _: _?.slice(1) || [] };
-      // exec sub cmd
-      console.log(LOG_FLAG, `mihawk ${subCmdName}`, Colors.gray(newArgs._.join(' ')));
+      debugLog(LOG_FLAG, `mihawk ${subCmdName}`, Colors.gray(newArgs._.join(' ')));
       try {
-        await callback?.(newArgs);
+        // exec sub cmd
+        await callback(newArgs);
       } catch (error) {
         console.log(LOG_FLAG, Colors.yellow('Oops... It looks like something wrong:'), error, '\n');
         showHelp();
         process.exit(1); // quit
       }
     } else {
-      console.log(`${LOG_FLAG} process.argv=`, process.argv);
-      console.log(`${LOG_FLAG} args=`, args);
+      debugLog(`${LOG_FLAG} process.argv=`, process.argv);
+      debugLog(`${LOG_FLAG} args=`, args);
       showPkgInfo();
       showHelp();
     }
@@ -74,7 +76,6 @@ const { name, version } = pkgInfo || {};
  * 显示包信息
  */
 function showPkgInfo() {
-  const { name: name, version: version } = pkgInfo || {};
   console.log(LOG_FLAG, `${name}@${version}\n`);
 }
 

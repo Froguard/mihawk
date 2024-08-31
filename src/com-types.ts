@@ -1,3 +1,5 @@
+import type { ParsedArgs } from 'minimist';
+
 /**
  * koa 类型
  */
@@ -68,6 +70,16 @@ export interface MihawkRC extends MihawkOptions {
   //
   [k: string]: any;
 }
+
+/**
+ * cli 命令行参数
+ */
+export type CliArgs<T extends Record<string, any> = any> = Loosify<ParsedArgs & T>;
+
+/**
+ * subCmd 主逻辑对应的回调函数
+ */
+export type SubCmdCallback<T = any> = (cliArg?: CliArgs<T>) => Promise<void>;
 
 /**
  * JSON 对象属性的 value 常规定义
