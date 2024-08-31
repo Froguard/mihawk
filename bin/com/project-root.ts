@@ -5,7 +5,7 @@
  * 所以这里，采用读文件的方式去进行读取
  */
 import path from 'path';
-import { debugLog } from '../../src/utils/debug';
+import { Debugger } from '../../src/utils/debug';
 import type { IPackageJson } from 'package-json-type';
 
 /**
@@ -39,7 +39,7 @@ export function getRootAbsPath() {
   // detect whether in dist or not
   const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => binParentDirName == distSubDir);
   const rootPath = isInDist ? path.join(binParentDirPath, '../../') : binParentDirPath;
-  debugLog('getRootAbsPath', { __dirname, binDirPath, binParentDirPath, isInDist, rootPath });
+  Debugger.log('getRootAbsPath', { __dirname, binDirPath, binParentDirPath, isInDist, rootPath });
   return path.resolve(rootPath);
 }
 

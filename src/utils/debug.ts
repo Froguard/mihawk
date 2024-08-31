@@ -1,3 +1,4 @@
+'use strict';
 /**
  * debug 操作相关封装：
  * - 1.不导出的成员（类型定义除外），请在命名上保持私有命名风格，以下划线_开头，_xxx
@@ -9,4 +10,4 @@ import { PKG_NAME } from '../consts';
 /**
  * debug 日志
  */
-export const debugLog = debug(PKG_NAME);
+export const Debugger = debug(PKG_NAME);

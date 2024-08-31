@@ -1,3 +1,4 @@
+'use strict';
 /**
  * 获取对象类型
  * - 缺陷：Object.prototype.toString.call(NaN) 的时候，返回的是 number，即其无法准确判断 number

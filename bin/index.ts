@@ -6,7 +6,7 @@
 import Colors from 'color-cc';
 import { LOG_FLAG } from '../src/consts';
 import { getCliArgs } from '../src/utils/cli';
-import { debugLog } from '../src/utils/debug';
+import { Debugger } from '../src/utils/debug';
 import { readPackageJson } from './com/project-root';
 import init from './sub-cmds/init';
 import type { SubCmdCallback } from '../src/com-types';
@@ -22,42 +22,33 @@ const { name, version } = readPackageJson() || {};
   const { _, v, V, version, h, H, help } = args;
   //
   if (v || V || version) {
-    // mihawk -v
-    showVersion();
-    //
+    showVersion(); // mihawk -v
   } else if (h || H || help) {
-    // mihawk -h
-    showHelp();
-    //
+    showHelp(); // mihawk -h
   } else {
-    // mihawk $subCmd
     let callback: null | SubCmdCallback<any> = null;
-    // find sub cmd callback
-    const subCmdName = _?.[0]?.trim() || '';
+    const subCmdName = _?.[0]?.trim() || ''; // find sub cmd callback
     switch (subCmdName) {
-      // mihawk init
       case 'init':
       case 'initial':
-        callback = init;
+        callback = init; // mihawk init
         break;
-      // mihawk
-      default:
+      default: // others
         break;
     }
     if (typeof callback === 'function') {
       const newArgs = { ...args, _: _?.slice(1) || [] };
-      debugLog(LOG_FLAG, `mihawk ${subCmdName}`, Colors.gray(newArgs._.join(' ')));
+      Debugger.log(LOG_FLAG, `mihawk ${subCmdName}`, Colors.gray(newArgs._.join(' ')));
       try {
-        // exec sub cmd
-        await callback(newArgs);
+        await callback(newArgs); // exec sub cmd
       } catch (error) {
         console.log(LOG_FLAG, Colors.yellow('Oops... It looks like something wrong:'), error, '\n');
         showHelp();
         process.exit(1); // quit
       }
     } else {
-      debugLog(`${LOG_FLAG} process.argv=`, process.argv);
-      debugLog(`${LOG_FLAG} args=`, args);
+      Debugger.log(`${LOG_FLAG} process.argv=`, process.argv);
+      Debugger.log(`${LOG_FLAG} args=`, args);
       showPkgInfo();
       showHelp();
     }

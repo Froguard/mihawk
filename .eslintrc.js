@@ -35,7 +35,6 @@ module.exports = {
     'import/no-named-as-default': ['off'],
     // 'import/no-named-as-default-member': ['warn'],
     'no-var': 'error',
-    'no-debugger': 'error',
     'max-len': ['error', { code: 180 }],
     'max-statements': ['error', 100, { ignoreTopLevelFunctions: true }],
     'max-params': 'off',
@@ -55,9 +54,6 @@ module.exports = {
     module: true,
     Module: true,
     globalThis: true,
-    // debug
-    debugger: true,
-    DEBUG: true,
     // test-case
     describe: true, // 测试用例所需对象
     it: true, // 测试用例所需对象

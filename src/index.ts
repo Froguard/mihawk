@@ -1,6 +1,8 @@
 'use strict';
+'use strict';
 import Colors from 'color-cc';
 import { LOG_FLAG } from './consts';
+import { Debugger } from './utils/debug';
 import type { MihawkOptions } from './com-types';
 
 /**
@@ -8,5 +10,5 @@ import type { MihawkOptions } from './com-types';
  * @param {MihawkOptions} options
  */
 export default function mihawk(options?: MihawkOptions) {
-  console.log(LOG_FLAG, Colors.gray('options:'), options);
+  Debugger.log.log('init', options);
 }
