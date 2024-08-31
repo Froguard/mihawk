@@ -1,5 +1,5 @@
 'use strict';
-import { existsSync, readFileSync } from 'fs';
+import * as fsEx from 'fs-extra';
 import * as json5 from 'json5';
 import LRUCache from 'lru-cache';
 
@@ -47,9 +47,9 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
     cacheObj: cacheJson,
     loadFunc: async key => {
       let jsonData: Record<string, any> = {};
-      if (existsSync(key)) {
+      if (await fsEx.exists(key)) {
         try {
-          const jsonStr = readFileSync(key, 'utf-8');
+          const jsonStr = await fsEx.readFile(key, 'utf-8');
           jsonData = json5.parse(jsonStr);
         } catch (e) {
           console.error('load & parse json file failed!', e);
@@ -86,14 +86,14 @@ export async function loadTS(tsFilePath: string, noCache = false) {
     cacheObj: cacheTsFileCnt,
     loadFunc: async key => {
       let tsCnt = '';
-      if (existsSync(key)) {
+      if (await fsEx.exists(key)) {
         try {
-          tsCnt = readFileSync(key, 'utf-8');
+          tsCnt = await fsEx.readFile(key, 'utf-8');
         } catch (e) {
           console.error('load ts file failed!', e);
         }
       } else {
-        console.error(`load ts file failed! because file not exists: ${key}`);
+        console.error(`load ts file failed! because file not fs.exists: ${key}`);
       }
       return tsCnt;
     },
