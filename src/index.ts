@@ -10,5 +10,18 @@ import type { MihawkOptions } from './com-types';
  * @param {MihawkOptions} options
  */
 export default function mihawk(options?: MihawkOptions) {
-  Debugger.log.log('init', options);
+  Debugger.log('init', options);
+  const {
+    port = 3000,
+    host = 'localhost',
+    https = false,
+    cors = true,
+    cache = true,
+    logConfig = {},
+    mockDir = 'mock',
+    mockDataFileType = 'json',
+    mockLogicFileType = 'none',
+    tsconfigPath = './mocks/tsconfig.json',
+    autoCreateMockFile = true,
+  } = options || {};
 }

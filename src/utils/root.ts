@@ -5,8 +5,12 @@
  * 所以这里，采用读文件的方式去进行读取
  */
 import path from 'path';
-import { Debugger } from '../../src/utils/debug';
+import debug from 'debug';
+import { PKG_NAME } from '../consts';
 import type { IPackageJson } from 'package-json-type';
+
+//
+const Debugger = debug(PKG_NAME);
 
 /**
  * 获取本工程的根目录
@@ -22,27 +26,38 @@ import type { IPackageJson } from 'package-json-type';
  */
 export function getRootAbsPath() {
   /**
-   * 无论在 ts 源码还是在 dist 的输出目录中，本 js 的结构都会如下
-   * bin/
+   * 无论在 ts 源码还是在 dist 的输出目录中，本文件的结构都会如下
+   * src/
    *  ├ ...
-   *  ├ com /
+   *  ├ utils /
    *  |  ├ ...
    *  |  └ project-root.ts（本文件）
    *  ├ ...
    *  └ index.ts
-   * 差别在于，源码是直接在根目录之下有一个 bin 目录，而 dist 的输出目录是 dist/{cjs,esm,types}/bin
-   * 所以，这里只需要判断一下, bin 之上的父目录，是不是在 cjs,esm,types 三者之一，就知道文件是否处于 dist 目录中
+   * 差别在于，源码是直接在根目录之下有一个 src 目录，而 dist 的输出目录是 dist/{cjs,esm,types}/src
+   * 所以，这里只需要判断一下, src 之上的父目录，是不是在 cjs,esm,types 三者之一，就知道文件是否处于 dist 目录中
    */
-  const binDirPath = path.join(__dirname, '../'); // dir(bin) path
-  const binParentDirPath = path.join(binDirPath, '../'); // dir(bin)'s parent dir path
-  const binParentDirName = path.basename(binParentDirPath); // dir(bin)'s parent dir name
+  const srcDirPath = path.join(__dirname, '../'); // dir(src) path
+  const srcParentDirPath = path.join(srcDirPath, '../'); // dir(src)'s parent dir path
+  const srcParentDirName = path.basename(srcParentDirPath); // dir(src)'s parent dir name
   // detect whether in dist or not
-  const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => binParentDirName == distSubDir);
-  const rootPath = isInDist ? path.join(binParentDirPath, '../../') : binParentDirPath;
-  Debugger.log('getRootAbsPath', { __dirname, binDirPath, binParentDirPath, isInDist, rootPath });
+  const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => srcParentDirName == distSubDir);
+  const rootPath = isInDist ? path.join(srcParentDirPath, '../../') : srcParentDirPath;
+  Debugger.log('getRootAbsPath', { __dirname, srcDirPath, srcParentDirPath, isInDist, rootPath });
   return path.resolve(rootPath);
 }
 
+/**
+ * 读取本工程的 package.json 文件
+ * @returns {IPackageJson} package.json 文件内容
+ */
+export function readPackageJson() {
+  return _requireFileFromRoot<IPackageJson>('./package.json');
+}
+
+//
+// ============================================================ private functions ============================================================
+//
 /**
  * 读取本工程跟目录下的文件
  * @param {string} relFilePath
@@ -52,12 +67,4 @@ function _requireFileFromRoot<Data = any>(relFilePath: string) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const data = require(path.resolve(getRootAbsPath(), relFilePath));
   return data as Data;
-}
-
-/**
- * 读取本工程的 package.json 文件
- * @returns {IPackageJson} package.json 文件内容
- */
-export function readPackageJson() {
-  return _requireFileFromRoot<IPackageJson>('./package.json');
 }
