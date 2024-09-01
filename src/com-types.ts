@@ -14,6 +14,22 @@ export type {
 // koa-bodyparser options
 export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 
+// koa 扩展
+declare module 'koa' {
+  interface Context {
+    skipDefaultMock?: boolean; // 跳过执行默认的 mock 逻辑
+  }
+  interface Request {
+    //
+  }
+  interface Response {
+    //
+  }
+}
+
+/**
+ * https 配置
+ */
 export interface HttpsConfig {
   key: string;
   cert: string;
