@@ -1,4 +1,5 @@
 'use strict';
+import Koa from 'koa';
 import Colors from 'color-cc';
 import { LOG_FLAG } from './consts';
 import { Debugger } from './utils/debug';
