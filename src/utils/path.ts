@@ -58,7 +58,7 @@ export function isExistedSync(targetPath: string, rootPath: string = CWD) {
  * - 作用：用于读取本工程根目录下的文件，如 package.json 文件
  * - 原因：如果采用直接 import 的方式，会导致 tsc 打包之后，目录 dist 之下，会额外输出一个 package.json 文件（这个文件和根目录下的 package.json 文件内容是一样的）
  *
- * 所以，需要动态计算出本工程的根目录
+ * 所以，需要动态计算出本工程的根目录，方便之后进行绝对路径的的 require
  *
  * 实现：会判断代码 src 目录是否处于 dist 目录中
  * - 打包前：ts 源码，直接就是正常目录
@@ -79,7 +79,7 @@ export function getRootAbsPath() {
    *  |  └ path.ts（本文件）
    *  ├ ...
    *  └ index.ts
-   * 差别在于，源码是直接在根目录之下有一个 src 目录，而 dist 的输出目录是 dist/{cjs,esm,types}/src
+   * 差别在于，源码是直接在根目录之下有一个 `./src` 目录，而 dist 的输出目录是 `./dist/{cjs,esm,types}/src`
    * 所以，这里只需要判断一下, src 之上的父目录，是不是在 cjs,esm,types 三者之一，就知道文件是否处于 dist 目录中
    */
   const curDirPath = join(__dirname, '../'); // dir(src) path
