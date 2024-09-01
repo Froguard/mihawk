@@ -15,3 +15,8 @@ export const PKG_NAME = 'mihawk';
  * 控制台打印输出时候的统一前缀
  */
 export const LOG_FLAG = `${Colors.magenta(`[${PKG_NAME}]`)}${Colors.gray(':')}`;
+
+/**
+ * 当前的执行目录
+ */
+export const CWD = process.cwd();
