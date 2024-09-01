@@ -1,4 +1,5 @@
 'use strict';
+import vm from 'vm';
 import { transpileModule, ModuleKind, ScriptTarget, type TranspileOptions } from 'typescript';
 import { existsSync, readFileSync } from 'fs-extra';
 import * as json5 from 'json5';
@@ -163,10 +164,9 @@ function _createTsFileRequireHandle(tsconfig: TsConfig) {
     // 方案一：直接 eval （不可取）
     // module.exports = eval(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
-    // @ts-ignore
-    const VM = require('vm'); // eslint-disable-line
-    // VM 执行
-    VM.runInNewContext(
+
+    // vm 执行
+    vm.runInNewContext(
       // source code
       jsCode,
       // context
