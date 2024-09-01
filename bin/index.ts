@@ -7,7 +7,7 @@ import Colors from 'color-cc';
 import { LOG_FLAG } from '../src/consts';
 import { getCliArgs } from '../src/utils/cli';
 import { Debugger } from '../src/utils/debug';
-import { readPackageJson } from '../src/utils/root';
+import { readPackageJson } from '../src/composites/loader';
 import init from './sub-cmds/init';
 import type { SubCmdCallback } from '../src/com-types';
 

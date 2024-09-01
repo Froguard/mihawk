@@ -64,9 +64,9 @@ export interface MihawkOptions {
   autoCreateMockFile?: boolean;
 
   /**
-   * mock 逻辑文件类型，默认 js
+   * mock 逻辑文件类型，默认 js|cjs
    */
-  mockLogicFileType?: 'none' | 'js' | 'javascript' | 'ts' | 'typescript';
+  mockLogicFileType?: 'none' | 'js' | 'cjs' | 'javascript' | 'ts' | 'typescript';
 
   /**
    * tsconfig.json 的路径

@@ -1,10 +1,14 @@
 'use strict';
 import vm from 'vm';
+import path from 'path';
 import { transpileModule, ModuleKind, ScriptTarget, type TranspileOptions } from 'typescript';
 import { existsSync, readFileSync } from 'fs-extra';
 import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
+import { CWD } from '../consts';
+import { absifyPath, getRootAbsPath } from '../utils/path';
+import type { IPackageJson } from 'package-json-type';
 
 // 缓存的 json 数据
 const _cacheJson = new LRUCache<string, Record<string, any>>({ max: 50 });
@@ -14,6 +18,7 @@ const _cacheJson = new LRUCache<string, Record<string, any>>({ max: 50 });
  * @param {string} jsonFilePath
  */
 export async function loadJson(jsonFilePath: string, noCache = false) {
+  jsonFilePath = absifyPath(jsonFilePath);
   const json = await _loadFileWithCache<Record<string, any>>(jsonFilePath, {
     cacheObj: _cacheJson,
     forceRefresh: noCache,
@@ -36,8 +41,9 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
  * @param {string} jsFilePath
  */
 export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
+  jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
-    _clearRequireCache(jsFilePath);
+    _clearSelfAndAncestorsCache(jsFilePath);
   }
   // @ts-ignore
   const res = require(jsFilePath); // eslint-disable-line
@@ -50,14 +56,14 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
  * @param {LoadTsOptions | boolean} options
  */
 export async function loadTS(tsFilePath: string, noCache = false) {
-  //
+  tsFilePath = absifyPath(tsFilePath);
   if (!require.extensions['.ts']) {
     console.warn(Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
     return null;
   }
   //
   if (!noCache) {
-    _clearRequireCache(tsFilePath);
+    _clearSelfAndAncestorsCache(tsFilePath);
   }
   // @ts-ignore
   return require(tsFilePath); // eslint-disable-line
@@ -71,6 +77,34 @@ export function enableRequireTsFile(tsconfig?: TsConfig) {
   if (!require.extensions['.ts']) {
     require.extensions['.ts'] = _createTsFileRequireHandle(tsconfig || {});
   }
+}
+
+/**
+ * 读取本工程根目录下的文件
+ * @description
+ * 为什么会有本函数？
+ * - 因为源码情况下可以直接正常路径进行读取根目录下的文件，但是直接使用相对路径进行 require/import 都会导致在 tsc 之后，将对应被 import 的文件一并打包
+ *   - 所以这里以绝对路径方式，进行 import/require 到唯一文件，而不会打包产生新的文件
+ * - tsc 之后，打包目录会是以 dist 开头，如 dist/cjs,dist/esm
+ *   - 所以，需要先计算出正确的”根目录绝对路径“，然后拼装目标文件路径
+ *
+ * 详见 getRootAbsPath() 函数的逻辑实现
+ *
+ * @param {string} relFilePath
+ * @returns {Data}
+ */
+export function loadFileFromRoot<Data = any>(relFilePath: string) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const data = require(path.resolve(getRootAbsPath(), relFilePath));
+  return data as Data;
+}
+
+/**
+ * 读取本工程的 package.json 文件
+ * @returns {IPackageJson} package.json 文件内容
+ */
+export function readPackageJson() {
+  return loadFileFromRoot<IPackageJson>('./package.json');
 }
 
 //
@@ -190,6 +224,55 @@ function _createTsFileRequireHandle(tsconfig: TsConfig) {
  * r@returns {void}
  */
 function _clearRequireCache(filename: string) {
-  delete require.cache[filename];
-  // TODO: 删除 cache 时，需要一并删除其对应依赖模块，以及依赖它的父模块的 require.cache 缓存
+  if (CWD === filename) {
+    return;
+  }
+  filename = absifyPath(filename);
+  const mod = require.cache[filename];
+  const parent = mod?.parent;
+  if (parent && typeof parent === 'object') {
+    try {
+      // 1. 删除父模块式对自己的引用
+      const parentChildList = parent.children;
+      if (Array.isArray(parentChildList)) {
+        const index = parentChildList.findIndex(item => item.filename === filename);
+        if (index > -1) {
+          parentChildList.splice(index, 1);
+        }
+      }
+      // 2. 删除自己
+      delete require.cache[filename];
+      // 3. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
+      const pathCache = (module?.constructor as any)?._pathCache;
+      if (pathCache) {
+        Object.keys(pathCache).forEach(key => {
+          if (pathCache[key]?.includes(filename)) {
+            delete pathCache[key];
+          }
+        });
+      }
+    } catch (error) {
+      console.error('clear require.cache failed!', filename, error);
+    }
+  }
+}
+
+/**
+ * 递归向上删除缓存
+ * - 删除自己对应的缓存
+ * - 删除父引用模块对应的缓存
+ * @param {string} filename
+ */
+function _clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
+  filename = absifyPath(filename);
+  if (filename === CWD || filename === stopPath) {
+    return;
+  }
+  const mod = require.cache[filename];
+  const parent = mod?.parent;
+  const parentId = parent?.id;
+  // clear self
+  _clearRequireCache(filename);
+  // clear parent
+  parentId && _clearSelfAndAncestorsCache(parentId, stopPath);
 }
