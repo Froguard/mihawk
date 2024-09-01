@@ -10,4 +10,4 @@ import { PKG_NAME } from '../consts';
 /**
  * debug 日志
  */
-export const Debugger = debug(PKG_NAME);
+export const Debugger = { log: debug(PKG_NAME) };

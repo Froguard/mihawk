@@ -1,11 +1,8 @@
 'use strict';
 import { join, basename, relative, resolve, isAbsolute } from 'path';
 import { existsSync } from 'fs-extra';
-import debug from 'debug';
-import { CWD, PKG_NAME } from '../consts';
-
-//
-const Debugger = debug(PKG_NAME);
+import { CWD } from '../consts';
+import { Debugger } from './debug';
 
 /**
  * 获取与 CWD 的相对路径
