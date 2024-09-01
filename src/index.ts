@@ -1,5 +1,4 @@
 'use strict';
-'use strict';
 import Colors from 'color-cc';
 import { LOG_FLAG } from './consts';
 import { Debugger } from './utils/debug';
