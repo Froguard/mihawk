@@ -1,0 +1,4 @@
+{
+  "GET /test": "GET /test",
+  "GET /test-*": "GET /test"
+}

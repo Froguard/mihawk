@@ -5,7 +5,7 @@
   "cors": true,
   "cache": false,
   "watch": true,
-  "mockDir": "./mock",
+  "mockDir": "./mocks",
   "mockDataFileType": "json",
   "mockLogicFileType": "none",
   "autoCreateMockLogicFile": false,

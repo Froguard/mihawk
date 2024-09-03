@@ -22,6 +22,6 @@ export default function mihawk(options?: MihawkOptions) {
     mockDataFileType = 'json',
     mockLogicFileType = 'none',
     tsconfigPath = './mocks/tsconfig.json',
-    autoCreateMockFile = true,
+    autoCreateMockLogicFile = true,
   } = options || {};
 }
