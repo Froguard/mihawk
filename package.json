@@ -20,6 +20,7 @@
   "scripts": {
     "dev": "nodemon --config './.nodemonrc.json' ./_example_/demo.ts",
     "dev:bin": "ts-node ./bin/index.ts",
+    "dev:bin:init": "ts-node ./bin/index.ts init",
     "-------------------build-------------------": "echo '------------------- build -------------------'",
     "prebuild": "ts-node ./build/pre-build.ts",
     "build": "run-p build:esm build:cjs build:types",

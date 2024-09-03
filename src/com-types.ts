@@ -60,11 +60,6 @@ export interface MihawkOptions {
   cors?: boolean;
 
   /**
-   * mock 目录，默认为 `./mocks`
-   */
-  mockDir?: string;
-
-  /**
    * 是否开启 watch（mock 文件变化的时候，进行刷新），默认 true
    */
   watch?: boolean;
@@ -75,14 +70,24 @@ export interface MihawkOptions {
   cache?: boolean;
 
   /**
-   * 是否自动创建 mock 文件，默认 false
+   * mock 目录，默认为 `./mocks`
    */
-  autoCreateMockFile?: boolean;
+  mockDir?: string;
+
+  /**
+   * mock 数据文件类型，默认 json
+   */
+  mockDataFileType?: 'json' | 'json5';
 
   /**
    * mock 逻辑文件类型，默认 js|cjs
    */
   mockLogicFileType?: 'none' | 'js' | 'cjs' | 'javascript' | 'ts' | 'typescript';
+
+  /**
+   * 是否自动创建 mock 文件，默认 true
+   */
+  autoCreateMockLogicFile?: boolean;
 
   /**
    * tsconfig.json 的路径
@@ -91,11 +96,6 @@ export interface MihawkOptions {
    *   - 可以写为 `./mocks/tsconfig.json`(建议和工程中的 tsconfig.json 区分开来，因为 mockTs 并不需要进行打包输出)
    */
   tsconfigPath?: string;
-
-  /**
-   * mock 数据文件类型，默认 json
-   */
-  mockDataFileType?: 'json' | 'json5';
 
   /**
    * 日志打印，配置项

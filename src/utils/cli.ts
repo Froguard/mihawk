@@ -103,3 +103,41 @@ export async function inputNumInCLI(promptTxt: string, options?: Partial<{ initi
   });
   return num as number;
 }
+
+/**
+ * 命令行交互：选择 (优先推荐使用 单选-singleSelectInCli； 多选-multipleSelectInCli；)
+ * @param {Array<string>} choices
+ */
+async function _selectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], options?: Partial<{ multiple: boolean; initial: T }>) {
+  const { initial, multiple } = options || {};
+  const config: prompts.PromptObject<string> = {
+    type: multiple ? 'multiselect' : 'select',
+    name: 'arr',
+    message: promptTxt || `Select ${multiple ? 'some choices' : 'just one choice'}:`,
+    choices,
+    initial,
+  };
+  if (multiple) {
+    config.hint = '- Space to select. Return to submit';
+  }
+  const { arr } = await prompts(config);
+  return arr as T[] | T;
+}
+
+/**
+ * 命令行交互：单选
+ * @param {Array<string>} choices
+ */
+export async function singleSelectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], initial?: T) {
+  const res = await _selectInCli<T>(promptTxt, choices, { multiple: false, initial });
+  return res as T;
+}
+
+/**
+ * 命令行交互：多选
+ * @param {Array<string>} choices
+ */
+export async function multipleSelectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], initial?: T) {
+  const res = await _selectInCli<T>(promptTxt, choices, { multiple: true, initial });
+  return res as T[];
+}

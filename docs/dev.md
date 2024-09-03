@@ -26,15 +26,26 @@ then create a new root config file `.frogagurc.json`
 ## Install
 
 ```sh
-yarn install --regitry=https://registry.npmmirror.org # install from npm mirror (china-mirror)
+yarn install --regitry=https://registry.npmmirror.com # install from npm mirror (china-mirror)
 ```
 
 > yarn install --regitry=https://registry.npmjs.org
 
 ## Dev
 
+### main:
+
 ```sh
 yarn dev
+```
+
+### :bin:
+
+```sh
+yarn dev:bin
+yarn dev:bin -h # yarn dev:bin --help
+yarn dev:bin -v # yarn dev:bin --version
+yarn dev:bin:init
 ```
 
 ## Generate Exports code
@@ -104,7 +115,7 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
 sed -i '' 's/\r$//' ./bin/*
 ```
 
-> 或者使用额外工具包 dos2unix
+> 或者使用额外工具包 dos2unix，本工程并未采用
 
 其他补充：设置全局 git 配置，设置 core.autocrlf 为 false
 
