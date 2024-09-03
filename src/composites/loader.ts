@@ -43,7 +43,8 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
-    clearSelfAndAncestorsCache(jsFilePath);
+    // clearSelfAndAncestorsCache(jsFilePath);
+    clearRequireCache(jsFilePath);
   }
   // @ts-ignore
   const res = require(jsFilePath); // eslint-disable-line
@@ -63,7 +64,8 @@ export async function loadTS(tsFilePath: string, noCache = false) {
   }
   //
   if (!noCache) {
-    clearSelfAndAncestorsCache(tsFilePath);
+    // clearSelfAndAncestorsCache(tsFilePath);
+    clearRequireCache(tsFilePath);
   }
   // @ts-ignore
   return require(tsFilePath); // eslint-disable-line
