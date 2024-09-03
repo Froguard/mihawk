@@ -2,6 +2,7 @@
 import net from 'net';
 import os from 'os';
 import Colors from 'color-cc';
+import { LOG_FLAG } from '../consts';
 
 interface PortDetecInfo {
   isInUse?: boolean;
@@ -26,10 +27,10 @@ export async function detectPort(port: number, noLogPrint?: boolean) {
     server.on('error', (err: { code: string }) => {
       const ERR_CODE = err.code.toUpperCase();
       if (ERR_CODE === 'EADDRINUSE') {
-        !noLogPrint && console.error(Colors.yellow(`[ERROR] ${port} 端口占用中！`));
+        !noLogPrint && console.error(LOG_FLAG, Colors.yellow(`[ERROR] ${port} 端口占用中！`));
       }
       if (ERR_CODE === 'EACCES') {
-        !noLogPrint && console.error(Colors.yellow(`[ERROR] ${port} 端口访问受限制！`));
+        !noLogPrint && console.error(LOG_FLAG, Colors.yellow(`[ERROR] ${port} 端口访问受限制！`));
       }
       res({ isInUse: true, err: err } as PortDetecInfo);
     });
@@ -57,7 +58,7 @@ export async function isPortInUse(port: number, options?: IsPortUseOptions) {
     ]);
     isInUse = !!detectd?.isInUse;
   } catch (error) {
-    console.warn(Colors.warn(`Detec isPortInUse(${port}) occur errors:`), error);
+    console.warn(LOG_FLAG, Colors.warn(`Detec isPortInUse(${port}) occur errors:`), error);
     isInUse = false;
   }
   return isInUse;

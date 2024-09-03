@@ -1,6 +1,7 @@
 'use strict';
 import prompts from 'prompts';
 import minimist from 'minimist';
+import { LOG_FLAG } from '../consts';
 import type { CliArgs } from '../com-types';
 
 //
@@ -47,8 +48,8 @@ export function getCliArgs<T extends Record<string, any> = any>(processArgv: str
    */
   const res = minimist(processArgv.slice(2));
   if (logDetail) {
-    console.log('[getCliArgs] processArgv:', processArgv);
-    console.log('[getCliArgs] return:', res);
+    console.log(LOG_FLAG, '[getCliArgs] processArgv:', processArgv);
+    console.log(LOG_FLAG, '[getCliArgs] return:', res);
   }
   return res as CliArgs<T>;
 }

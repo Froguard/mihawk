@@ -5,7 +5,7 @@ import path from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
-import { CWD } from '../consts';
+import { CWD, LOG_FLAG } from '../consts';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';
@@ -25,14 +25,14 @@ export async function initRCfile(name: string, options: InitOptions = { fileType
   const { fileType = 'json', overwrite = false, initConfig = {}, tsInfo = null } = options;
   const rcType = fileType || 'json';
   const rcName = `${name}.${rcType}`;
-  console.log(Colors.def(`init ${rcName} file..`));
+  console.log(LOG_FLAG, `init ${rcName} file..`);
   // detect if existed or not
   const rcFilePath = path.join(CWD, `./${rcName}`);
   if (existsSync(rcFilePath)) {
     if (overwrite) {
-      console.log(Colors.def(`${rcName} file already exists. Will overwrite it..`));
+      console.log(LOG_FLAG, `${rcName} file already exists. Will overwrite it..`);
     } else {
-      console.log(Colors.def(`${rcName} file already exists. Will skip it..`));
+      console.log(LOG_FLAG, `${rcName} file already exists. Will skip it..`);
       return;
     }
   }
@@ -99,17 +99,17 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
       });
       const res = await explorer.search(CWD);
       const { config, filepath } = res || {};
-      console.log(Colors.success(`load config file: ${Colors.gray(path.basename(filepath))}`));
+      console.log(LOG_FLAG, `load root-config file: ${Colors.gray(path.basename(filepath))}`);
       return (config as Partial<T>) || defConfig;
     } else {
       // 未检测到rc文件时，进行自动创建
-      console.log(Colors.warn("Can't found frogagu's rc-file(.frogagurc.js|json|ts). Will auto create & init it..")); // prettier-ignore
+      console.log(LOG_FLAG, Colors.warn(`Can't found rc-file(.${name}.js|json|ts). Will auto create & init it..`)); // prettier-ignore
       await initRCfile(name, { fileType: 'json', initConfig: defConfig, overwrite: false });
       return defConfig;
     }
   } catch (error) {
     //
-    console.log(Colors.error('load config file error..'), error);
+    console.error(LOG_FLAG, Colors.error('load config file error..'), error);
     return defConfig;
   }
 }

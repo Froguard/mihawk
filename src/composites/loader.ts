@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'fs-extra';
 import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
-import { CWD } from '../consts';
+import { CWD, LOG_FLAG } from '../consts';
 import { absifyPath, getRootAbsPath } from '../utils/path';
 import type { IPackageJson } from 'package-json-type';
 
@@ -27,7 +27,7 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
       try {
         jsonData = JsonStr ? json5.parse(JsonStr) : {};
       } catch (error) {
-        console.error('parse json file failed!', jsonFilePath, error);
+        console.error(LOG_FLAG, 'parse json file failed!', jsonFilePath, error);
         jsonData = {};
       }
       return jsonData;
@@ -58,7 +58,7 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
 export async function loadTS(tsFilePath: string, noCache = false) {
   tsFilePath = absifyPath(tsFilePath);
   if (!require.extensions['.ts']) {
-    console.warn(Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
+    console.warn(LOG_FLAG, Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
     return null;
   }
   //
@@ -142,7 +142,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
         fileContent = readFileSync(filePath, 'utf-8');
       }
     } catch (error) {
-      console.error('read file failed!', filePath, error);
+      console.error(LOG_FLAG, 'read file failed!', filePath, error);
     }
     if (typeof resolveData === 'function') {
       cacheData = await resolveData(fileContent);
@@ -252,7 +252,7 @@ function _clearRequireCache(filename: string) {
         });
       }
     } catch (error) {
-      console.error('clear require.cache failed!', filename, error);
+      console.error(LOG_FLAG, 'clear require.cache failed!', filename, error);
     }
   }
 }
