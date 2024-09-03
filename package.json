@@ -102,6 +102,11 @@
     "tslib": "^2.6.2",
     "typescript": "^4.5.5"
   },
+  "keywords": [
+    "mihawk",
+    "mock",
+    "mock-server"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:Froguard/mihawk.git"
