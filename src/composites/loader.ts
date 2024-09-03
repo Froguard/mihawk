@@ -43,7 +43,7 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
-    _clearSelfAndAncestorsCache(jsFilePath);
+    clearSelfAndAncestorsCache(jsFilePath);
   }
   // @ts-ignore
   const res = require(jsFilePath); // eslint-disable-line
@@ -63,7 +63,7 @@ export async function loadTS(tsFilePath: string, noCache = false) {
   }
   //
   if (!noCache) {
-    _clearSelfAndAncestorsCache(tsFilePath);
+    clearSelfAndAncestorsCache(tsFilePath);
   }
   // @ts-ignore
   return require(tsFilePath); // eslint-disable-line
@@ -223,7 +223,7 @@ function _createTsFileRequireHandle(tsconfig: TsConfig) {
  * @param {string} filename
  * r@returns {void}
  */
-function _clearRequireCache(filename: string) {
+export function clearRequireCache(filename: string) {
   if (CWD === filename) {
     return;
   }
@@ -241,10 +241,11 @@ function _clearRequireCache(filename: string) {
         }
       }
       // 2. 删除自己
+      mod.loaded = false;
       delete require.cache[filename];
       // 3. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
       const pathCache = (module?.constructor as any)?._pathCache;
-      if (pathCache) {
+      if (pathCache && typeof pathCache === 'object') {
         Object.keys(pathCache).forEach(key => {
           if (pathCache[key]?.includes(filename)) {
             delete pathCache[key];
@@ -263,7 +264,7 @@ function _clearRequireCache(filename: string) {
  * - 删除父引用模块对应的缓存
  * @param {string} filename
  */
-function _clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
+export function clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
   filename = absifyPath(filename);
   if (filename === CWD || filename === stopPath) {
     return;
@@ -272,7 +273,7 @@ function _clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
   const parent = mod?.parent;
   const parentId = parent?.id;
   // clear self
-  _clearRequireCache(filename);
+  clearRequireCache(filename);
   // clear parent
-  parentId && _clearSelfAndAncestorsCache(parentId, stopPath);
+  parentId && clearSelfAndAncestorsCache(parentId, stopPath);
 }
