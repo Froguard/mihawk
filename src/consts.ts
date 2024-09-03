@@ -36,5 +36,5 @@ export const DEFAULT_RC: MihawkRC = {
   mockDataFileType: 'json',
   mockLogicFileType: 'none',
   autoCreateMockLogicFile: false,
-  tsconfigPath: null,
+  tsconfigPath: './mocks/tsconfig.json',
 };

@@ -44,6 +44,8 @@ module.exports = {
     '@typescript-eslint/no-var-require': ['off', false],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^__' }],
     '@typescript-eslint/ban-ts-comment': ['warn'],
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
+    "no-trailing-spaces": "error",
     //...
   },
   globals: {
