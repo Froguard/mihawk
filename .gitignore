@@ -171,3 +171,7 @@ index.d.ts
 /.frogagurc.json
 /.frogagurc.js
 /.frogagurc.ts
+
+# tmp test dir
+/mocks/**
+!/mocks/**/.gitkeep

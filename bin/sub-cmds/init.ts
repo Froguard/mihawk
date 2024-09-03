@@ -5,7 +5,8 @@ import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-ext
 import { CWD, LOG_FLAG, DEFAULT_RC, PKG_NAME } from '../../src/consts';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
 import { initRCfile, getRcData } from '../../src/utils/rc';
-import routesDemo from './routes-demo.json';
+import routesDemo from './demo-routes.json';
+import dataDemo from './demo-data.json';
 import type { SubCmdCallback, MihawkRC } from '../../src/com-types';
 
 /**
@@ -135,6 +136,13 @@ async function initMockDataDir(mockDirName: string = 'mocks') {
       const subDirPathRel = path.join(mockDataDir, subDir);
       console.log(LOG_FLAG, Colors.success(`Create mock data dir ${Colors.green(subDirPathRel)} success!`));
     }
+  }
+  // demo data json file
+  const demoFilePathRel = path.join(mockDataDir, './GET/test.json');
+  const demoFilePath = path.join(CWD, demoFilePathRel);
+  if (!existsSync(demoFilePath)) {
+    writeFileSync(demoFilePath, JSON.stringify(dataDemo, null, 2));
+    console.log(LOG_FLAG, Colors.success(`Create mock data file ${Colors.green(demoFilePathRel)} success!`));
   }
 }
 
