@@ -38,7 +38,7 @@ const { name, version } = readPackageJson() || {};
     }
     if (typeof callback === 'function') {
       const newArgs = { ...args, _: _?.slice(1) || [] };
-      Debugger.log(LOG_FLAG, `mihawk ${subCmdName}`, Colors.gray(newArgs._.join(' ')));
+      console.log(LOG_FLAG, Colors.gray(`mihawk ${subCmdName}`), Colors.gray(newArgs._.join(' ')));
       try {
         await callback(newArgs); // exec sub cmd
       } catch (error) {

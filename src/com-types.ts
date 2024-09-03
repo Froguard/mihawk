@@ -95,7 +95,7 @@ export interface MihawkOptions {
    * - 默认不写则为空字符串，即采用内置的 ts 配置
    *   - 可以写为 `./mocks/tsconfig.json`(建议和工程中的 tsconfig.json 区分开来，因为 mockTs 并不需要进行打包输出)
    */
-  tsconfigPath?: string;
+  tsconfigPath?: string | null;
 
   /**
    * 日志打印，配置项
@@ -105,7 +105,7 @@ export interface MihawkOptions {
      * 指定路由对应日志忽略不打印
      */
     ignoreRoutes?: string[];
-  };
+  } | null;
 }
 
 /**

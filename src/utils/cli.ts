@@ -57,18 +57,18 @@ export function getCliArgs<T extends Record<string, any> = any>(processArgv: str
 /**
  * 命令行交互：确认提示
  * @param {string} question 问题文案
- * @returns {Promise<boolean>} 是够确定这么做
+ * @returns {Promise<boolean>} 默认确认？
  * @example
  * (async()=>{
  *   const ok = await confirmInCLI('Are you sure?', true);
  *   console.log(ok ? 'YES' : 'NO');
  * })
  */
-export async function confirmInCLI(question: string, isDefaultCancel?: boolean) {
+export async function confirmInCLI(question: string, defaultYes?: boolean) {
   const { sure = false } = await prompts({
     type: 'toggle', // 'confirm'
     name: 'sure', // 返回的字段名称命名
-    initial: !isDefaultCancel,
+    initial: defaultYes,
     active: 'yes',
     inactive: 'no',
     message: question || 'Are you sure?',
@@ -104,11 +104,13 @@ export async function inputNumInCLI(promptTxt: string, options?: Partial<{ initi
   return num as number;
 }
 
+//
+type SelectValue = string | number | boolean | Date;
 /**
  * 命令行交互：选择 (优先推荐使用 单选-singleSelectInCli； 多选-multipleSelectInCli；)
  * @param {Array<string>} choices
  */
-async function _selectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], options?: Partial<{ multiple: boolean; initial: T }>) {
+export async function selectInCli<T extends SelectValue>(promptTxt: string, choices: prompts.Choice[], options?: Partial<{ multiple: boolean; initial: number }>) {
   const { initial, multiple } = options || {};
   const config: prompts.PromptObject<string> = {
     type: multiple ? 'multiselect' : 'select',
@@ -128,8 +130,8 @@ async function _selectInCli<T extends string | number | boolean | Date>(promptTx
  * 命令行交互：单选
  * @param {Array<string>} choices
  */
-export async function singleSelectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], initial?: T) {
-  const res = await _selectInCli<T>(promptTxt, choices, { multiple: false, initial });
+export async function singleSelectInCli<T extends SelectValue>(promptTxt: string, choices: prompts.Choice[], initial?: number) {
+  const res = await selectInCli<T>(promptTxt, choices, { multiple: false, initial });
   return res as T;
 }
 
@@ -137,7 +139,7 @@ export async function singleSelectInCli<T extends string | number | boolean | Da
  * 命令行交互：多选
  * @param {Array<string>} choices
  */
-export async function multipleSelectInCli<T extends string | number | boolean | Date>(promptTxt: string, choices: prompts.Choice[], initial?: T) {
-  const res = await _selectInCli<T>(promptTxt, choices, { multiple: true, initial });
+export async function multipleSelectInCli<T extends SelectValue>(promptTxt: string, choices: prompts.Choice[], initial?: number) {
+  const res = await selectInCli<T>(promptTxt, choices, { multiple: true, initial });
   return res as T[];
 }

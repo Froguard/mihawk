@@ -17,11 +17,14 @@ interface InitOptions<T = any> {
   overwrite?: boolean; // 是否覆盖
 }
 /**
- * 初始化 .frogagurc.json|js|ts 配置文件
- * @param fileType
+ * 初始化 .xxxrc.json|js|ts 配置文件
+ * @param {string} name 配置文件名（包含 . 前缀，以及 rc 后缀，如 .abcrc；不强制，只是推荐）
+ * @param {InitOptions}
+ * @param {"json"|"js"|"ts"} options.fileType
+ * @param {any} options.initConfig
  * @returns {Promise<void>}
  */
-export async function initRCfile(name: string, options: InitOptions = { fileType: 'json', initConfig: {} }) {
+export async function initRCfile<T = any>(name: string, options: InitOptions<T> = { fileType: 'json' }) {
   const { fileType = 'json', overwrite = false, initConfig = {}, tsInfo = null } = options;
   const rcType = fileType || 'json';
   const rcName = `${name}.${rcType}`;
@@ -30,7 +33,7 @@ export async function initRCfile(name: string, options: InitOptions = { fileType
   const rcFilePath = path.join(CWD, `./${rcName}`);
   if (existsSync(rcFilePath)) {
     if (overwrite) {
-      console.log(LOG_FLAG, `${rcName} file already exists. Will overwrite it..`);
+      console.log(LOG_FLAG, `Force Update file ${rcName}..`);
     } else {
       console.log(LOG_FLAG, `${rcName} file already exists. Will skip it..`);
       return;
@@ -83,6 +86,9 @@ interface GetRcOptions<T = any> {
 
 /**
  * 加载根目录配置文件
+ * @param {string} name 配置文件名（包含 . 前缀，以及 rc 后缀，如 .abcrc；不强制，只是推荐）
+ * @param {GetRcOptions} options
+ * @param {any} options.initConfig 如果不存在时，进行初始化，所需要的初始数据
  * @returns {Promise<FrogaguRcConfig>}
  */
 export async function getRcData<T = any>(name: string, options?: GetRcOptions<Partial<T>>): Promise<Partial<T>> {
