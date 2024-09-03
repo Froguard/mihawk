@@ -2,10 +2,31 @@
 
 > For developer: development of this package
 
+## prepare
+
+> ensure you have installed frogagu, then you are able to commit your code
+
+```sh
+npm i -g frogagu
+```
+
+> frogagu@>=0.0.1-sigma
+
+then create a new root config file `.frogagurc.json`
+
+```json
+{
+  "gitconfig": {
+    "globalUserWhiteList": [],
+    "localUserWhiteList": [{ "name": "your_git_account_name", "email": "your_git_accout_email" }]
+  }
+}
+```
+
 ## Install
 
 ```sh
-yarn install --regitry=https://registry.npmmirror.org
+yarn install --regitry=https://registry.npmmirror.org # install from npm mirror (china-mirror)
 ```
 
 > yarn install --regitry=https://registry.npmjs.org

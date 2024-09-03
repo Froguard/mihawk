@@ -4,5 +4,6 @@
 .eslintrc.js
 .prettierrc.js
 .lintstagedrc.js
+.frontendrc.*
 tsconfig.json
 tsconfig.*.json

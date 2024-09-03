@@ -90,7 +90,6 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.0.1",
-    "frogagu": "^0.0.0-sigma",
     "husky": "^8.0.3",
     "jest": "^27.4.0",
     "lint-staged": "^12.3.3",
