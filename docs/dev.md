@@ -17,7 +17,7 @@ then create a new root config file `.frogagurc.json`
 ```json
 {
   "gitconfig": {
-    "globalUserWhiteList": [],
+    "globalUserWhiteList": [], // optional
     "localUserWhiteList": [{ "name": "your_git_account_name", "email": "your_git_accout_email" }]
   }
 }
