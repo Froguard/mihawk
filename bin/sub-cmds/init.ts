@@ -15,17 +15,21 @@ const callback: SubCmdCallback<any> = async function init() {
     ...DEFAULT_RC,
   };
   const configFileName = `.${PKG_NAME}rc`;
-  const configFileExt = 'json';
-  const configFilePath = path.join(CWD, `${configFileName}.${configFileExt}`);
-  const isExisted = existsSync(configFilePath);
-  if (isExisted) {
-    console.log(LOG_FLAG, Colors.yellow());
-    const overwrite = await confirmInCLI(`rcfile ${Colors.gray(configFileName)} is already existed, overwrite it?`, false);
-    if (!overwrite) {
-      return;
+  let hasRcExisted = false;
+  let existedExt = '';
+  for (const ext of ['json', 'js', 'ts']) {
+    const rcFilePath = path.join(CWD, `./${configFileName}.${ext}`);
+    if (existsSync(rcFilePath)) {
+      hasRcExisted = true;
+      existedExt = ext;
+      break;
     }
   }
-  // TODO: 检查文件已经存在的时候，提示“是否需要覆盖？”，然后再决定是否需要初始化
+  if (hasRcExisted) {
+    console.log(LOG_FLAG, `RC-file ${Colors.yellow(`${configFileName}.${existedExt}`)} is already existed, skip init!\n`);
+    return;
+  }
+  //
   // host
   config.host = await inputTxtInCLI('type in host', DEFAULT_RC.host);
   // port
@@ -67,10 +71,12 @@ const callback: SubCmdCallback<any> = async function init() {
   }
   // autoCreateMockLogicFile
   config.autoCreateMockLogicFile = await confirmInCLI('Auto create mock data file?', DEFAULT_RC.autoCreateMockLogicFile);
-
-  console.log(LOG_FLAG, Colors.green(`Will ${isExisted ? 'update' : 'create'} rc file, like below:`), config);
+  //
+  const configFileExt = 'json';
+  const configFileNameWithExt = `${configFileName}.${configFileExt}`;
+  console.log(LOG_FLAG, 'Will init rc file, like below:', config);
   await initRCfile(configFileName, { fileType: configFileExt, initConfig: config, overwrite: true });
-  console.log(LOG_FLAG, Colors.success(`${isExisted ? 'update' : 'create'} ${configFileExt} success!`));
+  console.log(LOG_FLAG, Colors.success(`Init ${configFileNameWithExt} success!`));
   //
 };
 
