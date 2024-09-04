@@ -5,6 +5,7 @@ import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-ext
 import { CWD, DEFAULT_RC, MOCK_DATA_DIR_NAME, MOCK_DIR_NAME, PKG_NAME } from '../../src/consts';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
 import { initRCfile, getRcData } from '../../src/utils/rc';
+import { getLogicFileExt, getRoutesFileExt } from '../../src/utils/path';
 import { Printer, Debugger } from '../../src/utils/print';
 import routesDemo from './demo-routes.json';
 import dataDemo from './demo-data.json';
@@ -154,7 +155,7 @@ async function initMockDataDir(mockDirName: string = MOCK_DIR_NAME) {
  * @returns
  */
 async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'none', mockDirName: string = 'mocks') {
-  const fileExt = getFileExt(fileType) || 'json';
+  const fileExt = getRoutesFileExt(fileType) || 'json';
   const routesFileName = `routes.${fileExt}`;
   const routesFilePathRel = path.join(mockDirName, routesFileName);
   const routesFilePathAbs = path.join(CWD, mockDirName, routesFileName);
@@ -213,7 +214,7 @@ async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'non
  * @returns {Promise<void>}
  */
 async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 'none', mockDirName: string = 'mocks') {
-  const fileExt = getFileExt(fileType);
+  const fileExt = getLogicFileExt(fileType);
   const middlewareFileName = `middleware.${fileExt || 'cjs'}`;
   const middlewareFilePathRel = path.join(mockDirName, middlewareFileName);
   const middlewareFilePathAbs = path.join(CWD, mockDirName, middlewareFileName);
@@ -262,26 +263,5 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
     ensureDirSync(path.join(CWD, mockDirName));
     writeFileSync(middlewareFilePathAbs, initContent, { encoding: 'utf8' });
     Printer.log(Colors.success(`Init mock middleware file ${Colors.green(middlewareFilePathRel)} success!`));
-  }
-}
-
-/**
- * 根据文件类型，获取文件后缀
- * @param {MihawkRC['mockLogicFileType']} fileType
- * @returns {string} 文件后缀，不带.点
- */
-function getFileExt(fileType: MihawkRC['mockLogicFileType']) {
-  switch (fileType) {
-    case 'js':
-    case 'javascript':
-      return 'js';
-    case 'cjs':
-      return 'cjs';
-    case 'ts':
-    case 'typescript':
-      return 'ts';
-    case 'none':
-    default:
-      return ''; // none
   }
 }

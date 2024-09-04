@@ -1,7 +1,7 @@
 /**
  * .mihawkrc.ts|js|json 配置文件相关操作逻辑
  */
-import path from 'path';
+import { isAbsolute, join, resolve } from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
@@ -33,7 +33,7 @@ export async function initRCfile<T = any>(name: string, options: InitOptions<T> 
   const rcName = `${name}.${rcType}`;
   Printer.log(`init ${rcName} file..`);
   // detect if existed or not
-  const rcFilePath = path.join(CWD, `./${rcName}`);
+  const rcFilePath = join(CWD, `./${rcName}`);
   if (existsSync(rcFilePath)) {
     if (overwrite) {
       Printer.log(`Force Update file ${rcName}..`);
@@ -99,7 +99,7 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
   const defConfig = Object.assign({}, initConfig);
   const rcNames = [`${name}.json`, `${name}.js`, `${name}.ts`];
   try {
-    if (rcNames.some(fileName => existsSync(path.join(CWD, fileName)))) {
+    if (rcNames.some(fileName => existsSync(join(CWD, fileName)))) {
       // 使用 cosmiconfig 进行 rc 文件的加载
       const explorer = cosmiconfig(name, {
         stopDir: CWD, // 搜索停止的目录
@@ -108,7 +108,7 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
       });
       const res = await explorer.search(CWD);
       const { config, filepath } = res || {};
-      Printer.log(`load root-config file: ${Colors.gray(path.basename(filepath))}`);
+      Printer.log(`load root-config file: ${Colors.gray(basename(filepath))}`);
       return (config as Partial<T>) || defConfig;
     } else {
       // 未检测到rc文件时，进行自动创建
@@ -151,8 +151,30 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   deepmerge(config, DEFAULT_RC);
   // 4.reset | format speaially keys
   config.port = Number(config.port); // port
-  config.mockDirPath = path.join(CWD, config.mockDir || MOCK_DIR_NAME);
-  config.mockDataDirPath = path.join(config.mockDirPath, MOCK_DATA_DIR_NAME);
-  config.tsconfigPath = config.tsconfigPath ? path.join(CWD, config.tsconfigPath) : path.join(config.mockDir, './tsconfig.json');
+  config.mockDirPath = _absifyPath(config.mockDir || MOCK_DIR_NAME); // mockDirPath
+  config.mockDataDirPath = join(config.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
+  // tsconfigPath
+  if (config.tsconfigPath) {
+    config.tsconfigPath = _absifyPath(config.tsconfigPath);
+  } else {
+    config.tsconfigPath = join(config.mockDirPath, 'tsconfig.json');
+  }
+  // isTypesctiptMode
+  const { mockDataFileType, mockLogicFileType } = config || {};
+  config.isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
   return config as MihawkOptions;
+}
+
+/**
+ * 得到绝对路径
+ * @private
+ * @param {string} targetPath
+ * @param {string} rootPath 相对的根目录（当 targetPath 为相对路径的时候会用到，默认为 CWD）
+ * @returns {string}
+ */
+function _absifyPath(targetPath: string, rootPath: string = CWD) {
+  rootPath = rootPath || CWD;
+  targetPath = targetPath ? targetPath.trim() : rootPath; // 防止空掉
+  const absPath = isAbsolute(targetPath) ? targetPath : resolve(rootPath, targetPath);
+  return absPath.replace(/[/\\]+$/, ''); // 消除末尾的 / \
 }

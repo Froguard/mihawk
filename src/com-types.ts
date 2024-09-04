@@ -114,7 +114,7 @@ export interface MihawkRC {
 export interface MihawkOptions extends Required<MihawkRC> {
   mockDirPath: string;
   mockDataDirPath: string;
-  typescriptMode?: boolean;
+  isTypesctiptMode: boolean;
 }
 
 /**

@@ -50,6 +50,6 @@ export const DEFAULT_RC: MihawkOptions = {
   mockLogicFileType: 'none',
   autoCreateMockLogicFile: false,
   tsconfigPath: `./${MOCK_DIR_NAME}/tsconfig.json`,
-  typescriptMode: false,
+  isTypesctiptMode: false,
   logConfig: null,
 };

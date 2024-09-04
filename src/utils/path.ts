@@ -2,6 +2,7 @@
 import { join, basename, relative, resolve, isAbsolute } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
+import { MihawkRC } from '../com-types';
 import { Printer, Debugger } from './print';
 
 /**
@@ -87,4 +88,35 @@ export function getRootAbsPath() {
   const rootPath = isInDist ? join(curParentDirPath, '../../') : curParentDirPath;
   Debugger.log('getRootAbsPath', { __dirname, curDirPath, curParentDirPath, isInDist, rootPath });
   return resolve(rootPath);
+}
+
+/**
+ * 根据文件类型，获取logic文件后缀（logic文件包含mock逻辑文件，以及 middleware文件）
+ * @param {MihawkRC['mockLogicFileType']} fileType
+ * @param {string} defaultExt 默认的后缀，当 fileType 为 none 的时候，会返回此默认的后缀
+ * @returns {string} 文件后缀，不带.点 js|cjs|ts|
+ */
+export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType'], defaultExt = '') {
+  switch (fileType) {
+    case 'js':
+    case 'javascript':
+      return 'js';
+    case 'cjs':
+      return 'cjs';
+    case 'ts':
+    case 'typescript':
+      return 'ts';
+    case 'none':
+    default:
+      return defaultExt || ''; // none
+  }
+}
+
+/**
+ * 根据文件类型，获取 routes 文件的后缀
+ * @param {MihawkRC['mockLogicFileType']} fileType
+ * @returns {string} 文件后缀，不带.点  js|cjs|ts|json
+ */
+export function getRoutesFileExt(fileType: MihawkRC['mockLogicFileType']) {
+  return getLogicFileExt(fileType, 'json');
 }
