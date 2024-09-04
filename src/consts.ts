@@ -41,6 +41,7 @@ export const DEFAULT_RC: MihawkOptions = {
   host: '0.0.0.0',
   port: 8888,
   https: false,
+  useHttps: false,
   cors: true,
   cache: false,
   watch: true,
@@ -61,6 +62,8 @@ export const DEFAULT_RC: MihawkOptions = {
   isTypesctiptMode: false,
   // routes file
   routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
+  // middleware file
+  middlewareFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
   //
   logConfig: null,
 };

@@ -1,22 +1,25 @@
 'use strict';
-import http from 'http';
 import path from 'path';
+import http from 'http';
+import https from 'https';
 import Koa from 'koa';
 import Colors from 'color-cc';
 import mdwBodyParser from 'koa-bodyparser';
-import { existsSync, ensureDirSync } from 'fs-extra';
+import mdwSSL from 'koa-sslify';
+import { existsSync, ensureDirSync, readFileSync } from 'fs-extra';
 import { Printer, Debugger } from './utils/print';
 import { formatOptionsByConfig } from './composites/rc';
-import { enableRequireTsFile, loadJS, loadTS } from './composites/loader';
-import { relPathToCWD, getRootAbsPath, unixifyPath } from './utils/path';
+import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/loader';
+import { relPathToCWD, getRootAbsPath, unixifyPath, absifyPath } from './utils/path';
 import mdwCommon from './middlewares/common';
 import mdwCors from './middlewares/cors';
 import mdwFavicon from './middlewares/favicon';
 import mdwHdCache from './middlewares/cache';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
-import { isPortInUse } from './utils/net';
-import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
+import { isPortInUse, getMyIp } from './utils/net';
+import { enhanceServer } from './utils/server';
+import type { HttpsConfig, KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
 /**
  * mihawk
@@ -28,22 +31,32 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   Printer.log('options:', options);
   //
   const {
+    // cache,
+    cors,
+    // https: httpsConfig,
+    useHttps,
     host,
     port,
     //
     mockDir,
-    mockDirPath: MOCKS_ROOT_PATH, //
+    // mockDirPath: MOCKS_ROOT_PATH,
     mockDataDirPath,
     //
-    logicFileExt,
+    // logicFileExt,
+    useLogicFile,
     isTypesctiptMode,
     tsconfigPath,
     //
     routesFilePath,
+    //
+    middlewareFilePath,
   } = options;
   const loadLogicFile = isTypesctiptMode ? loadTS : loadJS;
+  const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
 
-  // 0.detect port in use
+  /**
+   * 0.detect port in use
+   */
   const isPortAlreadyInUse = await isPortInUse(port);
   if (isPortAlreadyInUse) {
     Printer.error(Colors.yellow(`Port ${port} is already in use`));
@@ -51,34 +64,47 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     // return;
   }
 
-  // 1.ensure mock data dir exists
+  /**
+   * 1.ensure mock data dir exists
+   */
   ensureDirSync(mockDataDirPath);
 
-  // 2.detect if support typescript mode
+  /**
+   * 2.detect if support typescript mode
+   */
   if (isTypesctiptMode) {
     // 启用 ts 模式
     const tsconfig = require(tsconfigPath) || {};
     enableRequireTsFile(tsconfig);
   }
 
-  // 3.load routes file
+  /**
+   * 3.load routes file
+   */
   let routes: Record<string, string> = {};
   if (existsSync(routesFilePath)) {
-    routes = (await loadLogicFile(routesFilePath)) as Record<string, string>;
+    routes = (await loadRoutesFile(routesFilePath)) as Record<string, string>;
     Printer.log(`load routes file: ${relPathToCWD(routesFilePath)}`);
   }
 
-  // 4.load diy middleware if exists
+  /**
+   * 4.load diy middleware if exists
+   */
   let diyMiddleware: KoaMiddleware | null = null;
-  const diyMiddlewareFilePath = path.resolve(MOCKS_ROOT_PATH, `./middleware.${logicFileExt}`);
-  const hasDiyMiddlewareFile = existsSync(diyMiddlewareFilePath);
-  if (hasDiyMiddlewareFile) {
-    Printer.log(`load diy middleware file: ${relPathToCWD(diyMiddlewareFilePath)}`);
-    diyMiddleware = (await loadLogicFile(diyMiddlewareFilePath)) as KoaMiddleware;
+  if (useLogicFile && existsSync(middlewareFilePath)) {
+    Printer.log(`load diy middleware file: ${relPathToCWD(middlewareFilePath)}`);
+    diyMiddleware = (await loadLogicFile(middlewareFilePath)) as KoaMiddleware;
   }
 
-  // 5. create koa app (http-server instance)
+  /**
+   * 5. create koa app (http-server instance)
+   */
   const app = new Koa();
+
+  if (useHttps) {
+    // enable https
+    app.use(mdwSSL({ hostname: host, port }));
+  }
 
   // middleware: favicon
   app.use(mdwFavicon(path.resolve(getRootAbsPath(), './assets/favicon.ico')));
@@ -87,7 +113,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   app.use(mdwCommon(options));
 
   // middleware: cors
-  app.use(mdwCors(options));
+  cors && app.use(mdwCors(options));
 
   // middleware: cache middleware
   app.use(mdwHdCache(options));
@@ -107,9 +133,20 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   //
 
   /**
-   * server configuration
+   * 6.server configuration
    */
-  const server = http.createServer(app.callback());
+  let server: http.Server | https.Server | null = null;
+  // create http|https server
+  if (useHttps) {
+    const httpsOptions: Record<'key' | 'cert', any> | null = null;
+    const httpsConfig = options.https as HttpsConfig;
+    httpsOptions.key = readFileSync(absifyPath(httpsConfig.key));
+    httpsOptions.cert = readFileSync(absifyPath(httpsConfig.cert));
+    server = https.createServer(httpsOptions, app.callback());
+  } else {
+    server = http.createServer(app.callback());
+  }
+
   // server-event: error
   server.on('error', function (error: any) {
     if (error.syscall !== 'listen') {
@@ -129,14 +166,24 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
         throw error;
     }
   });
+
   // server-event: listening
   server.on('listening', function () {
-    Printer.log(Colors.green('Start mock-server success!'), `${host}:${port}`);
+    Printer.log(Colors.green('Start mock-server success!'));
+    Printer.log(
+      [
+        `- ${host}:${port}`,
+        `- ${getMyIp()}:${port}`, //
+      ].join('\n'),
+    );
     Printer.log(`Mock Data directory: ${Colors.gray(unixifyPath(mockDir))}`);
   });
 
+  // enhance server: add server.destory() method
+  server = enhanceServer(server);
+
   // start
-  server.listen(port);
+  server.listen(port, host); // or 443
 
   //
   return server;

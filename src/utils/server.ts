@@ -1,16 +1,17 @@
 import type { Server as HttpServer } from 'http';
+import type { Server as HttpsServer } from 'https';
 import type { Socket } from 'net';
 
-export interface EnhancedHttpServer extends HttpServer {
+export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
   destory: (callback: (...args: any[]) => any) => void;
-}
+};
 
 /**
  * 增强版服务实例
  * @param {HttpServer} server
- * @returns {EnhancedHttpServer} sever self
+ * @returns {EnhancedServer} sever self
  */
-export function enhanceServer(server: HttpServer) {
+export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
   // recored all connection
   const connectMap = new Map<string, Socket>();
   server.on('connection', socket => {
@@ -23,7 +24,7 @@ export function enhanceServer(server: HttpServer) {
     });
   });
   // add a destory method
-  (server as EnhancedHttpServer).destory = (callback: (...args: any[]) => any) => {
+  (server as EnhancedServer<T>).destory = (callback: (...args: any[]) => any) => {
     // close server
     server.close(() => {
       connectMap.clear();
@@ -35,5 +36,5 @@ export function enhanceServer(server: HttpServer) {
     });
   };
   //
-  return server as EnhancedHttpServer;
+  return server as EnhancedServer<T>;
 }

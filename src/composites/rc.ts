@@ -163,14 +163,20 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   // isTypesctiptMode
   const { mockDataFileType, mockLogicFileType } = config || {};
   config.isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
-  // routesFilePath
-  config.routesFilePath = join(config.mockDirPath, `./routes.${getRoutesFileExt(mockLogicFileType)}`);
   // useLogicFile
   config.useLogicFile = mockLogicFileType !== 'none';
+  const logicFileExt = getLogicFileExt(mockLogicFileType);
+  // routesFilePath
+  config.routesFilePath = join(config.mockDirPath, `./routes.${logicFileExt}`);
+  // middlewareFilePath
+  config.middlewareFilePath = join(config.mockDirPath, `./middleware.${logicFileExt}`);
   // logicFileExt
-  config.logicFileExt = getLogicFileExt(mockLogicFileType);
+  config.logicFileExt = logicFileExt;
   // dataFileExt
   config.dataFileExt = mockDataFileType;
-
+  // useHttps
+  config.useHttps = typeof config.https === 'object';
+  //
+  //
   return config as MihawkOptions;
 }

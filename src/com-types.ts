@@ -52,7 +52,7 @@ export interface MihawkRC {
   /**
    * 是否开启 https，默认 false
    */
-  https?: boolean | HttpsConfig;
+  https?: false | HttpsConfig;
 
   /**
    * 是否开启 cors，默认 true
@@ -121,16 +121,15 @@ export interface MihawkOptions extends Required<MihawkRC> {
    * mock data 数据文件目录的绝对路径，默认为 `${CWD}/mocks/data`
    */
   mockDataDirPath: string; //
-
-  /**
-   * routes.{json|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
-   */
-  routesFilePath: string; //
-
   /**
    * 当 mockLogicFileType 为 ts | typescript 时为 true
    */
   isTypesctiptMode: boolean; //
+
+  /**
+   * 是否开启 https，当且仅当 https 属性是一个对象时开启
+   */
+  useHttps: boolean;
 
   /**
    * 当 mockLogicFileType 不是 none 时为 true
@@ -148,6 +147,16 @@ export interface MihawkOptions extends Required<MihawkRC> {
    * - 值不包含 . 前缀，eg： json | json5
    */
   dataFileExt: string; //
+
+  /**
+   * routes.{json|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
+   */
+  routesFilePath: string; //
+
+  /**
+   * 自定义中间件的绝对路径，默认为 `${CWD}/mocks/middleware.js`
+   */
+  middlewareFilePath: string; //
 }
 
 /**

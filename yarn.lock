@@ -997,6 +997,13 @@
   dependencies:
     "@types/koa" "*"
 
+"@types/koa-sslify@^4.0.6":
+  version "4.0.6"
+  resolved "https://registry.npmmirror.com/@types/koa-sslify/-/koa-sslify-4.0.6.tgz#3d2f19e06653a31bebc240731efc3b8d314dd647"
+  integrity sha512-yPp3bND99D81iZ3k9HV4vEv1sFqdsYa/k9dKmXgb7W9UXuNrf54x+mYOzPEnHvhDBQQLGUyBDiW7lZ6DQadVIA==
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa@*", "@types/koa@^2.15.0":
   version "2.15.0"
   resolved "https://registry.npmmirror.com/@types/koa/-/koa-2.15.0.tgz#eca43d76f527c803b491731f95df575636e7b6f2"
@@ -3872,6 +3879,11 @@ koa-is-json@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmmirror.com/koa-is-json/-/koa-is-json-1.0.0.tgz#273c07edcdcb8df6a2c1ab7d59ee76491451ec14"
   integrity sha512-+97CtHAlWDx0ndt0J8y3P12EWLwTLMXIfMnYDev3wOTwH/RpBGMlfn4bDXlMEg1u73K6XRE9BbUp+5ZAYoRYWw==
+
+koa-sslify@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmmirror.com/koa-sslify/-/koa-sslify-5.0.1.tgz#b94ffead65a3e239a0324ff7516cb0fde996a1e1"
+  integrity sha512-QwQgMvNPyePpngghYZxeuPzeQqMOFYUXiKu8pd4wz9rd7ZmoOq4VKtoEIjctLt3Qcfv2aHL/0UIRAmIK4qDczg==
 
 koa@^1.2.4:
   version "1.7.0"
