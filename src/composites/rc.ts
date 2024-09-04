@@ -8,7 +8,7 @@ import { existsSync, writeFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
-import { Printer } from '../utils/print';
+import { Debugger, Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
 
 interface InitOptions<T = any> {
@@ -109,7 +109,8 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
       });
       const res = await explorer.search(CWD);
       const { config, filepath } = res || {};
-      Printer.log(`load root-config file: ${Colors.gray(basename(filepath))}`);
+      Printer.log(Colors.success(`load root-config file: ${Colors.gray(basename(filepath))}`));
+      Debugger.log('root-config: ', config);
       return (config as Partial<T>) || defConfig;
     } else {
       // 未检测到rc文件时，进行自动创建
@@ -175,7 +176,7 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   // dataFileExt
   config.dataFileExt = mockDataFileType;
   // useHttps
-  config.useHttps = typeof config.https === 'object';
+  config.useHttps = !!config.https || typeof config.https === 'object';
   //
   //
   return config as MihawkOptions;

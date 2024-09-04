@@ -28,9 +28,11 @@ const PKG_ROOT_PATH = getRootAbsPath();
  * @param {Loosify<MihawkRC>} config
  */
 export default async function mihawk(config?: Loosify<MihawkRC>) {
-  // Debugger.log('init config:', config);
-  const options = formatOptionsByConfig(config);
+  delete config._;
+  delete config['--'];
   Printer.log('config:', config);
+  const options = formatOptionsByConfig(config);
+  Debugger.log('formated options:', options);
   //
   const {
     // cache,
@@ -127,7 +129,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   app.use(mdwRoutes(routes, options));
 
   // ★ middleware: diy middleware ★
-  app.use(diyMiddleware);
+  typeof diyMiddleware === 'function' && app.use(diyMiddleware);
 
   // middleware: mock middleware
   app.use(mdwMock(options));
@@ -141,11 +143,26 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   // create http|https server
   if (useHttps) {
     const httpsOptions: Record<'key' | 'cert', any> | null = null;
-    const httpsConfig = options.https as HttpsConfig;
-    httpsOptions.key = readFileSync(absifyPath(httpsConfig.key));
-    httpsOptions.cert = readFileSync(absifyPath(httpsConfig.cert));
+    let key = '', cert = ''; // prettier-ignore
+    if (typeof options.https === 'object') {
+      key = options.https.key;
+      cert = options.https.cert;
+    }
+    const keyFilePath = absifyPath(key);
+    const certFilePath = absifyPath(cert);
+    if (!key || !cert || !existsSync(keyFilePath) || !existsSync(certFilePath)) {
+      httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
+      httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.cert'));
+      Printer.log(Colors.gray(`Custom https cert files ware found, use default build-in https cert files`));
+    } else {
+      httpsOptions.key = readFileSync(keyFilePath);
+      httpsOptions.cert = readFileSync(certFilePath);
+      Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`${key} ${cert}`));
+    }
+    // create https server (SSL)
     server = https.createServer(httpsOptions, app.callback());
   } else {
+    // create http server (normal)
     server = http.createServer(app.callback());
   }
 
@@ -172,13 +189,13 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   // server-event: listening
   server.on('listening', function () {
     Printer.log(Colors.green('Start mock-server success!'));
-    Printer.log(
-      [
-        `- ${host}:${port}`,
-        `- ${getMyIp()}:${port}`, //
-      ].join('\n'),
-    );
-    Printer.log(`Mock Data directory: ${Colors.gray(unixifyPath(mockDir))}`);
+    Printer.log(Colors.gray(`Mock Data directory: ${unixifyPath(mockDir)}`));
+    const protocol = useHttps ? 'https' : 'http';
+    const addr1 = `${protocol}://${host}:${port}`;
+    const addr2 = `${protocol}://${getMyIp()}:${port}`;
+    Printer.log(`- ${Colors.cyan(addr1)}`);
+    Printer.log(`- ${Colors.cyan(addr2)}`);
+    console.log();
   });
 
   // enhance server: add server.destory() method
@@ -186,7 +203,4 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
 
   // start
   server.listen(port, host); // or 443(https) 80(http)
-
-  //
-  return server;
 }

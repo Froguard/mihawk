@@ -19,19 +19,19 @@ export default function (options?: any) {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { method, path } = ctx;
-    const routePath = `${method.toUpperCase()}/ ${path}`;
+    const routePath = `${method.toUpperCase()} ${path}`;
     const disableLogPrint = needCheckIgnore && isMatchPatterns(routePath, ignoreRoutes);
     !disableLogPrint && Printer.log(routePath);
     // set common props to ctx
     ctx.routePath = routePath;
     ctx.disableLogPrint = disableLogPrint;
     //
-    ctx.setHeader('X-powered-By', PKG_NAME);
+    ctx.set('X-powered-By', PKG_NAME);
     const startTime = Date.now();
     //
     await next();
     //
     const keepTime = Date.now() - startTime;
-    ctx.setHeader('Server-Timing', `mock;dur=${keepTime}ms`);
+    ctx.set('Server-Timing', `mock;dur=${keepTime}ms`);
   };
 }

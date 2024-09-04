@@ -54,7 +54,7 @@ export interface MihawkRC {
   /**
    * 是否开启 https，默认 false
    */
-  https?: false | HttpsConfig;
+  https?: boolean | HttpsConfig;
 
   /**
    * 是否开启 cors，默认 true
