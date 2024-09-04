@@ -21,14 +21,16 @@ import { isPortInUse, getMyIp } from './utils/net';
 import { enhanceServer } from './utils/server';
 import type { HttpsConfig, KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
+const PKG_ROOT_PATH = getRootAbsPath();
+
 /**
  * mihawk
  * @param {Loosify<MihawkRC>} config
  */
 export default async function mihawk(config?: Loosify<MihawkRC>) {
-  Debugger.log('init config:', config);
+  // Debugger.log('init config:', config);
   const options = formatOptionsByConfig(config);
-  Printer.log('options:', options);
+  Printer.log('config:', config);
   //
   const {
     // cache,
@@ -107,7 +109,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   }
 
   // middleware: favicon
-  app.use(mdwFavicon(path.resolve(getRootAbsPath(), './assets/favicon.ico')));
+  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
 
   // middleware: common middleware
   app.use(mdwCommon(options));

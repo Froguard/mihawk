@@ -1,15 +1,15 @@
 /**
  * .mihawkrc.ts|js|json 配置文件相关操作逻辑
  */
-import { join } from 'path';
+import { join, basename } from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
-import { Printer, Debugger } from '../utils/print';
-import { absifyPath, getLogicFileExt, getRoutesFileExt } from '../utils/path';
+import { Printer } from '../utils/print';
+import { absifyPath, getLogicFileExt } from '../utils/path';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';

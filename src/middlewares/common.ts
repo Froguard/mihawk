@@ -1,4 +1,5 @@
 import { Printer, Debugger } from '../utils/print';
+import { isMatchPatterns } from '../utils/str';
 import { PKG_NAME } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
@@ -8,6 +9,9 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function (options?: any) {
+  const { logConfig } = options || {};
+  const { ignoreRoutes } = logConfig || {};
+  const needCheckIgnore = ignoreRoutes?.length > 0;
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
@@ -15,7 +19,13 @@ export default function (options?: any) {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { method, path } = ctx;
-    Debugger.log(`/${method.toUpperCase()} ${path}`);
+    const routePath = `${method.toUpperCase()}/ ${path}`;
+    const disableLogPrint = needCheckIgnore && isMatchPatterns(routePath, ignoreRoutes);
+    !disableLogPrint && Printer.log(routePath);
+    // set common props to ctx
+    ctx.routePath = routePath;
+    ctx.disableLogPrint = disableLogPrint;
+    //
     ctx.setHeader('X-powered-By', PKG_NAME);
     const startTime = Date.now();
     //

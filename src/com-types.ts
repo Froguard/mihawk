@@ -18,6 +18,8 @@ export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 declare module 'koa' {
   interface Context {
     skipDefaultMock?: boolean; // 跳过执行默认的 mock 逻辑
+    disableLogPrint?: boolean; // 默认为 false，即打印
+    routePath: string; // Method + Path (在 common middleware 中定义)
   }
   interface Request {
     //
