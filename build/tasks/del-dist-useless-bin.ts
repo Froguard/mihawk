@@ -7,14 +7,14 @@ import path from 'path';
 import Colors from 'color-cc';
 import { removeSync } from 'fs-extra';
 
-const LOG_FLAG = `${Colors.magenta('[post-build]')} ${Colors.gray('deleteDistUselessBins:')}:`;
+const LOG_PREFIX = `${Colors.magenta('[post-build]')} ${Colors.gray('deleteDistUselessBins:')}:`;
 const ROOT_DIR = path.resolve(__dirname, '../../');
 
 /**
  * 删除 dist/esm/bin 和 dist/types/bin 这两个文件夹
  */
 export default function deleteDistUselessBins() {
-  console.log(LOG_FLAG, '删除 dist/esm/bin 和 dist/types/bin 这两个文件夹...');
+  console.log(LOG_PREFIX, '删除 dist/esm/bin 和 dist/types/bin 这两个文件夹...');
   //
   const binDirs = ['./dist/esm/bin', './dist/types/bin'].map(d => path.resolve(ROOT_DIR, d));
   binDirs.forEach(dir => removeSync(dir));

@@ -2,8 +2,8 @@
 import path from 'path';
 import Koa from 'koa';
 import Colors from 'color-cc';
-import { LOG_FLAG, DEFAULT_RC } from './consts';
-import { Debugger } from './utils/debug';
+import { DEFAULT_RC } from './consts';
+import { Printer, Debugger } from './utils/print';
 import type { MihawkOptions } from './com-types';
 
 /**

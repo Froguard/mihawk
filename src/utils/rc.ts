@@ -5,7 +5,8 @@ import path from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
-import { CWD, LOG_FLAG } from '../consts';
+import { CWD } from '../consts';
+import { Printer, Debugger } from './print';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';
@@ -28,14 +29,14 @@ export async function initRCfile<T = any>(name: string, options: InitOptions<T> 
   const { fileType = 'json', overwrite = false, initConfig = {}, tsInfo = null } = options;
   const rcType = fileType || 'json';
   const rcName = `${name}.${rcType}`;
-  console.log(LOG_FLAG, `init ${rcName} file..`);
+  Printer.log(`init ${rcName} file..`);
   // detect if existed or not
   const rcFilePath = path.join(CWD, `./${rcName}`);
   if (existsSync(rcFilePath)) {
     if (overwrite) {
-      console.log(LOG_FLAG, `Force Update file ${rcName}..`);
+      Printer.log(`Force Update file ${rcName}..`);
     } else {
-      console.log(LOG_FLAG, `${rcName} file already exists. Will skip it..`);
+      Printer.log(`${rcName} file already exists. Will skip it..`);
       return;
     }
   }
@@ -105,17 +106,17 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
       });
       const res = await explorer.search(CWD);
       const { config, filepath } = res || {};
-      console.log(LOG_FLAG, `load root-config file: ${Colors.gray(path.basename(filepath))}`);
+      Printer.log(`load root-config file: ${Colors.gray(path.basename(filepath))}`);
       return (config as Partial<T>) || defConfig;
     } else {
       // 未检测到rc文件时，进行自动创建
-      console.log(LOG_FLAG, Colors.warn(`Can't found rc-file(.${name}.js|json|ts). Will auto create & init it..`)); // prettier-ignore
+      Printer.log(Colors.warn(`Can't found rc-file(.${name}.js|json|ts). Will auto create & init it..`)); // prettier-ignore
       await initRCfile(name, { fileType: 'json', initConfig: defConfig, overwrite: false });
       return defConfig;
     }
   } catch (error) {
     //
-    console.error(LOG_FLAG, Colors.error('load config file error..'), error);
+    Printer.error(Colors.error('load config file error..'), error);
     return defConfig;
   }
 }

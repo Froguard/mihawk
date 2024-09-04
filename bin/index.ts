@@ -6,8 +6,8 @@
 import Colors from 'color-cc';
 import { LOG_FLAG } from '../src/consts';
 import { getCliArgs } from '../src/utils/cli';
-import { Debugger } from '../src/utils/debug';
 import { readPackageJson } from '../src/composites/loader';
+import { Printer, Debugger } from '../src/utils/print';
 import init from './sub-cmds/init';
 import type { SubCmdCallback } from '../src/com-types';
 
@@ -38,11 +38,11 @@ const { name, version } = readPackageJson() || {};
     }
     if (typeof callback === 'function') {
       const newArgs = { ...args, _: _?.slice(1) || [] };
-      console.log(LOG_FLAG, Colors.gray(`mihawk ${subCmdName}`), Colors.gray(newArgs._.join(' ')));
+      Printer.log(Colors.gray(`mihawk ${subCmdName}`), Colors.gray(newArgs._.join(' ')));
       try {
         await callback(newArgs); // exec sub cmd
       } catch (error) {
-        console.log(LOG_FLAG, Colors.yellow('Oops... It looks like something wrong:'), error, '\n');
+        Printer.log(Colors.yellow('Oops... It looks like something wrong:'), error, '\n');
         showHelp();
         process.exit(1); // quit
       }
@@ -67,7 +67,7 @@ const { name, version } = readPackageJson() || {};
  * 显示包信息
  */
 function showPkgInfo() {
-  console.log(LOG_FLAG, `${name}@${version}\n`);
+  Printer.log(`${name}@${version}\n`);
 }
 
 /**

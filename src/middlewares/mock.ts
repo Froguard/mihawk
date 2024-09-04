@@ -1,4 +1,4 @@
-import { Debugger } from '../utils/debug';
+import { Printer, Debugger } from '../utils/print';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**

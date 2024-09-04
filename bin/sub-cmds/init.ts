@@ -2,9 +2,10 @@
 import path from 'path';
 import Colors from 'color-cc';
 import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-extra';
-import { CWD, LOG_FLAG, DEFAULT_RC, PKG_NAME } from '../../src/consts';
+import { CWD, DEFAULT_RC, PKG_NAME } from '../../src/consts';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
 import { initRCfile, getRcData } from '../../src/utils/rc';
+import { Printer, Debugger } from '../../src/utils/print';
 import routesDemo from './demo-routes.json';
 import dataDemo from './demo-data.json';
 import type { SubCmdCallback, MihawkRC } from '../../src/com-types';
@@ -56,7 +57,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
     }
   }
   if (hasRcExisted) {
-    console.log(LOG_FLAG, `RC-file ${Colors.yellow(`${configFileName}.${existedExt}`)} is already existed, skip init!`);
+    Printer.log(`RC-file ${Colors.yellow(`${configFileName}.${existedExt}`)} is already existed, skip init!`);
     return;
   }
   //
@@ -104,7 +105,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
   //
   const configFileExt = 'json';
   const configFileNameWithExt = `${configFileName}.${configFileExt}`;
-  console.log(LOG_FLAG, 'Will init rc file, like below:', config);
+  Printer.log('Will init rc file, like below:', config);
   await initRCfile(configFileName, {
     fileType: configFileExt,
     initConfig: config,
@@ -115,7 +116,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
       typeName: 'MihawkRC',
     },
   });
-  console.log(LOG_FLAG, Colors.success(`Init ${configFileNameWithExt} success!`));
+  Printer.log(Colors.success(`Init ${configFileNameWithExt} success!`));
 }
 
 /**
@@ -126,7 +127,7 @@ async function initMockDataDir(mockDirName: string = 'mocks') {
   const mockDataDirPath = path.join(CWD, mockDataDir);
   if (!existsSync(mockDataDirPath)) {
     ensureDirSync(mockDataDirPath);
-    console.log(LOG_FLAG, Colors.success(`Create mock data dir ${Colors.green(mockDataDir)} success!`));
+    Printer.log(Colors.success(`Create mock data dir ${Colors.green(mockDataDir)} success!`));
   }
   // detect subDirs
   for (const subDir of ['PUT', 'DELETE', 'POST', 'GET']) {
@@ -134,7 +135,7 @@ async function initMockDataDir(mockDirName: string = 'mocks') {
     if (!existsSync(subDirPath)) {
       ensureFileSync(path.join(subDirPath, '.gitkeep'));
       const subDirPathRel = path.join(mockDataDir, subDir);
-      console.log(LOG_FLAG, Colors.success(`Create mock data dir ${Colors.green(subDirPathRel)} success!`));
+      Printer.log(Colors.success(`Create mock data dir ${Colors.green(subDirPathRel)} success!`));
     }
   }
   // demo data json file
@@ -142,7 +143,7 @@ async function initMockDataDir(mockDirName: string = 'mocks') {
   const demoFilePath = path.join(CWD, demoFilePathRel);
   if (!existsSync(demoFilePath)) {
     writeFileSync(demoFilePath, JSON.stringify(dataDemo, null, 2));
-    console.log(LOG_FLAG, Colors.success(`Create mock data file ${Colors.green(demoFilePathRel)} success!`));
+    Printer.log(Colors.success(`Create mock data file ${Colors.green(demoFilePathRel)} success!`));
   }
 }
 
@@ -159,7 +160,7 @@ async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'non
   const routesFilePathAbs = path.join(CWD, mockDirName, routesFileName);
   if (existsSync(routesFilePathAbs)) {
     // skip if existed
-    console.log(LOG_FLAG, `Mock routes file ${Colors.yellow(routesFilePathRel)} is already existed, skip init!`);
+    Printer.log(`Mock routes file ${Colors.yellow(routesFilePathRel)} is already existed, skip init!`);
     return;
   } else {
     // create if not existed
@@ -201,7 +202,7 @@ async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'non
     ensureDirSync(path.join(CWD, mockDirName));
     // write file
     writeFileSync(routesFilePathAbs, initContent, { encoding: 'utf8' });
-    console.log(LOG_FLAG, Colors.success(`Init mock routes file ${Colors.green(routesFilePathRel)} success!`));
+    Printer.log(Colors.success(`Init mock routes file ${Colors.green(routesFilePathRel)} success!`));
   }
 }
 
@@ -218,7 +219,7 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
   const middlewareFilePathAbs = path.join(CWD, mockDirName, middlewareFileName);
   if (existsSync(middlewareFilePathAbs)) {
     // skip if existed
-    console.log(LOG_FLAG, `Mock middleware file ${Colors.yellow(middlewareFilePathRel)} is already existed, skip init!`);
+    Printer.log(`Mock middleware file ${Colors.yellow(middlewareFilePathRel)} is already existed, skip init!`);
     return;
   } else {
     // create if not existed
@@ -260,7 +261,7 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
     }
     ensureDirSync(path.join(CWD, mockDirName));
     writeFileSync(middlewareFilePathAbs, initContent, { encoding: 'utf8' });
-    console.log(LOG_FLAG, Colors.success(`Init mock middleware file ${Colors.green(middlewareFilePathRel)} success!`));
+    Printer.log(Colors.success(`Init mock middleware file ${Colors.green(middlewareFilePathRel)} success!`));
   }
 }
 
