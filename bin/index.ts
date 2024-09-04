@@ -98,8 +98,18 @@ function showHelp() {
       '',
       `Usage: ${name} [options]`,
       'Options:',
-      '  -v, -V, --version  Show version information', //
-      '  -h, -H, --help     Display help for command',
+      '  -v, -V, --ver --version   Show version information', //
+      '  -h, -H, --help            Display help for command',
+      `  -p, --port ${Colors.gray('<number>')}       Specify the port number(1024-10000)`,
+      `  -d, --mockDir ${Colors.gray('<string>')}    Specify the mock data directory(non-empty-string)`,
+      `  -w, --watch ${Colors.gray('<boolean>')}     Enable watch mode`,
+      'Examples:',
+      Colors.gray(`  > ${name} -p 8888 -d ./mocks`),
+      Colors.green('Recommended:'),
+      `  1. init a ${Colors.gray(`.${name}rc.json`)} file`,
+      Colors.gray(`  > ${name} init`),
+      `  2. then start mihawk server directly`,
+      Colors.gray(`  > ${name}`),
       '\n',
     ].join('\n'),
   );
