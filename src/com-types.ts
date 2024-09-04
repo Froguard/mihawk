@@ -36,9 +36,9 @@ export interface HttpsConfig {
 }
 
 /**
- * mihawk options
+ * mihawk root-config 配置文件
  */
-export interface MihawkOptions {
+export interface MihawkRC {
   /**
    * 监听地址，默认 `0.0.0.0`
    */
@@ -109,9 +109,13 @@ export interface MihawkOptions {
 }
 
 /**
- * mihawk root-config 配置文件
+ * Mihawk 启动参数
  */
-export interface MihawkRC extends MihawkOptions {}
+export interface MihawkOptions extends Required<MihawkRC> {
+  mockDirPath: string;
+  mockDataDirPath: string;
+  typescriptMode?: boolean;
+}
 
 /**
  * cli 命令行参数
@@ -140,4 +144,9 @@ export type JSONObject = Record<string | number, JSONValue>;
  *
  * 可用于“一些对象可能长得像某个类型时，但子属性又不局限于这个类型定义”的场景
  */
-export type Loosify<T> = Partial<T> & Record<string | number | symbol, any>;
+export type Loosify<T> = Record<string | number | symbol, any> & Partial<T>;
+// export type Loosify<T extends Record<string | number | symbol, any>> = {
+//   [k: string | number | symbol]: any;
+// } & {
+//   [k in keyof T]?: T[k];
+// };

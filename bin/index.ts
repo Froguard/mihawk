@@ -4,11 +4,11 @@
  * cli: mihawk
  */
 import Colors from 'color-cc';
-import { LOG_FLAG } from '../src/consts';
 import { getCliArgs } from '../src/utils/cli';
 import { readPackageJson } from '../src/composites/loader';
 import { Printer, Debugger } from '../src/utils/print';
 import init from './sub-cmds/init';
+import start from './sub-cmds/start';
 import type { SubCmdCallback } from '../src/com-types';
 
 //
@@ -19,40 +19,53 @@ const { name, version } = readPackageJson() || {};
  */
 (async () => {
   const args = getCliArgs();
-  const { _, v, V, version, h, H, help } = args;
+  const { _, v, V, ver, version, h, H, help } = args;
   //
-  if (v || V || version) {
-    showVersion(); // mihawk -v
+  if (v || V || ver || version) {
+    // mihawk -v
+    showVersion();
   } else if (h || H || help) {
-    showHelp(); // mihawk -h
+    // mihawk -h
+    showHelp();
   } else {
-    let callback: null | SubCmdCallback<any> = null;
-    const subCmdName = _?.[0]?.trim() || ''; // find sub cmd callback
-    switch (subCmdName) {
-      case 'init':
-      case 'initial':
-        callback = init; // mihawk init
-        break;
-      default: // others
-        break;
-    }
-    if (typeof callback === 'function') {
-      const newArgs = { ...args, _: _?.slice(1) || [] };
-      Printer.log(Colors.gray(`mihawk ${subCmdName}`), Colors.gray(newArgs._.join(' ')));
+    const subCmdName = _?.[0]?.trim() || '';
+    const isMainCmd = !subCmdName;
+    if (isMainCmd) {
+      // main cmd: mihawk -a -b -c -d ...
+      Printer.log(Colors.gray(`mihawk ${_.join(' ')}`));
       try {
-        await callback(newArgs); // exec sub cmd
+        await start(args);
       } catch (error) {
-        Printer.log(Colors.yellow('Oops... It looks like something wrong:'), error, '\n');
+        errorHandler(error);
+      }
+    } else {
+      // sub cmd: mihawk <sub-cmd> -a -b -c -d ...
+      let callback: null | SubCmdCallback<any> = null;
+      switch (subCmdName) {
+        case 'i':
+        case 'init':
+        case 'initial':
+          callback = init; // mihawk init
+          break;
+        default: // mihawk unknown
+          break;
+      }
+      // detect sub cmd callback & exec it, if it existed
+      if (typeof callback === 'function') {
+        const newArgs = { ...args, _: _?.slice(1) || [] };
+        Printer.log(Colors.gray(`mihawk ${subCmdName}`), Colors.gray(newArgs._.join(' ')));
+        try {
+          await callback(newArgs); // exec sub cmd
+        } catch (error) {
+          errorHandler(error);
+        }
+      } else {
+        Debugger.log('process.argv=', process.argv, 'args=', args);
+        showPkgInfo();
         showHelp();
         process.exit(1); // quit
       }
-    } else {
-      Debugger.log(`${LOG_FLAG} process.argv=`, process.argv);
-      Debugger.log(`${LOG_FLAG} args=`, args);
-      showPkgInfo();
-      showHelp();
     }
-    //
   }
 })();
 //
@@ -62,6 +75,12 @@ const { name, version } = readPackageJson() || {};
 // ============================================= functions ===================================================
 //
 //
+
+function errorHandler(error: any) {
+  Printer.log(Colors.yellow('Oops... It looks like something went wrong:'), error, '\n');
+  showHelp();
+  process.exit(1); // quit
+}
 
 /**
  * 显示包信息

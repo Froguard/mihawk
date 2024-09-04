@@ -2,7 +2,7 @@
 import path from 'path';
 import Colors from 'color-cc';
 import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-extra';
-import { CWD, DEFAULT_RC, PKG_NAME } from '../../src/consts';
+import { CWD, DEFAULT_RC, MOCK_DATA_DIR_NAME, MOCK_DIR_NAME, PKG_NAME } from '../../src/consts';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
 import { initRCfile, getRcData } from '../../src/utils/rc';
 import { Printer, Debugger } from '../../src/utils/print';
@@ -74,7 +74,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
   // watch
   config.watch = await confirmInCLI('enable file watch?', DEFAULT_RC.watch);
   // mockDir
-  config.mockDir = await inputTxtInCLI('type in mock data directory', './mocks');
+  config.mockDir = await inputTxtInCLI('type in mock data directory', MOCK_DIR_NAME);
   // mockDataFileType
   config.mockDataFileType = await singleSelectInCli(
     'select mock data json file type',
@@ -122,8 +122,8 @@ async function initRootConfigFileViaCli(configFileName: string) {
 /**
  * 初始化 mock data dir (如果不存在的话，才会创建)
  */
-async function initMockDataDir(mockDirName: string = 'mocks') {
-  const mockDataDir = path.join(mockDirName || 'mocks', './data');
+async function initMockDataDir(mockDirName: string = MOCK_DIR_NAME) {
+  const mockDataDir = path.join(mockDirName || MOCK_DIR_NAME, MOCK_DATA_DIR_NAME);
   const mockDataDirPath = path.join(CWD, mockDataDir);
   if (!existsSync(mockDataDirPath)) {
     ensureDirSync(mockDataDirPath);

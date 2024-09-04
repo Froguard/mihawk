@@ -5,7 +5,9 @@ import path from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
-import { CWD } from '../consts';
+import deepmerge from 'deepmerge';
+import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
+import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Printer, Debugger } from './print';
 
 interface InitOptions<T = any> {
@@ -119,4 +121,38 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
     Printer.error(Colors.error('load config file error..'), error);
     return defConfig;
   }
+}
+
+/**
+ * 格式化 rc 配置
+ * @param {any} oldConfig
+ */
+export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
+  const config: Loosify<MihawkOptions> = deepmerge({}, { ...oldConfig });
+  // 1.remove invalid keys
+  ['_', '--', 'h', 'H', 'help', 'v', 'V', 'version'].forEach(key => delete config[key]);
+  // 2.resolve alias
+  if (config.p !== undefined) {
+    // p alias for port
+    config.port = config.p;
+    delete config.p;
+  }
+  if (config.d !== undefined) {
+    // d alias for mockDir
+    config.mockDir = config.d || MOCK_DIR_NAME;
+    delete config.d;
+  }
+  if (config.w !== undefined) {
+    // w alias for watch
+    config.watch = config.w;
+    delete config.w;
+  }
+  // 3.set default values
+  deepmerge(config, DEFAULT_RC);
+  // 4.reset | format speaially keys
+  config.port = Number(config.port); // port
+  config.mockDirPath = path.join(CWD, config.mockDir || MOCK_DIR_NAME);
+  config.mockDataDirPath = path.join(config.mockDirPath, MOCK_DATA_DIR_NAME);
+  config.tsconfigPath = config.tsconfigPath ? path.join(CWD, config.tsconfigPath) : path.join(config.mockDir, './tsconfig.json');
+  return config as MihawkOptions;
 }
