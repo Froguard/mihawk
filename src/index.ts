@@ -183,7 +183,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   server = enhanceServer(server);
 
   // start
-  server.listen(port, host); // or 443
+  server.listen(port, host); // or 443(https) 80(http)
 
   //
   return server;
