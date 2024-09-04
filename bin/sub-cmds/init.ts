@@ -4,7 +4,7 @@ import Colors from 'color-cc';
 import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-extra';
 import { CWD, DEFAULT_RC, MOCK_DATA_DIR_NAME, MOCK_DIR_NAME, PKG_NAME } from '../../src/consts';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
-import { initRCfile, getRcData } from '../../src/utils/rc';
+import { initRCfile, getRcData } from '../../src/composites/rc';
 import { getLogicFileExt, getRoutesFileExt } from '../../src/utils/path';
 import { Printer, Debugger } from '../../src/utils/print';
 import routesDemo from './demo-routes.json';

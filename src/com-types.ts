@@ -109,12 +109,45 @@ export interface MihawkRC {
 }
 
 /**
- * Mihawk 启动参数
+ * Mihawk 启动参数, 在 MihawkRC 之上封装一些额外的参数，方便后续逻辑处理
  */
 export interface MihawkOptions extends Required<MihawkRC> {
-  mockDirPath: string;
-  mockDataDirPath: string;
-  isTypesctiptMode: boolean;
+  /**
+   * mock 目录的绝对路径，默认为 `${CWD}/mocks`
+   */
+  mockDirPath: string; //
+
+  /**
+   * mock data 数据文件目录的绝对路径，默认为 `${CWD}/mocks/data`
+   */
+  mockDataDirPath: string; //
+
+  /**
+   * routes.{json|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
+   */
+  routesFilePath: string; //
+
+  /**
+   * 当 mockLogicFileType 为 ts | typescript 时为 true
+   */
+  isTypesctiptMode: boolean; //
+
+  /**
+   * 当 mockLogicFileType 不是 none 时为 true
+   */
+  useLogicFile: boolean; //
+
+  /**
+   * 当 mockLogicFileType 不是 none 时才会有值，否则是空字符或者 null
+   * - 值不包含 . 前缀，eg: ts | js | cjs
+   */
+  logicFileExt?: string; //
+
+  /**
+   * 同 mockDataFileType 一致，为 json 或者 json5，这里多定义一个只是为了代码可读一点，与上面 logicFileExt 形成对比
+   * - 值不包含 . 前缀，eg： json | json5
+   */
+  dataFileExt: string; //
 }
 
 /**

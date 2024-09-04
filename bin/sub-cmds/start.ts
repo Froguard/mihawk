@@ -1,7 +1,7 @@
 'use strict';
 import deepmerge from 'deepmerge';
 import { Debugger, Printer } from '../../src/utils/print';
-import { getRcData } from '../../src/utils/rc';
+import { getRcData } from '../../src/composites/rc';
 import { PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
 import type { SubCmdCallback, MihawkRC, Loosify } from '../../src/com-types';

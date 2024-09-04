@@ -1,14 +1,15 @@
 /**
  * .mihawkrc.ts|js|json 配置文件相关操作逻辑
  */
-import { isAbsolute, join, resolve } from 'path';
+import { join } from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
-import { Printer, Debugger } from './print';
+import { Printer, Debugger } from '../utils/print';
+import { absifyPath, getLogicFileExt, getRoutesFileExt } from '../utils/path';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';
@@ -151,30 +152,25 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   deepmerge(config, DEFAULT_RC);
   // 4.reset | format speaially keys
   config.port = Number(config.port); // port
-  config.mockDirPath = _absifyPath(config.mockDir || MOCK_DIR_NAME); // mockDirPath
+  config.mockDirPath = absifyPath(config.mockDir || MOCK_DIR_NAME); // mockDirPath
   config.mockDataDirPath = join(config.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
   // tsconfigPath
   if (config.tsconfigPath) {
-    config.tsconfigPath = _absifyPath(config.tsconfigPath);
+    config.tsconfigPath = absifyPath(config.tsconfigPath);
   } else {
     config.tsconfigPath = join(config.mockDirPath, 'tsconfig.json');
   }
   // isTypesctiptMode
   const { mockDataFileType, mockLogicFileType } = config || {};
   config.isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
-  return config as MihawkOptions;
-}
+  // routesFilePath
+  config.routesFilePath = join(config.mockDirPath, `./routes.${getRoutesFileExt(mockLogicFileType)}`);
+  // useLogicFile
+  config.useLogicFile = mockLogicFileType !== 'none';
+  // logicFileExt
+  config.logicFileExt = getLogicFileExt(mockLogicFileType);
+  // dataFileExt
+  config.dataFileExt = mockDataFileType;
 
-/**
- * 得到绝对路径
- * @private
- * @param {string} targetPath
- * @param {string} rootPath 相对的根目录（当 targetPath 为相对路径的时候会用到，默认为 CWD）
- * @returns {string}
- */
-function _absifyPath(targetPath: string, rootPath: string = CWD) {
-  rootPath = rootPath || CWD;
-  targetPath = targetPath ? targetPath.trim() : rootPath; // 防止空掉
-  const absPath = isAbsolute(targetPath) ? targetPath : resolve(rootPath, targetPath);
-  return absPath.replace(/[/\\]+$/, ''); // 消除末尾的 / \
+  return config as MihawkOptions;
 }

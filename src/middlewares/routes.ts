@@ -6,18 +6,16 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @param options
  * @returns
  */
-export default function (options?: any) {
+export default function (routes: Record<string, string>, options?: any) {
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { req, res, skipDefaultMock } = ctx;
-    if (skipDefaultMock) {
-      await next();
-    } else {
-      Printer.warn('[koa-middleware]>>>', req.url);
-    }
+    const { req, res } = ctx;
+    Debugger.log('[koa-middleware]>>>', req.url);
+    await next();
+    Debugger.log('[koa-middleware]<<<', req.url);
   };
 }

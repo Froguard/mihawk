@@ -1,5 +1,4 @@
 import { Printer, Debugger } from '../utils/print';
-import { PKG_NAME } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**
@@ -14,14 +13,11 @@ export default function (options?: any) {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { method, path } = ctx;
-    Debugger.log(`/${method.toUpperCase()} ${path}`);
-    ctx.setHeader('X-powered-By', PKG_NAME);
-    const startTime = Date.now();
+    // 禁掉缓存，为了确保每次请求过去的数据都是最新的，方便mock时候debug
+    ctx.set('Pragma', 'No-cache');
+    ctx.set('Cache-Control', 'No-cache');
+    ctx.cookies.set('Expires', '0');
     //
     await next();
-    //
-    const keepTime = Date.now() - startTime;
-    ctx.setHeader('Server-Timing', `mock;dur=${keepTime}ms`);
   };
 }

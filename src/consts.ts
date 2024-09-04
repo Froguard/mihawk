@@ -37,19 +37,30 @@ export const MOCK_DATA_DIR_NAME = 'data';
  * 默认的 mihawk 配置
  */
 export const DEFAULT_RC: MihawkOptions = {
+  // base
   host: '0.0.0.0',
   port: 8888,
   https: false,
   cors: true,
   cache: false,
   watch: true,
+  // paths
   mockDir: MOCK_DIR_NAME,
   mockDirPath: path.resolve(CWD, MOCK_DIR_NAME),
   mockDataDirPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME),
+  // mock data file
   mockDataFileType: 'json',
+  dataFileExt: 'json',
+  // mock logic file
   mockLogicFileType: 'none',
+  useLogicFile: false,
+  logicFileExt: '', // 为空表示没有
   autoCreateMockLogicFile: false,
+  // typescript
   tsconfigPath: `./${MOCK_DIR_NAME}/tsconfig.json`,
   isTypesctiptMode: false,
+  // routes file
+  routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
+  //
   logConfig: null,
 };
