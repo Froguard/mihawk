@@ -1,16 +1,18 @@
+import dedupe from 'free-dedupe';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { PKG_NAME } from '../consts';
-import type { KoaContext, KoaNext } from '../com-types';
+import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
 
 /**
  * 中间件生成器
  * @param options
  * @returns
  */
-export default function (options?: any) {
+export default function (options?: MihawkOptions) {
   const { logConfig } = options || {};
-  const { ignoreRoutes } = logConfig || {};
+  let { ignoreRoutes } = logConfig || {};
+  ignoreRoutes = dedupe(ignoreRoutes);
   const needCheckIgnore = ignoreRoutes?.length > 0;
   /**
    * koa 中间件：
@@ -20,6 +22,7 @@ export default function (options?: any) {
   return async function (ctx: KoaContext, next: KoaNext) {
     const { method, path } = ctx;
     const routePath = `${method.toUpperCase()} ${path}`;
+    Debugger.log('[mdw-common]', routePath);
     const disableLogPrint = needCheckIgnore && isMatchPatterns(routePath, ignoreRoutes);
     !disableLogPrint && Printer.log(routePath);
     // set common props to ctx

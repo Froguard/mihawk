@@ -20,7 +20,7 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
   maxAge = isNil(maxAge) ? 86400000 : Math.min(Math.max(0, maxAge), 31556926000);
   const cacheControl = `public, max-age=${(maxAge / 1000) | 0}`;
   mime = mime || 'image/x-icon';
-  let iconFile: any = null;
+  const iconFile = readFileSync(absifyPath(faviconPath));
   //
   /**
    * koa 中间件函数：
@@ -34,9 +34,6 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
         ctx.status = 'OPTIONS' == method ? 200 : 405;
         ctx.set('Allow', 'GET, HEAD, OPTIONS');
       } else {
-        if (!iconFile) {
-          iconFile = readFileSync(absifyPath(faviconPath));
-        }
         ctx.skipDefaultMock = true;
         ctx.set('Cache-Control', cacheControl);
         ctx.type = mime;

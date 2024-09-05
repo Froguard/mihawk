@@ -46,7 +46,10 @@ export function shallowEqual(str1: string, str2: string) {
  * @param {string[]} filters “glob表达式字符串”，所组成的数组
  * @returns {boolean}
  */
-export function isMatchPatterns(target: string, patterns: string[]) {
+export function isMatchPatterns(target: string, patterns: string[] | string) {
+  if (typeof patterns === 'string') {
+    patterns = [patterns];
+  }
   patterns = formatPatterns(patterns);
   if (!patterns?.length) {
     return false;

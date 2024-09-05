@@ -120,3 +120,12 @@ export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType'], default
 export function getRoutesFileExt(fileType: MihawkRC['mockLogicFileType']) {
   return getLogicFileExt(fileType, 'json');
 }
+
+/**
+ * 移除文件后缀
+ * @param {string} filePath 带后缀的文件路径
+ * @returns {string} 不带后缀的文件路径
+ */
+export function removeFilePathExt(filePath: string) {
+  return filePath.replace(/\.[^.]+$/, '');
+}

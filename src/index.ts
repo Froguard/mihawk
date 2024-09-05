@@ -37,7 +37,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   const {
     // cache,
     cors,
-    // https: httpsConfig,
+    https: httpsConfig,
     useHttps,
     host,
     port,
@@ -105,10 +105,8 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
    */
   const app = new Koa();
 
-  if (useHttps) {
-    // enable https
-    app.use(mdwSSL({ hostname: host, port }));
-  }
+  // middleware: https base ssl
+  useHttps && app.use(mdwSSL({ hostname: host, port }));
 
   // middleware: favicon
   app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
@@ -142,19 +140,21 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   let server: http.Server | https.Server | null = null;
   // create http|https server
   if (useHttps) {
-    const httpsOptions: Record<'key' | 'cert', any> | null = null;
+    const httpsOptions: Record<'key' | 'cert', any> | null = { key: null, cert: null };
     let key = '', cert = ''; // prettier-ignore
-    if (typeof options.https === 'object') {
-      key = options.https.key;
-      cert = options.https.cert;
+    if (typeof httpsConfig === 'object') {
+      key = httpsConfig.key;
+      cert = httpsConfig.cert;
     }
     const keyFilePath = absifyPath(key);
     const certFilePath = absifyPath(cert);
     if (!key || !cert || !existsSync(keyFilePath) || !existsSync(certFilePath)) {
+      // use built-in https cert files
       httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
       httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.cert'));
       Printer.log(Colors.gray(`Custom https cert files ware found, use default build-in https cert files`));
     } else {
+      // load custom https cert files
       httpsOptions.key = readFileSync(keyFilePath);
       httpsOptions.cert = readFileSync(certFilePath);
       Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`${key} ${cert}`));
