@@ -23,6 +23,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
     Printer.log('Will exiit process...');
     process.exit(1);
   }
+  // TODO: 实现文件监控，检测到文件变化，刷新文件缓存（js|cjs|ts|json|json5）
 };
 
 //
