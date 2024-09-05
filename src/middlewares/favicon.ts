@@ -49,9 +49,11 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
         ctx.body = iconFile;
       }
     } else {
+      // ================================================
       //
       return next();
       //
+      // ================================================
     }
   };
 }

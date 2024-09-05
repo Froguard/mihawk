@@ -20,7 +20,11 @@ export default function cache() {
     ctx.set('Pragma', 'No-cache');
     ctx.set('Cache-Control', 'No-cache');
     ctx.set('Expires', '0');
+
+    // ================================================
     //
     await next();
+    //
+    // ================================================
   };
 }

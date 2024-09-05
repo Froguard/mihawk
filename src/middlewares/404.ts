@@ -25,9 +25,13 @@ export default function notFound() {
   return async function (ctx: KoaContext, next: KoaNext) {
     const { disableLogPrint, routePath, mockPath, req, url } = ctx || {};
     Debugger.log('mdw-404 >>', routePath);
+
+    // ================================================
     //
     await next();
     //
+    // ================================================
+
     // 如果没有匹配到任何路由
     if (ctx.status === 404) {
       const { accept } = req.headers || {};

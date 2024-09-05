@@ -22,7 +22,11 @@ export default function (options?: MihawkOptions) {
     const { skipDefaultMock } = ctx;
     !disableLogPrint && Printer.log('mdw-mock', routePath, Colors.gray(`↔ ${mockPath}`), Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     if (skipDefaultMock) {
+      // ================================================
+      //
       await next();
+      //
+      // ================================================
     } else {
       Printer.log('mdw-mock', routePath, 'TODO: mock 逻辑尚待实现...');
     }
