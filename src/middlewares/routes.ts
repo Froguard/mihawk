@@ -39,13 +39,12 @@ export default function (routes: Record<string, string>) {
       if (matched) {
         Printer.log('mdw-routes', `Reset routePath: ${routePath} → ${matched.route}`);
         ctx.routePath = matched.route;
-      } else {
-        // ================================================
-        //
-        await next();
-        //
-        // ================================================
       }
+      // ================================================
+      //
+      await next();
+      //
+      // ================================================
     }
     //
     Debugger.log('mdw-routes <<', routePath);
