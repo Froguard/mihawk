@@ -23,7 +23,7 @@ export default function notFound() {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { disableLogPrint, routePath, mockPath, req, url } = ctx || {};
+    const { disableLogPrint, routePath, mockRelPath, req, url } = ctx || {};
     Debugger.log('mdw-404 >>', routePath);
 
     // ================================================
@@ -35,11 +35,11 @@ export default function notFound() {
     // 如果没有匹配到任何路由
     if (ctx.status === 404) {
       const { accept } = req.headers || {};
-      !disableLogPrint && Printer.log('mdw-404', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
+      // !disableLogPrint && Printer.log('mdw-404', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
         // html
         ctx.set('Content-Type', 'text/html');
-        ctx.body = html.replace("'<%= mockPath %>'", mockPath);
+        ctx.body = html.replace("'<%= mockRelPath %>'", mockRelPath);
         // ctx.body = `<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>Target request: ${url}</p></body></html>`;
       } else if (accept.includes('application/json')) {
         // json

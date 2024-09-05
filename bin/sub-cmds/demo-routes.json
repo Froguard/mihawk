@@ -1,4 +1,4 @@
 {
-  "GET /test": "./data/GET/test",
-  "GET /test-*": "./data/GET/test"
+  "GET /test": "./GET/test",
+  "GET /test-*": "./GET/test"
 }

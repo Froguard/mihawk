@@ -41,6 +41,7 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 /**
  * 加载&执行 js 文件，返回执行结果
  * @param {string} jsFilePath
+ * @returns {Promise<T|null>}
  */
 export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   jsFilePath = absifyPath(jsFilePath);
@@ -48,17 +49,23 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
     // clearSelfAndAncestorsCache(jsFilePath);
     clearRequireCache(jsFilePath);
   }
-  // @ts-ignore
-  const res = require(jsFilePath); // eslint-disable-line
-  return res as T;
+  try {
+    // @ts-ignore
+    const mod = require(jsFilePath); // eslint-disable-line
+    return mod as T;
+  } catch (error) {
+    Printer.error(Colors.red('load js file failed!'), jsFilePath, error);
+    return null;
+  }
 }
 
 /**
  * 加载&执行 ts 文件，返回执行结果
  * @param {string} tsFilePath
  * @param {LoadTsOptions | boolean} options
+ * @returns {Promise<T|null>}
  */
-export async function loadTS(tsFilePath: string, noCache = false) {
+export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
   tsFilePath = absifyPath(tsFilePath);
   if (!require.extensions['.ts']) {
     Printer.warn(Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
@@ -69,8 +76,14 @@ export async function loadTS(tsFilePath: string, noCache = false) {
     // clearSelfAndAncestorsCache(tsFilePath);
     clearRequireCache(tsFilePath);
   }
-  // @ts-ignore
-  return require(tsFilePath); // eslint-disable-line
+  try {
+    // @ts-ignore
+    const mod = require(tsFilePath); // eslint-disable-line
+    return mod as T;
+  } catch (error) {
+    Printer.error(Colors.red('load ts file failed!'), tsFilePath, error);
+    return null;
+  }
 }
 
 /**

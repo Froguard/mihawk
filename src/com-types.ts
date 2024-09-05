@@ -4,13 +4,14 @@ import type { ParsedArgs } from 'minimist';
 /**
  * koa 类型
  */
-export type {
-  Middleware as KoaMiddleware, // async (ctx: Koa.Context, next: Koa.Next) => void
-  Context as KoaContext, // Koa.Context
-  Next as KoaNext, // Koa.Next
-  Request as KoaRequest, // Koa.Request
-  Response as KoaResponse, // Koa.Response
-} from 'koa';
+// export type {
+//   Middleware as KoaMiddleware, // async (ctx: Koa.Context, next: Koa.Next) => void
+//   Context as KoaContext, // Koa.Context
+//   Next as KoaNext, // Koa.Next
+//   Request as KoaRequest, // Koa.Request
+//   Response as KoaResponse, // Koa.Response
+// } from 'koa';
+import type { Middleware, Context, Next, Request, Response } from 'koa';
 // koa-bodyparser options
 export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 
@@ -34,11 +35,11 @@ declare module 'koa' {
     routePath: string;
 
     /**
-     * mock 文件的相对路径，比如 'GET /a/b' => '/mocks/data/GET/a/b'
+     * mock 文件的相对路径(相对于 data 目录)，比如 'GET /a/b' => '/GET/a/b'
      * - 初始化详见在 middlewares/common.ts  中逻辑代码
-     * - 可通过动态设置 `ctx.mockPath` 来覆盖，比如 middlewares/route.ts 中就是通过动态设置 `ctx.mockPath` 来达到 route 重定向的效果
+     * - 可通过动态设置 `ctx.mockRelPath` 来覆盖，比如 middlewares/route.ts 中就是通过动态设置 `ctx.mockRelPath` 来达到 route 重定向的效果
      */
-    mockPath: string;
+    mockRelPath: string;
   }
   interface Request {
     //
@@ -47,6 +48,20 @@ declare module 'koa' {
     //
   }
 }
+
+/**
+ * koa 类型二次导出
+ */
+export type KoaMiddleware = Middleware;
+export type KoaContext = Context;
+export type KoaNext = Next;
+export type KoaRequest = Request;
+export type KoaResponse = Response;
+
+/**
+ * Mock 数据转换器
+ */
+export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (ctx: Context, originData: T) => Promise<T>;
 
 /**
  * https 配置

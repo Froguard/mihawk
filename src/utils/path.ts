@@ -1,5 +1,5 @@
 'use strict';
-import { join, basename, relative, resolve, isAbsolute } from 'path';
+import { join, basename, relative, resolve, isAbsolute, normalize } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
 import { MihawkRC } from '../com-types';
@@ -122,10 +122,19 @@ export function getRoutesFileExt(fileType: MihawkRC['mockLogicFileType']) {
 }
 
 /**
- * 移除文件后缀
+ * 移除文件后缀(js|cjs|ts|json)
  * @param {string} filePath 带后缀的文件路径
  * @returns {string} 不带后缀的文件路径
  */
-export function removeFilePathExt(filePath: string) {
-  return filePath.replace(/\.[^.]+$/, '');
+export function removeSpecialExt(filePath: string) {
+  return filePath.replace(/\.(js|cjs|ts|json)$/g, '');
+}
+
+/**
+ * 格式化路径
+ * @param {string} targetPath
+ * @returns {string} newPath formated
+ */
+export function formatPath(targetPath: string) {
+  return normalize(unixifyPath(targetPath));
 }

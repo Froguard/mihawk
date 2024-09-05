@@ -24,7 +24,7 @@ export default function error() {
   return async function (ctx: KoaContext, next: KoaNext) {
     const { disableLogPrint, routePath } = ctx;
     Debugger.log('mdw-err >>', routePath);
-    !disableLogPrint && Printer.log('mdw-err', routePath);
+    // !disableLogPrint && Printer.log('mdw-err', routePath);
     // ================================================
     try {
       //
