@@ -2,14 +2,14 @@
 import Colors from 'color-cc';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
-import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
+import type { KoaContext, KoaNext } from '../com-types';
 
 /**
  * 中间件生成器
  * @param options
  * @returns
  */
-export default function (routes: Record<string, string>, options?: MihawkOptions) {
+export default function (routes: Record<string, string>) {
   Debugger.log('mdw-routes init...', routes);
   const needCheckRoutes = Object.keys(routes)?.length > 0;
   const routeKvEntries = needCheckRoutes ? Object.entries(routes) : [];
@@ -46,6 +46,6 @@ export default function (routes: Record<string, string>, options?: MihawkOptions
       }
     }
     //
-    Debugger.log('mdw-routes >>', routePath);
+    Debugger.log('mdw-routes <<', routePath);
   };
 }

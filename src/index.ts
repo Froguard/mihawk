@@ -13,9 +13,10 @@ import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/load
 import { relPathToCWD, getRootAbsPath, unixifyPath, absifyPath } from './utils/path';
 import mdwFavicon from './middlewares/favicon';
 import mdwCommon from './middlewares/common';
+import mdwError from './middlewares/error';
 import mdwCors from './middlewares/cors';
 import mdwHdCache from './middlewares/cache';
-import notFound from './middlewares/404';
+import mdw404 from './middlewares/404';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
@@ -116,20 +117,22 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   // middleware: common middleware
   app.use(mdwCommon(options));
 
+  app.use(mdwError());
+
   // middleware: cors
-  cors && app.use(mdwCors(options));
+  cors && app.use(mdwCors());
 
   // middleware: cache middleware
-  app.use(mdwHdCache(options));
+  app.use(mdwHdCache());
 
   // middleware: 404
-  app.use(notFound());
+  app.use(mdw404());
 
   // middleware: body parser
   app.use(mdwBodyParser());
 
   // middleware: special routes mapping
-  app.use(mdwRoutes(routes, options));
+  app.use(mdwRoutes(routes));
 
   // ★ middleware: diy middleware ★
   typeof diyMiddleware === 'function' && app.use(diyMiddleware);

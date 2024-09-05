@@ -1,14 +1,11 @@
 'use strict';
-import { resolve, join } from 'path';
+import { join } from 'path';
 import dedupe from 'free-dedupe';
-import { readFileSync } from 'fs-extra';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { PKG_NAME, MOCK_DATA_DIR_NAME } from '../consts';
-import { getRootAbsPath, unixifyPath } from '../utils/path';
+import { unixifyPath } from '../utils/path';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
-
-const ERR_HTML_PATH = resolve(getRootAbsPath(), './assets/50x.html');
 
 /**
  * 中间件生成器
@@ -21,14 +18,13 @@ export default function (options?: MihawkOptions) {
   let { ignoreRoutes } = logConfig || {};
   ignoreRoutes = dedupe(ignoreRoutes || []);
   const needCheckIgnore = ignoreRoutes?.length > 0;
-  const errHtml = readFileSync(ERR_HTML_PATH, 'utf-8');
 
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
    * @param {KoaNext} next
    */
-  return async function (ctx: KoaContext, next: KoaNext) {
+  return async function common(ctx: KoaContext, next: KoaNext) {
     const { method, path } = ctx;
     const routePath = `${method.toUpperCase()} ${path}`;
     Debugger.log('mdw-com >>', routePath);
@@ -41,23 +37,11 @@ export default function (options?: MihawkOptions) {
     //
     ctx.set('X-Mock-Powered-By', PKG_NAME);
     const startTime = Date.now();
-
     // ================================================
-    try {
-      //
-      await next();
-      //
-    } catch (err) {
-      // ctx.throw(500, err);
-      const { message, stack } = (err || {}) as Error;
-      const errMsg = message || err?.toString() || 'Something wrong...';
-      Printer.error('mdw-com', `Occurs error: ${errMsg}`, err);
-      ctx.status = 500;
-      ctx.set('Content-Type', 'text/html');
-      ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');
-    }
+    //
+    await next();
+    //
     // ================================================
-
     const keepTime = Date.now() - startTime;
     ctx.set('Server-Timing', `mock;dur=${keepTime}ms`);
     Debugger.log('mdw-com <<', routePath);

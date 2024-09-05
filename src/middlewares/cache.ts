@@ -1,13 +1,13 @@
 'use strict';
 import { Debugger } from '../utils/print';
-import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
+import type { KoaContext, KoaNext } from '../com-types';
 
 /**
  * 中间件生成器
  * @param options
  * @returns
  */
-export default function (options?: MihawkOptions) {
+export default function cache() {
   Debugger.log('mdw-cache init...');
 
   /**
