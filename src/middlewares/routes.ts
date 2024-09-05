@@ -20,7 +20,7 @@ export default function (routes: Record<string, string>) {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { disableLogPrint, skipDefaultMock, routePath, path } = ctx;
+    const { disableLogPrint, skipDefaultMock, mockPath, routePath, path } = ctx;
     Debugger.log('mdw-routes >>', routePath);
     !disableLogPrint && Printer.log('mdw-routes', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     //
@@ -36,9 +36,9 @@ export default function (routes: Record<string, string>) {
           break; // 以第一个匹配到的为准
         }
       }
-      if (matched) {
-        Printer.log('mdw-routes', `Reset routePath: ${routePath} → ${matched.route}`);
-        ctx.routePath = matched.route;
+      if (matched && matched.mockFile) {
+        Printer.log('mdw-routes', `Reset mockPath: ${mockPath} → ${matched.mockFile}`);
+        ctx.mockPath = matched.mockFile;
       }
       // ================================================
       //
