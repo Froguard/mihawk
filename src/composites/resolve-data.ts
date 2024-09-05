@@ -1,3 +1,4 @@
+'use strict';
 import { Printer } from '../utils/print';
 import { removeFilePathExt } from '../utils/path';
 
@@ -7,6 +8,6 @@ import { removeFilePathExt } from '../utils/path';
  */
 export async function doMock(mockKey: string, mockRoutePath: string) {
   mockKey = removeFilePathExt(mockKey);
-  Printer.warn('[doMock]', { mockKey, mockRoutePath });
+  Printer.log('[doMock]', { mockKey, mockRoutePath });
   // TODO: 待实现
 }

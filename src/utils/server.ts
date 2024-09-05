@@ -1,3 +1,4 @@
+'use strict';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import type { Socket } from 'net';

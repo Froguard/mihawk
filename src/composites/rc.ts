@@ -1,3 +1,4 @@
+'use strict';
 /**
  * .mihawkrc.ts|js|json 配置文件相关操作逻辑
  */

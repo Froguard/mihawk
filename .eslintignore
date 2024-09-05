@@ -8,3 +8,4 @@ node_modules
 *.js
 package-lock.json
 yarn.lock
+assets/404.html

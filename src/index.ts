@@ -11,15 +11,16 @@ import { Printer, Debugger } from './utils/print';
 import { formatOptionsByConfig } from './composites/rc';
 import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/loader';
 import { relPathToCWD, getRootAbsPath, unixifyPath, absifyPath } from './utils/path';
+import mdwFavicon from './middlewares/favicon';
 import mdwCommon from './middlewares/common';
 import mdwCors from './middlewares/cors';
-import mdwFavicon from './middlewares/favicon';
 import mdwHdCache from './middlewares/cache';
+import notFound from './middlewares/404';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
 import { enhanceServer } from './utils/server';
-import type { HttpsConfig, KoaMiddleware, Loosify, MihawkRC } from './com-types';
+import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
 const PKG_ROOT_PATH = getRootAbsPath();
 
@@ -119,6 +120,9 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
 
   // middleware: cache middleware
   app.use(mdwHdCache(options));
+
+  // middleware: 404
+  app.use(notFound());
 
   // middleware: body parser
   app.use(mdwBodyParser());

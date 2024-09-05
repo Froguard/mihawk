@@ -1,3 +1,4 @@
+'use strict';
 import debug from 'debug';
 import { PKG_NAME, LOG_FLAG } from '../consts';
 

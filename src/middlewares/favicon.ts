@@ -1,7 +1,12 @@
-import { readFileSync } from 'fs-extra';
+'use strict';
+import { readFileSync, existsSync } from 'fs-extra';
 import { absifyPath } from '../utils/path';
 import { isNil } from '../utils/is-type';
+import { Debugger } from '../utils/print';
 import type { KoaContext, KoaNext } from '../com-types';
+
+const ICON_BASE64 = 'data:image/x-icon;base64,8J+YgQ==';
+const ICON_MIME = 'image/x-icon';
 
 interface FaviconOptions {
   mime?: string;
@@ -15,13 +20,17 @@ interface FaviconOptions {
  * @returns
  */
 export default function favicon(faviconPath: string, options?: FaviconOptions) {
+  Debugger.log('[mdw-favicon] init...');
+  //
+  faviconPath = absifyPath(faviconPath);
+  const isExisted = existsSync(faviconPath);
+  const iconFile = isExisted ? readFileSync(faviconPath) : ICON_BASE64;
   //
   let { maxAge, mime } = options || {};
   maxAge = isNil(maxAge) ? 86400000 : Math.min(Math.max(0, maxAge), 31556926000);
+  mime = isExisted ? mime : ICON_MIME;
   const cacheControl = `public, max-age=${(maxAge / 1000) | 0}`;
-  mime = mime || 'image/x-icon';
-  const iconFile = readFileSync(absifyPath(faviconPath));
-  //
+
   /**
    * koa 中间件函数：
    * @param {KoaContext} ctx
@@ -36,11 +45,13 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
       } else {
         ctx.skipDefaultMock = true;
         ctx.set('Cache-Control', cacheControl);
-        ctx.type = mime;
+        ctx.type = mime || ICON_MIME;
         ctx.body = iconFile;
       }
     } else {
+      //
       return next();
+      //
     }
   };
 }

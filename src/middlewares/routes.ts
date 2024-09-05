@@ -1,3 +1,4 @@
+'use strict';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
@@ -8,8 +9,10 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (routes: Record<string, string>, options?: MihawkOptions) {
+  Debugger.log('[mdw-routes] init...', routes);
   const needCheckRoutes = Object.keys(routes)?.length > 0;
   const routeKvEntries = needCheckRoutes ? Object.entries(routes) : [];
+
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
@@ -17,7 +20,7 @@ export default function (routes: Record<string, string>, options?: MihawkOptions
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { skipDefaultMock, routePath, path } = ctx;
-    Debugger.log('[mdw-mock]', routePath);
+    Debugger.log('[mdw-routes]', routePath);
     if (skipDefaultMock || !needCheckRoutes) {
       await next();
     } else {

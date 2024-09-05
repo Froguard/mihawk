@@ -7,3 +7,4 @@
 .frontendrc.*
 tsconfig.json
 tsconfig.*.json
+assets/404.html

@@ -1,3 +1,4 @@
+'use strict';
 import { Printer, Debugger } from '../utils/print';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
 
@@ -7,6 +8,8 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (options?: MihawkOptions) {
+  Debugger.log('[mdw-mock] init...');
+
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
