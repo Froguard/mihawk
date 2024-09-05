@@ -28,7 +28,12 @@ export default function (options?: MihawkOptions) {
       //
       // ================================================
     } else {
-      Printer.log('mdw-mock', routePath, 'TODO: mock 逻辑尚待实现...');
+      /**
+       * 【警告】需要依据 mockPath 值来决定查找那个 mock 文件来进行如何处理
+       * （因为前面的 routes.ts 中间件中，会根据 routes.json 文件中的 kv 匹配进行重定向）
+       */
+      Printer.log('mdw-mock', `${routePath} → ${mockPath}`, 'TODO: mock 逻辑尚待实现...');
+      // TODO: 待实现
     }
     //
     Debugger.log('mdw-mock <<', routePath);
