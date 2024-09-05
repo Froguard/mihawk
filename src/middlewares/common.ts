@@ -16,7 +16,7 @@ export default function (options?: MihawkOptions) {
   Debugger.log('mdw-com init...', options);
   const { logConfig } = options || {};
   let { ignoreRoutes } = logConfig || {};
-  ignoreRoutes = dedupe(ignoreRoutes || []);
+  ignoreRoutes = dedupe(ignoreRoutes || []).map(ignRt => ignRt.trim().replace(/\s+/g, ' '));
   const needCheckIgnore = ignoreRoutes?.length > 0;
 
   /**
@@ -28,7 +28,7 @@ export default function (options?: MihawkOptions) {
     const { method, path } = ctx;
     const routePath = `${method.toUpperCase()} ${path}`;
     Debugger.log('mdw-com >>', routePath);
-    const disableLogPrint = needCheckIgnore && isMatchPatterns(routePath, ignoreRoutes);
+    const disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
     // !disableLogPrint && Printer.log('mdw-com', routePath);
     // set common props to ctx
     ctx.mockRelPath = unixifyPath(join(method, path));

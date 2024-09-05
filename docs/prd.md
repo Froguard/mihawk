@@ -10,20 +10,19 @@
   - [x] 创建路由文件 `routes.json`（默认）
 - [x] 使用时，支持用户自定义 middleware（Koa 的 middleware 格式），比如，处理一些公共的接口逻辑
   - [x] 中间件处理的时候，能够获取 post 请求上的 body (自定义 middleware 的加载顺序放到 bodyParser 之后就行)
-- [ ] 使用时，支持用户同时通过 json,js,ts 去描述 mock 逻辑
-  - [ ] ts 支持自定义 tsconfig 的路径（支持相对路径），如果不写则默认配置
+- [x] 使用时，支持用户同时通过 json,js,ts 去描述 mock 逻辑
+  - [x] ts 支持自定义 tsconfig 的路径（支持相对路径），如果不写则默认配置
     - [x] 加载 tsconfig 的时候，需要强制将其中的打包输出配置覆盖掉，如 `outDir`,`declaration`,`paths`,`include`,`ts-node`
-    - [ ] 对于上面的被覆盖掉的配置项，需要在控制台中，给出提示
-- [ ] 当 json,js,ts 文件同时存在的时候，json 作为原始数据，ts|js 作为中间件处理数据
-  - [ ] 当 mock 目录中，同时存在 js 和 ts 时，根据配置项中的 `mockLogicFileType` 选择处理方式
+- [x] 当 json,js,ts 文件同时存在的时候，json 作为原始数据，ts|js 作为中间件处理数据
+  - [x] 当 mock 目录中，同时存在 js 和 ts 时，根据配置项中的 `mockLogicFileType` 选择处理方式
   - [x] mock 数据文件，同时支持 `json` 和 `json5`
   - [x] `json 文件自定义加载解析`，不走 require|import，而是走文件内容解析，即 fs 加载文本，JSON5.parse
     - 这样好处是，即便是 json 文件，也能按照 json5 标准去写，能够支持注释等语法
 - [ ] 当检测到 json,js,ts 都不存在的时候，自动创建一个 json 文件（js 和 ts 不创建）
   - [ ] json 自动创建
   - [ ] js|ts 根据是否开启 autoCreate 属性决定自动创建
-- [ ] 日志中，允许进行针对特定 path 进行输出过滤，比如 `OPTION/ xxx` 请求，配置需要支持 `glob 表达式`
-- [ ] 支持 `routes.json` 文件，该文件为 kv 键值对，支持 `glob` 表达式
+- [x] 日志中，允许进行针对特定 path 进行输出过滤，比如 `OPTION/ xxx` 请求，配置需要支持 `glob 表达式`
+- [x] 支持 `routes.json` 文件，该文件为 kv 键值对，支持 `glob` 表达式
   - `k`: 标识路由
   - `v`: 标识 mock 文件路径
 - [ ] 日志输出时，遍历所有可用的路由，进行输出
