@@ -17,9 +17,28 @@ export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 // koa 扩展
 declare module 'koa' {
   interface Context {
-    skipDefaultMock?: boolean; // 跳过执行默认的 mock 逻辑
-    disableLogPrint?: boolean; // 默认为 false，即打印
-    routePath: string; // Method + Path (在 common middleware 中定义)
+    /**
+     * 跳过执行默认的 mock 逻辑，默认为 false，即：都是需要处理的
+     */
+    skipDefaultMock?: boolean;
+
+    /**
+     * 默认为 false，即：需要打印
+     */
+    disableLogPrint?: boolean;
+
+    /**
+     * Method + Path
+     * - 初始化详见在 middlewares/common.ts  中逻辑代码
+     */
+    routePath: string;
+
+    /**
+     * mock 文件的相对路径，比如 'GET /a/b' => '/mocks/data/GET/a/b'
+     * - 初始化详见在 middlewares/common.ts  中逻辑代码
+     * - 可通过动态设置 `ctx.mockPath` 来覆盖，比如 middlewares/route.ts 中就是通过动态设置 `ctx.mockPath` 来达到 route 重定向的效果
+     */
+    mockPath: string;
   }
   interface Request {
     //

@@ -20,7 +20,7 @@ interface FaviconOptions {
  * @returns
  */
 export default function favicon(faviconPath: string, options?: FaviconOptions) {
-  Debugger.log('[mdw-favicon] init...');
+  Debugger.log('mdw-favicon init...');
   //
   faviconPath = absifyPath(faviconPath);
   const isExisted = existsSync(faviconPath);

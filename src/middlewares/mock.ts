@@ -1,4 +1,5 @@
 'use strict';
+import Colors from 'color-cc';
 import { Printer, Debugger } from '../utils/print';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
 
@@ -8,20 +9,24 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (options?: MihawkOptions) {
-  Debugger.log('[mdw-mock] init...');
+  Debugger.log('mdw-mock init...');
 
   /**
    * koa 中间件：
    * @param {KoaContext} ctx
    * @param {KoaNext} next
    */
-  return async function (ctx: KoaContext, next: KoaNext) {
-    Debugger.log('[mdw-mock]', ctx.routePath);
-    const { req, res, skipDefaultMock } = ctx;
+  return async function mock(ctx: KoaContext, next: KoaNext) {
+    const { disableLogPrint, mockPath, routePath } = ctx || {};
+    Debugger.log('mdw-mock >>', routePath);
+    const { skipDefaultMock } = ctx;
+    !disableLogPrint && Printer.log('mdw-mock', routePath, Colors.gray(`↔ ${mockPath}`), Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     if (skipDefaultMock) {
       await next();
     } else {
-      Printer.warn('[mdw-mock]', req.url);
+      Printer.log('mdw-mock', routePath, 'TODO: mock 逻辑尚待实现...');
     }
+    //
+    Debugger.log('mdw-mock <<', routePath);
   };
 }

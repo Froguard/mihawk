@@ -20,6 +20,7 @@ import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
 import { enhanceServer } from './utils/server';
+import { isObjStrict } from './utils/is-type';
 import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
 const PKG_ROOT_PATH = getRootAbsPath();
@@ -146,7 +147,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   if (useHttps) {
     const httpsOptions: Record<'key' | 'cert', any> | null = { key: null, cert: null };
     let key = '', cert = ''; // prettier-ignore
-    if (typeof httpsConfig === 'object') {
+    if (isObjStrict(httpsConfig)) {
       key = httpsConfig.key;
       cert = httpsConfig.cert;
     }

@@ -9,6 +9,7 @@ import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath } from '../utils/path';
 import { Printer, Debugger } from '../utils/print';
+import { isObjStrict } from '../utils/is-type';
 import type { IPackageJson } from 'package-json-type';
 
 // 缓存的 json 数据
@@ -233,7 +234,7 @@ export function clearRequireCache(filename: string) {
   filename = absifyPath(filename);
   const mod = require.cache[filename];
   const parent = mod?.parent;
-  if (parent && typeof parent === 'object') {
+  if (parent && isObjStrict(parent)) {
     try {
       // 1. 删除父模块式对自己的引用
       const parentChildList = parent.children;
@@ -248,7 +249,7 @@ export function clearRequireCache(filename: string) {
       delete require.cache[filename];
       // 3. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
       const pathCache = (module?.constructor as any)?._pathCache;
-      if (pathCache && typeof pathCache === 'object') {
+      if (pathCache && isObjStrict(pathCache)) {
         Object.keys(pathCache).forEach(key => {
           if (pathCache[key]?.includes(filename)) {
             delete pathCache[key];

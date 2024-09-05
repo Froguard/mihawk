@@ -1,4 +1,5 @@
 'use strict';
+import Colors from 'color-cc';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
@@ -9,7 +10,7 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (routes: Record<string, string>, options?: MihawkOptions) {
-  Debugger.log('[mdw-routes] init...', routes);
+  Debugger.log('mdw-routes init...', routes);
   const needCheckRoutes = Object.keys(routes)?.length > 0;
   const routeKvEntries = needCheckRoutes ? Object.entries(routes) : [];
 
@@ -19,10 +20,14 @@ export default function (routes: Record<string, string>, options?: MihawkOptions
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { skipDefaultMock, routePath, path } = ctx;
-    Debugger.log('[mdw-routes]', routePath);
+    const { disableLogPrint, skipDefaultMock, routePath, path } = ctx;
+    Debugger.log('mdw-routes >>', routePath);
+    !disableLogPrint && Printer.log('mdw-routes', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
+    //
     if (skipDefaultMock || !needCheckRoutes) {
+      //
       await next();
+      //
     } else {
       let matched: Record<'route' | 'mockFile', string> | null = null;
       for (const [k, v] of routeKvEntries) {
@@ -32,14 +37,15 @@ export default function (routes: Record<string, string>, options?: MihawkOptions
         }
       }
       if (matched) {
-        Printer.warn('[mdw-mock]', matched);
-        // TODO: 实现 mock 处理逻辑
-        // ...
+        Printer.log('mdw-routes', `Reset routePath: ${routePath} → ${matched.route}`);
+        ctx.routePath = matched.route;
       } else {
         //
         await next();
         //
       }
     }
+    //
+    Debugger.log('mdw-routes >>', routePath);
   };
 }

@@ -6,7 +6,7 @@ import { Printer, Debugger } from '../utils/print';
 import { getRootAbsPath } from '../utils/path';
 import type { KoaContext, KoaNext } from '../com-types';
 
-const HTML_FILE_PATH = path.resolve(getRootAbsPath(), '404.html');
+const HTML_FILE_PATH = path.resolve(getRootAbsPath(), './assets/404.html');
 
 /**
  * 中间件生成器
@@ -14,7 +14,7 @@ const HTML_FILE_PATH = path.resolve(getRootAbsPath(), '404.html');
  * @returns
  */
 export default function notFound() {
-  Debugger.log('[mdw-404] init...');
+  Debugger.log('mdw-404 init...');
   const html = readFileSync(HTML_FILE_PATH, 'utf-8');
 
   /**
@@ -23,19 +23,19 @@ export default function notFound() {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { req, routePath, url } = ctx || {};
-    Debugger.log('[mdw-404]', routePath);
+    const { disableLogPrint, routePath, mockPath, req, url } = ctx || {};
+    Debugger.log('mdw-404 >>', routePath);
     //
     await next();
     //
     // 如果没有匹配到任何路由
     if (ctx.status === 404) {
       const { accept } = req.headers || {};
-      Printer.log('[mdw-404]', Colors.yellow(routePath), Colors.gray(accept));
+      !disableLogPrint && Printer.log('mdw-404', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
         // html
         ctx.set('Content-Type', 'text/html');
-        ctx.body = html.replace("'<%= mockPath %>'", routePath);
+        ctx.body = html.replace("'<%= mockPath %>'", mockPath);
         // ctx.body = `<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>Target request: ${url}</p></body></html>`;
       } else if (accept.includes('application/json')) {
         // json
@@ -47,6 +47,8 @@ export default function notFound() {
         ctx.body = JSON.stringify({ code: 404, data: '404 Not Found', msg: `Target request ${routePath} (${accept}) was not found!` });
       }
     }
+
+    Debugger.log('mdw-404 <<', routePath);
     //
   };
 }

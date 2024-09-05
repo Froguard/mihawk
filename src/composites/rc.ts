@@ -11,6 +11,7 @@ import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Debugger, Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
+import { isObjStrict } from '../utils/is-type';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';
@@ -177,7 +178,7 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   // dataFileExt
   config.dataFileExt = mockDataFileType;
   // useHttps
-  config.useHttps = !!config.https || typeof config.https === 'object';
+  config.useHttps = !!config.https || isObjStrict(config.https);
   //
   //
   return config as MihawkOptions;
