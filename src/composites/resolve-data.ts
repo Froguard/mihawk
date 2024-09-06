@@ -54,8 +54,9 @@ export function createDataResolver(options: MihawkOptions) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
     } else {
       Printer.warn('MockDataResolver:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
-      // auto create json file
+      // ★ Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, initData);
+      //
     }
     ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
 
@@ -79,8 +80,8 @@ export function createDataResolver(options: MihawkOptions) {
       } else {
         if (autoCreateMockLogicFile) {
           Printer.warn('MockDataResolver:', "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
-          // auto create logic file
-          initMockLogicFile(mockLogicAbsPath, { routePath, mockJsonPath: jsonPath4log, logicFileExt: LOGIC_EXT });
+          // ★ Auto create logic file
+          _initMockLogicFile(mockLogicAbsPath, { routePath, jsonPath4log, logicPath4log, logicFileExt: LOGIC_EXT, overwrite: false });
           //
         } else {
           Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
@@ -98,9 +99,26 @@ export function createDataResolver(options: MihawkOptions) {
 //
 //
 
-function initMockLogicFile(mockLogicFilePath: string, options: { routePath: string; mockJsonPath: string; logicFileExt: LoigicFileExt }) {
-  const { logicFileExt, routePath, mockJsonPath } = options;
+interface MockLogicFileInitOptions {
+  routePath: string;
+  logicFileExt: LoigicFileExt;
+  logicPath4log: string;
+  jsonPath4log: string;
+  overwrite?: boolean;
+}
+/**
+ * 创建 mock 逻辑文件
+ * @param {string} mockLogicFilePath 目标文件路径
+ * @param options
+ * @returns {void}
+ */
+function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileInitOptions) {
+  const { logicFileExt, routePath, jsonPath4log, overwrite } = options;
   if (!logicFileExt) {
+    return;
+  }
+  if (!overwrite && existsSync(mockLogicFilePath)) {
+    Printer.warn('File is already exists, skip init logic file.', Colors.gray(mockLogicFilePath));
     return;
   }
   let initContent: string = '';
@@ -112,7 +130,7 @@ function initMockLogicFile(mockLogicFilePath: string, options: { routePath: stri
   ];
   const methodCommentCode = [
     '/**',
-    ` * @param {object} originData (${mockJsonPath})`, //
+    ` * @param {object} originData (${jsonPath4log})`, //
     ' * @param {MkCvtorTools} tools',
     ' * @returns {object} newData',
     ' */',
