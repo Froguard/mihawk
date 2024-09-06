@@ -7,7 +7,7 @@ import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
-import { absifyPath, getRootAbsPath } from '../utils/path';
+import { absifyPath, getRootAbsPath, relPathToCWD } from '../utils/path';
 import { Printer, Debugger } from '../utils/print';
 import { isObjStrict } from '../utils/is-type';
 import type { IPackageJson } from 'package-json-type';
@@ -157,6 +157,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     try {
       if (isFileExist) {
         fileContent = readFileSync(filePath, 'utf-8');
+        Printer.log(`ForceRefresh: Read load from ${Colors.gray(relPathToCWD(filePath))}`);
       }
     } catch (error) {
       Printer.error('read file failed!', filePath, error);
@@ -244,6 +245,7 @@ export function clearRequireCache(filename: string) {
   if (CWD === filename) {
     return;
   }
+  Printer.log(`Clearing require cache for ${filename}`);
   filename = absifyPath(filename);
   const mod = require.cache[filename];
   const parent = mod?.parent;
@@ -286,6 +288,7 @@ export function clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
   if (filename === CWD || filename === stopPath) {
     return;
   }
+  Printer.log('clearSelfAndAncestorsCache:', filename);
   const mod = require.cache[filename];
   const parent = mod?.parent;
   const parentId = parent?.id;

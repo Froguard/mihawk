@@ -9,8 +9,8 @@ import { Printer } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is-type';
-import { MOCK_DATA_DIR_NAME } from '../consts';
-import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
+import { MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
+import type { KoaContext, LoigicFileExt, MihawkOptions, MockDataConvertor } from '../com-types';
 
 /**
  *
@@ -48,7 +48,7 @@ export function createDataResolver(options: MihawkOptions) {
     const jsonPath = `${mockRelPathNoExt}.${JSON_EXT}`;
     const jsonPath4log = `${DATA_BASE_PATH}/${jsonPath}`; // only for log
     const mockJsonAbsPath = absifyPath(join(MOCK_DATA_DIR_PATH, jsonPath));
-    const initData = { code: 200, data: 'Empty json data', msg: `Auto init file: ${jsonPath4log}` };
+    const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
@@ -79,7 +79,9 @@ export function createDataResolver(options: MihawkOptions) {
       } else {
         if (autoCreateMockLogicFile) {
           Printer.warn('MockDataResolver:', "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
-          // TODO: auto create logic file
+          // auto create logic file
+          initMockLogicFile(mockLogicAbsPath, { routePath, mockJsonPath: jsonPath4log, logicFileExt: LOGIC_EXT });
+          //
         } else {
           Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
         }
@@ -96,6 +98,52 @@ export function createDataResolver(options: MihawkOptions) {
 //
 //
 
-function initMockLogicFile(mockLogicFilePath: string, options: { routePath: string; mockPath: string; logicFileExt: string }) {
-  const { routePath, mockPath } = options;
+function initMockLogicFile(mockLogicFilePath: string, options: { routePath: string; mockJsonPath: string; logicFileExt: LoigicFileExt }) {
+  const { logicFileExt, routePath, mockJsonPath } = options;
+  if (!logicFileExt) {
+    return;
+  }
+  let initContent: string = '';
+  const commentCode = [
+    'use strict;',
+    '/**', //
+    ` * ${routePath}`, //
+    ' */',
+  ];
+  const methodCommentCode = [
+    '/**',
+    ` * @param {object} originData (${mockJsonPath})`, //
+    ' * @param {MkCvtorTools} tools',
+    ' * @returns {object} newData',
+    ' */',
+  ];
+  switch (logicFileExt) {
+    case 'ts':
+      initContent = [
+        ...commentCode,
+        `import { MkCvtorTools } from "${PKG_NAME}/com-types";`,
+        '',
+        ...methodCommentCode,
+        'export default function (originData: Record<string, any>, tools? MkCvtorTools) {',
+        '  // TODO: write your logic here', //
+        '  return originData;',
+        '};',
+      ].join('\n');
+      break;
+    case 'js':
+    case 'cjs':
+      initContent = [
+        ...commentCode,
+        '',
+        ...methodCommentCode,
+        'module.exports = function (originData, tools) {',
+        '  // TODO: write your logic here', //
+        '  return originData;',
+        '};',
+      ].join('\n');
+      break;
+    default:
+      break;
+  }
+  initContent && writeFileSafeSync(mockLogicFilePath, initContent);
 }

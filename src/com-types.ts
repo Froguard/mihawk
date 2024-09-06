@@ -61,16 +61,27 @@ export type KoaNext = Next;
 export type KoaRequest = Request;
 export type KoaResponse = Response;
 
+export interface MkCvtorTools {
+  /**
+   * 颜色工具
+   */
+  Colors: typeof Colors;
+  /**
+   * 深度合并对象的函数
+   */
+  deepMerge: typeof deepmerge;
+  /**
+   * 处理 json 数据的函数
+   */
+  JSON5: typeof JSON5;
+}
+
 /**
  * Mock 数据转换器
  */
 export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (
   originData: T,
-  tools?: {
-    Colors: typeof Colors;
-    deepMerge: typeof deepmerge;
-    JSON5: typeof JSON5;
-  },
+  tools?: MkCvtorTools,
   ctx?: Context, // ctx 一般不推荐用户使用，所以放到末尾
 ) => Promise<T>;
 

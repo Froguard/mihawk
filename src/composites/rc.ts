@@ -5,7 +5,7 @@
 import { join, basename } from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
-import { existsSync, writeFileSync } from 'fs-extra';
+import { existsSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { writeFileSafeSync } from '../utils/file';
 import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
