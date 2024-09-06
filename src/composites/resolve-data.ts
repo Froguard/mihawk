@@ -67,7 +67,7 @@ export function createDataResolver(options: MihawkOptions) {
       const logicPath4log = `${DATA_BASE_PATH}/${logicPath}`; // only for log
       const mockLogicAbsPath = join(MOCK_DATA_DIR_PATH, logicPath);
       if (existsSync(mockLogicAbsPath)) {
-        Printer.log('MockDataResolver:', `Load logic file: ${Colors.gray(logicPath4log)}`);
+        Printer.log('MockDataResolver:', 'Load logic file:', Colors.gray(logicPath4log));
         // get convertor function via loadJS/loadTS
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
