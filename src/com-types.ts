@@ -243,7 +243,7 @@ export interface MihawkOptions extends Required<MihawkRC> {
   dataFileExt: DataFileExt; //
 
   /**
-   * routes.{json|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
+   * routes.{json|json5|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   routesFilePath: string; //
