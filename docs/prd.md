@@ -11,6 +11,10 @@
 - [x] rc 文件友好提示
   - [x] json时给出 schema
   - [x] ts时给出类型定义
+- [x] server 需要同时支持 http 和 https
+  - [x] https 支持 boolean，false|true，只写 true 的时候，使用内置的秘钥证书
+  - [x] https 支持对象格式 { cert, key }; 用户可以填写自己的证书文件路径
+  - [x] https 作为对象自定义 { cert, key } 是，cert 和 key 必须承兑出现，当用户一旦有一个缺失的时候，都会转到使用内置证书
 - [x] 使用时，支持用户自定义 middleware（Koa 的 middleware 格式），比如，处理一些公共的接口逻辑
   - [x] 中间件处理的时候，能够获取 post 请求上的 body (自定义 middleware 的加载顺序放到 bodyParser 之后就行)
 - [x] 使用时，支持用户同时通过 json,js,ts 去描述 mock 逻辑

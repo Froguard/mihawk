@@ -159,7 +159,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     if (!key || !cert || !existsSync(keyFilePath) || !existsSync(certFilePath)) {
       // use built-in https cert files
       httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
-      httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.cert'));
+      httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.crt'));
       Printer.log(Colors.gray(`Custom https cert files ware found, use default build-in https cert files`));
     } else {
       // load custom https cert files
