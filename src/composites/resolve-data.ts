@@ -67,15 +67,17 @@ export function createDataResolver(options: MihawkOptions) {
       const logicPath4log = `${DATA_BASE_PATH}/${logicPath}`; // only for log
       const mockLogicAbsPath = join(MOCK_DATA_DIR_PATH, logicPath);
       if (existsSync(mockLogicAbsPath)) {
+        Printer.log('MockDataResolver:', `Load logic file: ${Colors.gray(logicPath4log)}`);
+        // get convertor function via loadJS/loadTS
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
           mockJson = await dataConvertor(ctx, mockJson, { Colors, deepMerge: deepmerge, JSON5 });
           ctx.set('X-Mock-Use-Logic', '1');
           if (isObjStrict(mockJson)) {
-            Printer.warn('MockDataResolver:', Colors.yellow("convertor-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
+            Printer.warn('MockDataResolver:', Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
-          Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't export a convertor-function!"), Colors.gray(logicPath4log));
+          Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't export a convert-function!"), Colors.gray(logicPath4log));
         }
       } else {
         if (autoCreateMockLogicFile) {
