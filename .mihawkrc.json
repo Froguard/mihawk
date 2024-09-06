@@ -7,7 +7,7 @@
   "watch": true,
   "mockDir": "mocks",
   "mockDataFileType": "json",
-  "mockLogicFileType": "js",
+  "mockLogicFileType": "ts",
   "autoCreateMockLogicFile": false,
   "tsconfigPath": "./mocks/tsconfig.json",
   "logConfig": null

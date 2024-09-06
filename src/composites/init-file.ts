@@ -226,10 +226,12 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
     '"use strict;"',
     '/**', //
     ` * ${routePath}`, //
+    ' * 本文件并非必须，如无需要（比如 json 不需要修改的场景）可直接删除即可',
     ' */',
   ];
   const methodCommentCode = [
     '/**',
+    ' * Mock 数据处理函数，原始数据来源为本文件的同名 json 文件',
     ` * @param {object} originData (${jsonPath4log})`, //
     ' * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }',
     ' * @returns {object} newData',
