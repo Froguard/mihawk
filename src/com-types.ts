@@ -64,19 +64,39 @@ export type KoaResponse = Response;
 /**
  * Mock 数据转换器函数中 tools 参数的类型
  */
-export interface MhkCvtorTools {
+export interface MhkCvtrExtra {
   /**
-   * 颜色工具
+   * ctx.url
    */
-  Colors: typeof Colors;
+  readonly url: string;
   /**
-   * 深度合并对象的函数
+   * ctx.method
    */
-  deepMerge: typeof deepmerge;
+  readonly method: string;
   /**
-   * 处理 json 数据的函数
+   * ctx.path
    */
-  JSON5: typeof JSON5;
+  readonly path: string;
+  /**
+   * ctx.query
+   */
+  readonly query: Readonly<Record<string, any>>;
+  /**
+   * ctx.params
+   */
+  readonly params?: Readonly<Record<string, any>>;
+  /**
+   * ctx.req.body
+   */
+  readonly body?: Readonly<Record<string, any>>;
+  /**
+   * ctx.headers
+   */
+  readonly headers: Readonly<Record<string, any>>;
+  /**
+   * ctx.host (hostname + port)
+   */
+  readonly host: string;
 }
 
 /**
@@ -84,18 +104,13 @@ export interface MhkCvtorTools {
  */
 export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (
   /**
-   * koa context
-   * - 可用于获取跟请求相关的信息，比如 ctx.query, ctx.req.body
-   */
-  ctx?: Context,
-  /**
    * json data
    */
-  originData?: T,
+  originData: T,
   /**
    * tools 对象，包含 Colors, deepMerge, JSON5 等工具
    */
-  tools?: MhkCvtorTools,
+  extra: MhkCvtrExtra,
 ) => Promise<T>;
 
 /**
@@ -198,37 +213,43 @@ export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
 /**
  * Mihawk 启动参数, 在 MihawkRC 之上封装一些额外的参数，方便后续逻辑处理
  */
-export interface MihawkOptions extends Required<MihawkRC> {
+export type MihawkOptions = MihawkRC & {
   /**
+   * @extra
    * mock 目录的绝对路径，默认为 `${CWD}/mocks`
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   mockDirPath: string; //
 
   /**
+   * @extra
    * mock data 数据文件目录的绝对路径，默认为 `${CWD}/mocks/data`
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   mockDataDirPath: string; //
   /**
+   * @extra
    * 当 mockLogicFileType 为 ts | typescript 时为 true
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   isTypesctiptMode: boolean; //
 
   /**
+   * @extra
    * 是否开启 https，当且仅当 https 属性是一个对象时开启
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   useHttps: boolean;
 
   /**
+   * @extra
    * 当 mockLogicFileType 不是 none 时为 true
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   useLogicFile: boolean; //
 
   /**
+   * @extra
    * 当 mockLogicFileType 不是 none 时才会有值，否则是空字符或者 null
    * - 值不包含 . 前缀，eg: ts | js | cjs
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
@@ -236,6 +257,7 @@ export interface MihawkOptions extends Required<MihawkRC> {
   logicFileExt?: LoigicFileExt | null; //
 
   /**
+   * @extra
    * 同 mockDataFileType 一致，为 json 或者 json5，这里多定义一个只是为了代码可读一点，与上面 logicFileExt 形成对比
    * - 值不包含 . 前缀，eg： json | json5
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
@@ -243,17 +265,19 @@ export interface MihawkOptions extends Required<MihawkRC> {
   dataFileExt: DataFileExt; //
 
   /**
+   * @extra
    * routes.{json|json5|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   routesFilePath: string; //
 
   /**
+   * @extra
    * 自定义中间件的绝对路径，默认为空，推荐为 `${CWD}/mocks/middleware.js`
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   middlewareFilePath: string; //
-}
+};
 
 /**
  * cli 命令行参数

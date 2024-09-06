@@ -2,15 +2,14 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
-import deepmerge from 'deepmerge';
-import * as JSON5 from 'json5';
-import { writeJSONSafeSync, writeFileSafeSync } from '../utils/file';
+import { writeJSONSafeSync } from '../utils/file';
 import { Printer } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is-type';
-import { MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
-import type { KoaContext, LoigicFileExt, MihawkOptions, MockDataConvertor } from '../com-types';
+import { MOCK_DATA_DIR_NAME } from '../consts';
+import { initMockLogicFile } from './init-file';
+import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 /**
  *
@@ -71,7 +70,16 @@ export function createDataResolver(options: MihawkOptions) {
         // get convertor function via loadJS/loadTS
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
-          mockJson = await dataConvertor(ctx, mockJson, { Colors, deepMerge: deepmerge, JSON5 });
+          mockJson = await dataConvertor(mockJson, {
+            url: ctx.url,
+            method: ctx.method,
+            path: ctx.path,
+            host: ctx.host,
+            headers: ctx.headers,
+            params: ctx.params,
+            query: ctx.query,
+            body: ctx.request.body,
+          });
           ctx.set('X-Mock-Use-Logic', '1');
           if (isObjStrict(mockJson)) {
             Printer.warn('MockDataResolver:', Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
@@ -83,7 +91,7 @@ export function createDataResolver(options: MihawkOptions) {
         if (autoCreateMockLogicFile) {
           Printer.warn('MockDataResolver:', "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
           // ★ Auto create logic file
-          _initMockLogicFile(mockLogicAbsPath, { routePath, jsonPath4log, logicPath4log, logicFileExt: LOGIC_EXT, overwrite: false });
+          initMockLogicFile(mockLogicAbsPath, { routePath, jsonPath4log, logicPath4log, logicFileExt: LOGIC_EXT, overwrite: false });
           //
         } else {
           Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
@@ -93,91 +101,4 @@ export function createDataResolver(options: MihawkOptions) {
     //
     return mockJson;
   };
-}
-
-//
-//
-// ============================================= private functions ===================================================
-//
-//
-
-interface MockLogicFileInitOptions {
-  routePath: string;
-  logicFileExt: LoigicFileExt;
-  logicPath4log: string;
-  jsonPath4log: string;
-  overwrite?: boolean;
-}
-/**
- * 创建 mock 逻辑文件
- * @param {string} mockLogicFilePath 目标文件路径
- * @param options
- * @returns {void}
- */
-function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileInitOptions) {
-  mockLogicFilePath = absifyPath(mockLogicFilePath);
-  const { logicFileExt, routePath, jsonPath4log, overwrite } = options;
-  // check logic file ext empty
-  if (!logicFileExt) {
-    Printer.warn('Empty logic file ext, skip init logic file.');
-    return;
-  }
-  // check file exists
-  if (!overwrite && existsSync(mockLogicFilePath)) {
-    Printer.warn('File is already exists, skip init logic file.', Colors.gray(mockLogicFilePath));
-    return;
-  }
-  // generate init-content
-  let initContent: string = '';
-  const commentCode = [
-    'use strict;',
-    '/**', //
-    ` * ${routePath}`, //
-    ' */',
-  ];
-  const methodCommentCode = [
-    '/**',
-    ' * @param {KoaContext} ctx koa-context',
-    ` * @param {object} originData (${jsonPath4log})`, //
-    ' * @param {MhkCvtorTools} tools { Colors, deepMerge, JSON5 }',
-    ' * @returns {object} newData',
-    ' */',
-  ];
-  switch (logicFileExt) {
-    case 'ts':
-      // typescript dode
-      initContent = [
-        ...commentCode,
-        `import { KoaContext, MhkCvtorTools } from "${PKG_NAME}/com-types";`,
-        '',
-        ...methodCommentCode,
-        'export default async function (ctx: KoaContext, originData: any, tools: MhkCvtorTools) {',
-        '  // write your logic here', //
-        '  return originData;',
-        '};',
-      ].join('\n');
-      break;
-    case 'js':
-    case 'cjs':
-      // commonjs code
-      initContent = [
-        ...commentCode,
-        '',
-        ...methodCommentCode,
-        'module.exports = async function (ctx, originData, tools) {',
-        '  // write your logic here', //
-        '  return originData;',
-        '};',
-      ].join('\n');
-      break;
-    default:
-      break;
-  }
-  // check initContent
-  if (!initContent) {
-    Printer.warn('No logic file ext was matched, skip init logic file.', logicFileExt);
-    return;
-  }
-  //
-  writeFileSafeSync(mockLogicFilePath, initContent);
 }

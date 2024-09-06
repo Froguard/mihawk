@@ -6,7 +6,7 @@
  */
 import path from 'path';
 import Colors from 'color-cc';
-import { MihawkOptions } from './com-types';
+import { MihawkOptions, MihawkRC } from './com-types';
 
 /**
  * 本工程的 npm 包名
@@ -34,36 +34,49 @@ export const MOCK_DIR_NAME = 'mocks';
 export const MOCK_DATA_DIR_NAME = 'data';
 
 /**
- * 默认的 mihawk 配置
+ * 跟陌路配置文件，默认配置
  */
-export const DEFAULT_RC: MihawkOptions = {
+export const DEFAULT_RC: MihawkRC = Object.freeze({
   // base
   host: '0.0.0.0',
   port: 8888,
   https: false,
-  useHttps: false,
   cors: true,
   cache: false,
   watch: true,
   // paths
   mockDir: MOCK_DIR_NAME,
-  mockDirPath: path.resolve(CWD, MOCK_DIR_NAME),
-  mockDataDirPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME),
   // mock data file
   mockDataFileType: 'json',
-  dataFileExt: 'json',
   // mock logic file
   mockLogicFileType: 'none',
-  useLogicFile: false,
-  logicFileExt: '', // 为空表示没有
   autoCreateMockLogicFile: false,
   // typescript
   tsconfigPath: `./${MOCK_DIR_NAME}/tsconfig.json`,
+  //
+  logConfig: null,
+});
+
+/**
+ * 默认的 mihawk options
+ * - 在 rc 配置之上额外增加，方便逻辑计算，初始赋值逻辑详见 formatOptionsByConfig 方法
+ */
+export const DEFAULT_OPTIONS: MihawkOptions = {
+  ...DEFAULT_RC,
+  // base
+  useHttps: false,
+  // paths
+  mockDirPath: path.resolve(CWD, MOCK_DIR_NAME),
+  mockDataDirPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME),
+  // mock data file
+  dataFileExt: 'json',
+  // mock logic file
+  useLogicFile: false,
+  logicFileExt: '', // 为空表示没有
+  // typescript
   isTypesctiptMode: false,
   // routes file
   routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
   // middleware file
   middlewareFilePath: null, // path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
-  //
-  logConfig: null,
 };

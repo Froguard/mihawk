@@ -8,7 +8,7 @@ import { cosmiconfig } from 'cosmiconfig';
 import { existsSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { writeFileSafeSync } from '../utils/file';
-import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
+import { CWD, DEFAULT_OPTIONS, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Debugger, Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
@@ -158,7 +158,7 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   }
 
   // 3.set default values
-  deepmerge(config, DEFAULT_RC);
+  deepmerge(config, DEFAULT_OPTIONS);
 
   // 4.reset | format speaially keys
   const { mockDataFileType, mockLogicFileType } = config || {};
