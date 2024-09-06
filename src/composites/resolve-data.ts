@@ -113,8 +113,10 @@ interface MockLogicFileInitOptions {
  * @returns {void}
  */
 function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileInitOptions) {
+  mockLogicFilePath = absifyPath(mockLogicFilePath);
   const { logicFileExt, routePath, jsonPath4log, overwrite } = options;
   if (!logicFileExt) {
+    Printer.warn('No logic file ext, skip init logic file.');
     return;
   }
   if (!overwrite && existsSync(mockLogicFilePath)) {
