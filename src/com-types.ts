@@ -61,6 +61,9 @@ export type KoaNext = Next;
 export type KoaRequest = Request;
 export type KoaResponse = Response;
 
+/**
+ * Mock 数据转换器函数中 tools 参数的类型
+ */
 export interface MkCvtorTools {
   /**
    * 颜色工具
