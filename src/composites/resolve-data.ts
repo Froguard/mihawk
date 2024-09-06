@@ -69,7 +69,7 @@ export function createDataResolver(options: MihawkOptions) {
       if (existsSync(mockLogicAbsPath)) {
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
-          mockJson = await dataConvertor(mockJson, { Colors, deepMerge: deepmerge, JSON5 }, ctx);
+          mockJson = await dataConvertor(ctx, mockJson, { Colors, deepMerge: deepmerge, JSON5 });
           ctx.set('X-Mock-Use-Logic', '1');
           if (isObjStrict(mockJson)) {
             Printer.warn('MockDataResolver:', Colors.yellow("convertor-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
@@ -135,32 +135,35 @@ function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileIni
   ];
   const methodCommentCode = [
     '/**',
+    ' * @param {KoaContext} ctx koa-context',
     ` * @param {object} originData (${jsonPath4log})`, //
-    ' * @param {MkCvtorTools} tools',
+    ' * @param {MhkCvtorTools} tools { Colors, deepMerge, JSON5 }',
     ' * @returns {object} newData',
     ' */',
   ];
   switch (logicFileExt) {
     case 'ts':
+      // typescript dode
       initContent = [
         ...commentCode,
-        `import { MkCvtorTools } from "${PKG_NAME}/com-types";`,
+        `import { KoaContext, MhkCvtorTools } from "${PKG_NAME}/com-types";`,
         '',
         ...methodCommentCode,
-        'export default function (originData: Record<string, any>, tools? MkCvtorTools) {',
-        '  // TODO: write your logic here', //
+        'export default async function (ctx: KoaContext, originData: any, tools: MhkCvtorTools) {',
+        '  // write your logic here', //
         '  return originData;',
         '};',
       ].join('\n');
       break;
     case 'js':
     case 'cjs':
+      // commonjs code
       initContent = [
         ...commentCode,
         '',
         ...methodCommentCode,
-        'module.exports = function (originData, tools) {',
-        '  // TODO: write your logic here', //
+        'module.exports = async function (ctx, originData, tools) {',
+        '  // write your logic here', //
         '  return originData;',
         '};',
       ].join('\n');

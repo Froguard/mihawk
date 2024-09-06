@@ -63,7 +63,7 @@ export const DEFAULT_RC: MihawkOptions = {
   // routes file
   routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
   // middleware file
-  middlewareFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
+  middlewareFilePath: null, // path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
   //
   logConfig: null,
 };

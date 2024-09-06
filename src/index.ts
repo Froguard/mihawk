@@ -22,6 +22,7 @@ import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
 import { enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is-type';
+import { scanExistedRoutes } from './composites/scanner';
 import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
 const PKG_ROOT_PATH = getRootAbsPath();
@@ -49,6 +50,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     // mockDirPath: MOCKS_ROOT_PATH,
     mockDataDirPath,
     //
+    dataFileExt,
     // logicFileExt,
     useLogicFile,
     isTypesctiptMode,
@@ -72,7 +74,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   }
 
   /**
-   * 1.ensure mock data dir exists
+   * 1.ensure mock data dir exists, scan it's json files to get routes
    */
   ensureDirSync(mockDataDirPath);
 
@@ -160,7 +162,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
       // use built-in https cert files
       httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
       httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.crt'));
-      Printer.log(Colors.gray(`Custom https cert files ware found, use default build-in https cert files`));
+      Printer.log(Colors.gray(`Custom https cert files ware not found, use default build-in https cert files`));
     } else {
       // load custom https cert files
       httpsOptions.key = readFileSync(keyFilePath);
@@ -181,11 +183,11 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     }
     switch (error.code) {
       case 'EACCES':
-        Printer.error(Colors.yellow(`MockServer failed! Port ${port} requires elevated privileges`));
+        Printer.error(Colors.error(`MockServer failed! Port ${port} requires elevated privileges!!!\n`));
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        Printer.error(Colors.yellow(`MockServer failed! Port ${port} is already in use`));
+        Printer.error(Colors.error(`MockServer failed! Port ${port} is already in use!!!\n`));
         process.exit(1);
         break;
       default:
@@ -197,10 +199,19 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   // server-event: listening
   server.on('listening', function () {
     Printer.log(Colors.green('Start mock-server success!'));
-    Printer.log(Colors.gray(`Mock Data directory: ${unixifyPath(mockDir)}`));
+    //
+    Printer.log('Mock Data directory: ', Colors.gray(unixifyPath(mockDir)));
+    const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt);
+    Debugger.log('Existed routes by scann:', existedRoutes);
+    const existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
+    existedRoutePaths.push(...Object.keys(routes));
+    const existedCount = existedRoutePaths.length;
+    Printer.log(`Existed all routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
+    //
     const protocol = useHttps ? 'https' : 'http';
     const addr1 = `${protocol}://${host}:${port}`;
     const addr2 = `${protocol}://${getMyIp()}:${port}`;
+    Printer.log(`🚀 Mock Server address:`);
     Printer.log(`- ${Colors.cyan(addr1)}`);
     Printer.log(`- ${Colors.cyan(addr2)}`);
     console.log();

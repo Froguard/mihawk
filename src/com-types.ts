@@ -64,7 +64,7 @@ export type KoaResponse = Response;
 /**
  * Mock 数据转换器函数中 tools 参数的类型
  */
-export interface MkCvtorTools {
+export interface MhkCvtorTools {
   /**
    * 颜色工具
    */
@@ -83,9 +83,19 @@ export interface MkCvtorTools {
  * Mock 数据转换器
  */
 export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (
-  originData: T,
-  tools?: MkCvtorTools,
-  ctx?: Context, // ctx 一般不推荐用户使用，所以放到末尾
+  /**
+   * koa context
+   * - 可用于获取跟请求相关的信息，比如 ctx.query, ctx.req.body
+   */
+  ctx?: Context,
+  /**
+   * json data
+   */
+  originData?: T,
+  /**
+   * tools 对象，包含 Colors, deepMerge, JSON5 等工具
+   */
+  tools?: MhkCvtorTools,
 ) => Promise<T>;
 
 /**
@@ -175,6 +185,14 @@ export interface MihawkRC {
   } | null;
 }
 
+/**
+ * mock 数据文件后缀
+ */
+export type DataFileExt = 'json' | 'json5';
+
+/**
+ * mock 逻辑文件后缀
+ */
 export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
 
 /**
@@ -183,47 +201,56 @@ export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
 export interface MihawkOptions extends Required<MihawkRC> {
   /**
    * mock 目录的绝对路径，默认为 `${CWD}/mocks`
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   mockDirPath: string; //
 
   /**
    * mock data 数据文件目录的绝对路径，默认为 `${CWD}/mocks/data`
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   mockDataDirPath: string; //
   /**
    * 当 mockLogicFileType 为 ts | typescript 时为 true
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   isTypesctiptMode: boolean; //
 
   /**
    * 是否开启 https，当且仅当 https 属性是一个对象时开启
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   useHttps: boolean;
 
   /**
    * 当 mockLogicFileType 不是 none 时为 true
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   useLogicFile: boolean; //
 
   /**
    * 当 mockLogicFileType 不是 none 时才会有值，否则是空字符或者 null
    * - 值不包含 . 前缀，eg: ts | js | cjs
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   logicFileExt?: LoigicFileExt | null; //
 
   /**
    * 同 mockDataFileType 一致，为 json 或者 json5，这里多定义一个只是为了代码可读一点，与上面 logicFileExt 形成对比
    * - 值不包含 . 前缀，eg： json | json5
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
-  dataFileExt: string; //
+  dataFileExt: DataFileExt; //
 
   /**
    * routes.{json|js|cjs|ts} 文件的绝对路径，默认为 `${CWD}/mocks/routes.json`
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   routesFilePath: string; //
 
   /**
-   * 自定义中间件的绝对路径，默认为 `${CWD}/mocks/middleware.js`
+   * 自定义中间件的绝对路径，默认为空，推荐为 `${CWD}/mocks/middleware.js`
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   middlewareFilePath: string; //
 }

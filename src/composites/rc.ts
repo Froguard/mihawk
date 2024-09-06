@@ -136,8 +136,10 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
  */
 export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   const config: Loosify<MihawkOptions> = deepmerge({}, { ...oldConfig });
+
   // 1.remove invalid keys
   ['_', '--', 'h', 'H', 'help', 'v', 'V', 'version'].forEach(key => delete config[key]);
+
   // 2.resolve alias
   if (config.p !== undefined) {
     // p alias for port
@@ -154,33 +156,49 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
     config.watch = config.w;
     delete config.w;
   }
+
   // 3.set default values
   deepmerge(config, DEFAULT_RC);
+
   // 4.reset | format speaially keys
+  const { mockDataFileType, mockLogicFileType } = config || {};
+  // - port mockDirPath mockDataDirPath
   config.port = Number(config.port); // port
   config.mockDirPath = absifyPath(config.mockDir || MOCK_DIR_NAME); // mockDirPath
   config.mockDataDirPath = join(config.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
-  // tsconfigPath
-  if (config.tsconfigPath) {
-    config.tsconfigPath = absifyPath(config.tsconfigPath);
-  } else {
-    config.tsconfigPath = join(config.mockDirPath, 'tsconfig.json');
+
+  // - isTypesctiptMode
+  const isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
+  config.isTypesctiptMode = isTypesctiptMode;
+  // - tsconfigPath
+  if (isTypesctiptMode) {
+    if (config.tsconfigPath) {
+      config.tsconfigPath = absifyPath(config.tsconfigPath);
+    } else {
+      config.tsconfigPath = join(config.mockDirPath, 'tsconfig.json');
+    }
   }
-  // isTypesctiptMode
-  const { mockDataFileType, mockLogicFileType } = config || {};
-  config.isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
-  // useLogicFile
-  config.useLogicFile = mockLogicFileType !== 'none';
+
+  // - dataFileExt
+  const dataFileExt = mockDataFileType;
+  config.dataFileExt = dataFileExt;
+
+  // - useLogicFile
+  const useLogicFile = mockLogicFileType !== 'none';
+  config.useLogicFile = useLogicFile;
+  // - logicFileExt
   const logicFileExt = getLogicFileExt(mockLogicFileType);
-  // routesFilePath
-  config.routesFilePath = join(config.mockDirPath, `./routes.${logicFileExt}`);
-  // middlewareFilePath
-  config.middlewareFilePath = join(config.mockDirPath, `./middleware.${logicFileExt}`);
-  // logicFileExt
   config.logicFileExt = logicFileExt;
-  // dataFileExt
-  config.dataFileExt = mockDataFileType;
-  // useHttps
+
+  // - middlewareFilePath
+  if (useLogicFile) {
+    config.middlewareFilePath = join(config.mockDirPath, `./middleware.${logicFileExt}`);
+  }
+
+  // - routesFilePath
+  config.routesFilePath = join(config.mockDirPath, `./routes.${logicFileExt || dataFileExt}`);
+
+  // - useHttps
   config.useHttps = !!config.https || isObjStrict(config.https); // https 为 true，或者为一个对象 { key,cert }
   //
   //

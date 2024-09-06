@@ -2,8 +2,8 @@
 import { join, basename, relative, resolve, isAbsolute, normalize } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
-import { LoigicFileExt, MihawkRC } from '../com-types';
-import { Printer, Debugger } from './print';
+import { DataFileExt, LoigicFileExt, MihawkRC } from '../com-types';
+import { Debugger } from './print';
 
 /**
  * 获取与 CWD 的相对路径
@@ -156,4 +156,25 @@ export function formatMockPath(mockPath: string) {
   let newPath = formatPath(removeSpecialExt(mockPath));
   newPath = newPath.endsWith('/') ? `${newPath}index` : newPath;
   return newPath;
+}
+
+/**
+ * 根据 json 文件的路径，获取路由信息
+ * - 如： GET/a/b/c.json   →  { method: "GET", path: "/a/b/c" }
+ * - 如： get/a/b/c.json   →  { method: "GET", path: "/a/b/c" }
+ * - 如： Get/a/b/c.json   →  { method: "GET", path: "/a/b/c" }
+ * - 如： /GET/a/b/c.json  →  { method: "GET", path: "/a/b/c" }
+ * - 如： myDiy/a/b/c.json →  { method: "MYDIY", path: "/a/b/c" }
+ * @param {string} jsonRelPath json 文件的相对路径，即相对于 data 文件夹根目录
+ * @param {string} jsonExt
+ * @returns {RouteInfo} routeInfo
+ */
+export function getRouteByJsonPath(jsonRelPath: string, jsonExt: DataFileExt = 'json') {
+  const ext = (jsonExt || 'json').replace(/^\.+/g, '');
+  const routePath = unixifyPath(jsonRelPath.replace(/^\/+/, '').replace(new RegExp(`\\.${ext}$`), ''));
+  const [first, ...others] = routePath.split('/');
+  return {
+    method: first.toUpperCase(),
+    path: `/${others.join('/')}`,
+  };
 }
