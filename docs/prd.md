@@ -8,6 +8,9 @@
   - [x] 创建必要的 `目录`,
   - [x] 创建接口示例代码， `demo` 文件（默认）
   - [x] 创建路由文件 `routes.json`（默认）
+- [x] rc 文件友好提示
+  - [x] json时给出 schema
+  - [x] ts时给出类型定义
 - [x] 使用时，支持用户自定义 middleware（Koa 的 middleware 格式），比如，处理一些公共的接口逻辑
   - [x] 中间件处理的时候，能够获取 post 请求上的 body (自定义 middleware 的加载顺序放到 bodyParser 之后就行)
 - [x] 使用时，支持用户同时通过 json,js,ts 去描述 mock 逻辑
