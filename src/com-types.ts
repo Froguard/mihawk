@@ -1,4 +1,7 @@
 'use strict';
+import Colors from 'color-cc';
+import deepmerge from 'deepmerge';
+import * as JSON5 from 'json5';
 import type { ParsedArgs } from 'minimist';
 
 /**
@@ -61,7 +64,15 @@ export type KoaResponse = Response;
 /**
  * Mock 数据转换器
  */
-export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (ctx: Context, originData: T) => Promise<T>;
+export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (
+  originData: T,
+  tools?: {
+    Colors: typeof Colors;
+    deepMerge: typeof deepmerge;
+    JSON5: typeof JSON5;
+  },
+  ctx?: Context, // ctx 一般不推荐用户使用，所以放到末尾
+) => Promise<T>;
 
 /**
  * https 配置
@@ -150,6 +161,8 @@ export interface MihawkRC {
   } | null;
 }
 
+export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
+
 /**
  * Mihawk 启动参数, 在 MihawkRC 之上封装一些额外的参数，方便后续逻辑处理
  */
@@ -182,7 +195,7 @@ export interface MihawkOptions extends Required<MihawkRC> {
    * 当 mockLogicFileType 不是 none 时才会有值，否则是空字符或者 null
    * - 值不包含 . 前缀，eg: ts | js | cjs
    */
-  logicFileExt?: string; //
+  logicFileExt?: LoigicFileExt | null; //
 
   /**
    * 同 mockDataFileType 一致，为 json 或者 json5，这里多定义一个只是为了代码可读一点，与上面 logicFileExt 形成对比

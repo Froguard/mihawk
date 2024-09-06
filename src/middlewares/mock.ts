@@ -1,6 +1,5 @@
 'use strict';
-import Colors from 'color-cc';
-import { Printer, Debugger } from '../utils/print';
+import { Debugger } from '../utils/print';
 import { createDataResolver } from '../composites/resolve-data';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
 

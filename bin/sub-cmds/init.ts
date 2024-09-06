@@ -46,6 +46,9 @@ export default callback;
  */
 async function initRootConfigFileViaCli(configFileName: string) {
   const config: Partial<MihawkRC> = {
+    // logConfig: {
+    //   ignoreRoutes: ['OPTIONS /*'],
+    // },
     ...DEFAULT_RC,
   };
   let hasRcExisted = false;

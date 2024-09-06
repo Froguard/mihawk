@@ -2,7 +2,7 @@
 import { join, basename, relative, resolve, isAbsolute, normalize } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
-import { MihawkRC } from '../com-types';
+import { LoigicFileExt, MihawkRC } from '../com-types';
 import { Printer, Debugger } from './print';
 
 /**
@@ -96,7 +96,7 @@ export function getRootAbsPath() {
  * @param {string} defaultExt 默认的后缀，当 fileType 为 none 的时候，会返回此默认的后缀
  * @returns {string} 文件后缀，不带.点 js|cjs|ts|
  */
-export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType'], defaultExt = '') {
+export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType']): LoigicFileExt {
   switch (fileType) {
     case 'js':
     case 'javascript':
@@ -108,7 +108,7 @@ export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType'], default
       return 'ts';
     case 'none':
     default:
-      return defaultExt || ''; // none
+      return ''; // none
   }
 }
 
@@ -118,7 +118,7 @@ export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType'], default
  * @returns {string} 文件后缀，不带.点  js|cjs|ts|json
  */
 export function getRoutesFileExt(fileType: MihawkRC['mockLogicFileType']) {
-  return getLogicFileExt(fileType, 'json');
+  return (getLogicFileExt(fileType) || 'json') as LoigicFileExt | 'json';
 }
 
 /**
@@ -140,4 +140,20 @@ export function removeSpecialExt(filePath: string) {
 export function formatPath(targetPath: string) {
   // 注意顺序，unixifyPath 要在 normalize 外层，确保最后产出结果是 unix 样式的
   return unixifyPath(normalize(targetPath));
+}
+
+/**
+ * 格式化 mock 路径（会统一成 unix 风格）
+ * - 对于 `/test/a/b`，会返回 `/test/a/b`
+ * - 对于 `/test/a/b.xxx`，会返回 `/test/a/b`
+ * - 对于 `/test/a/b.json5`，会返回 `/test/a/b`
+ * - 对于 `/test/a/`，会返回 `/test/a/index` 【特别注意】这里的末尾/或转化增加一个 index 后缀
+ * @private
+ * @param mockPath
+ * @returns
+ */
+export function formatMockPath(mockPath: string) {
+  let newPath = formatPath(removeSpecialExt(mockPath));
+  newPath = newPath.endsWith('/') ? `${newPath}index` : newPath;
+  return newPath;
 }

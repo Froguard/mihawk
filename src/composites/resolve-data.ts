@@ -2,9 +2,11 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
+import deepmerge from 'deepmerge';
+import * as JSON5 from 'json5';
 import { writeJSONSafeSync, writeFileSafeSync } from '../utils/file';
 import { Printer } from '../utils/print';
-import { absifyPath, formatPath, removeSpecialExt } from '../utils/path';
+import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is-type';
 import { MOCK_DATA_DIR_NAME } from '../consts';
@@ -39,26 +41,26 @@ export function createDataResolver(options: MihawkOptions) {
      * （因为前面的 routes.ts 中间件中，会根据 routes.json 文件中的 kv 匹配进行重定向）
      */
     // 0.format mock path
-    const mockRelPathNoExt = _formatMockPath(mockRelPath);
+    const mockRelPathNoExt = formatMockPath(mockRelPath);
     !disableLogPrint && Printer.log('MockDataResolver:', `${Colors.cyan(routePath)} -> ${Colors.green(mockRelPathNoExt)}`);
 
     // 1.load mock data from json|json5 file
     const jsonPath = `${mockRelPathNoExt}.${JSON_EXT}`;
     const jsonPath4log = `${DATA_BASE_PATH}/${jsonPath}`; // only for log
     const mockJsonAbsPath = absifyPath(join(MOCK_DATA_DIR_PATH, jsonPath));
-    const defaultData = { code: 200, data: 'Empty json data', msg: `Load mock jsonfile failed! ${jsonPath4log}` };
-    let mockJson: Record<string, any> = defaultData;
+    const initData = { code: 200, data: 'Empty json data', msg: `Auto init file: ${jsonPath4log}` };
+    let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
-      mockJson = (await loadJson(mockJsonAbsPath, !cache)) || defaultData;
+      mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
     } else {
       Printer.warn('MockDataResolver:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
       // auto create json file
-      writeJSONSafeSync(mockJsonAbsPath, defaultData, { spaces: 2, encoding: 'utf-8' });
+      writeJSONSafeSync(mockJsonAbsPath, initData);
     }
-    ctx.set('X-Mock-Use-Default', mockJson === defaultData ? '1' : '0');
-    ctx.set('X-Mock-Use-Logic', '0');
+    ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
 
     // 2.convert data by logic file, if it exists & exec correctly
+    ctx.set('X-Mock-Use-Logic', '0');
     if (useLogicFile) {
       const logicPath = `${mockRelPathNoExt}.${LOGIC_EXT}`;
       const logicPath4log = `${DATA_BASE_PATH}/${logicPath}`; // only for log
@@ -66,7 +68,7 @@ export function createDataResolver(options: MihawkOptions) {
       if (existsSync(mockLogicAbsPath)) {
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
-          mockJson = await dataConvertor(ctx, mockJson);
+          mockJson = await dataConvertor(mockJson, { Colors, deepMerge: deepmerge, JSON5 }, ctx);
           ctx.set('X-Mock-Use-Logic', '1');
           if (isObjStrict(mockJson)) {
             Printer.warn('MockDataResolver:', Colors.yellow("convertor-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
@@ -94,18 +96,6 @@ export function createDataResolver(options: MihawkOptions) {
 //
 //
 
-/**
- * 格式化 mock 路径
- * - 对于 `/test/a/b`，会返回 `/test/a/b`
- * - 对于 `/test/a/b.xxx`，会返回 `/test/a/b`
- * - 对于 `/test/a/b.json5`，会返回 `/test/a/b`
- * - 对于 `/test/a/`，会返回 `/test/a/index` 【这里特别注意】
- * @private
- * @param mockPath
- * @returns
- */
-function _formatMockPath(mockPath: string) {
-  let newPath = formatPath(removeSpecialExt(mockPath));
-  newPath = newPath.endsWith('/') ? `${newPath}index` : newPath;
-  return newPath;
+function initMockLogicFile(mockLogicFilePath: string, options: { routePath: string; mockPath: string; logicFileExt: string }) {
+  const { routePath, mockPath } = options;
 }
