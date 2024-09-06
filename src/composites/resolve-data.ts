@@ -115,14 +115,17 @@ interface MockLogicFileInitOptions {
 function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileInitOptions) {
   mockLogicFilePath = absifyPath(mockLogicFilePath);
   const { logicFileExt, routePath, jsonPath4log, overwrite } = options;
+  // check logic file ext empty
   if (!logicFileExt) {
-    Printer.warn('No logic file ext, skip init logic file.');
+    Printer.warn('Empty logic file ext, skip init logic file.');
     return;
   }
+  // check file exists
   if (!overwrite && existsSync(mockLogicFilePath)) {
     Printer.warn('File is already exists, skip init logic file.', Colors.gray(mockLogicFilePath));
     return;
   }
+  // generate init-content
   let initContent: string = '';
   const commentCode = [
     'use strict;',
@@ -165,5 +168,11 @@ function _initMockLogicFile(mockLogicFilePath: string, options: MockLogicFileIni
     default:
       break;
   }
-  initContent && writeFileSafeSync(mockLogicFilePath, initContent);
+  // check initContent
+  if (!initContent) {
+    Printer.warn('No logic file ext was matched, skip init logic file.', logicFileExt);
+    return;
+  }
+  //
+  writeFileSafeSync(mockLogicFilePath, initContent);
 }
