@@ -132,9 +132,12 @@ export function removeSpecialExt(filePath: string) {
 
 /**
  * 格式化路径
+ * - 注意，如果末尾有 / 会保留，并不会删除掉，这个和 absifyPath 有区别
+ * - 返回的路径是 unix 样式的
  * @param {string} targetPath
  * @returns {string} newPath formated
  */
 export function formatPath(targetPath: string) {
-  return normalize(unixifyPath(targetPath));
+  // 注意顺序，unixifyPath 要在 normalize 外层，确保最后产出结果是 unix 样式的
+  return unixifyPath(normalize(targetPath));
 }

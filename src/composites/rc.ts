@@ -7,6 +7,7 @@ import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
+import { writeFileSafeSync } from '../utils/file';
 import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Debugger, Printer } from '../utils/print';
@@ -85,7 +86,7 @@ export async function initRCfile<T = any>(name: string, options: InitOptions<T> 
       break;
   }
   // write file
-  writeFileSync(rcFilePath, initContent, { encoding: 'utf8' });
+  writeFileSafeSync(rcFilePath, initContent);
 }
 
 interface GetRcOptions<T = any> {
@@ -180,7 +181,7 @@ export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
   // dataFileExt
   config.dataFileExt = mockDataFileType;
   // useHttps
-  config.useHttps = !!config.https || isObjStrict(config.https);
+  config.useHttps = !!config.https || isObjStrict(config.https); // https 为 true，或者为一个对象 { key,cert }
   //
   //
   return config as MihawkOptions;

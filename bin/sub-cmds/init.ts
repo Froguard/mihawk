@@ -1,12 +1,13 @@
 'use strict';
 import path from 'path';
 import Colors from 'color-cc';
-import { existsSync, ensureDirSync, writeFileSync, ensureFileSync } from 'fs-extra';
+import { existsSync, ensureDirSync, ensureFileSync } from 'fs-extra';
 import { CWD, DEFAULT_RC, MOCK_DATA_DIR_NAME, MOCK_DIR_NAME, PKG_NAME } from '../../src/consts';
+import { writeFileSafeSync, writeJSONSafeSync } from '../../src/utils/file';
 import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '../../src/utils/cli';
 import { initRCfile, getRcData } from '../../src/composites/rc';
 import { getLogicFileExt, getRoutesFileExt } from '../../src/utils/path';
-import { Printer, Debugger } from '../../src/utils/print';
+import { Printer } from '../../src/utils/print';
 import routesDemo from './demo-routes.json';
 import dataDemo from './demo-data.json';
 import type { SubCmdCallback, MihawkRC } from '../../src/com-types';
@@ -143,7 +144,7 @@ async function initMockDataDir(mockDirName: string = MOCK_DIR_NAME) {
   const demoFilePathRel = path.join(mockDataDir, './GET/test.json');
   const demoFilePath = path.join(CWD, demoFilePathRel);
   if (!existsSync(demoFilePath)) {
-    writeFileSync(demoFilePath, JSON.stringify(dataDemo, null, 2));
+    writeJSONSafeSync(demoFilePath, dataDemo);
     Printer.log(Colors.success(`Create mock data file ${Colors.green(demoFilePathRel)} success!`));
   }
 }
@@ -202,7 +203,7 @@ async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'non
     // ensure dir existed
     ensureDirSync(path.join(CWD, mockDirName));
     // write file
-    writeFileSync(routesFilePathAbs, initContent, { encoding: 'utf8' });
+    writeFileSafeSync(routesFilePathAbs, initContent);
     Printer.log(Colors.success(`Init mock routes file ${Colors.green(routesFilePathRel)} success!`));
   }
 }
@@ -261,7 +262,7 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
         break;
     }
     ensureDirSync(path.join(CWD, mockDirName));
-    writeFileSync(middlewareFilePathAbs, initContent, { encoding: 'utf8' });
+    writeFileSafeSync(middlewareFilePathAbs, initContent);
     Printer.log(Colors.success(`Init mock middleware file ${Colors.green(middlewareFilePathRel)} success!`));
   }
 }

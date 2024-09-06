@@ -2,6 +2,7 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
+import { writeJSONSafeSync, writeFileSafeSync } from '../utils/file';
 import { Printer } from '../utils/print';
 import { absifyPath, formatPath, removeSpecialExt } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
@@ -50,8 +51,9 @@ export function createDataResolver(options: MihawkOptions) {
     if (existsSync(mockJsonAbsPath)) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || defaultData;
     } else {
-      Printer.warn('MockDataResolver:', Colors.yellow(`${jsonPath4log} not exists!`));
-      // TODO: auto create json file
+      Printer.warn('MockDataResolver:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
+      // auto create json file
+      writeJSONSafeSync(mockJsonAbsPath, defaultData, { spaces: 2, encoding: 'utf-8' });
     }
     ctx.set('X-Mock-Use-Default', mockJson === defaultData ? '1' : '0');
     ctx.set('X-Mock-Use-Logic', '0');
