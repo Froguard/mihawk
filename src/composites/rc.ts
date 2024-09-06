@@ -7,7 +7,7 @@ import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
 import { existsSync, writeFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
-import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME } from '../consts';
+import { CWD, DEFAULT_RC, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Debugger, Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
@@ -80,6 +80,8 @@ export async function initRCfile<T = any>(name: string, options: InitOptions<T> 
     case 'json':
     default:
       // initContent = JSON.stringify(initConfig, null, 2);
+      (initConfig as any).$schema = `./node_modules/${PKG_NAME}/assets/schema/root-config.json`;
+      initContent = JSON.stringify(initConfig || {}, null, 2);
       break;
   }
   // write file

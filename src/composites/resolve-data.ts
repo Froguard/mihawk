@@ -2,12 +2,12 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
-import { Printer, Debugger } from '../utils/print';
+import { Printer } from '../utils/print';
 import { absifyPath, formatPath, removeSpecialExt } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is-type';
 import { MOCK_DATA_DIR_NAME } from '../consts';
-import type { KoaContext, KoaNext, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 /**
  *
@@ -23,6 +23,7 @@ export function createDataResolver(options: MihawkOptions) {
     mockDataDirPath: MOCK_DATA_DIR_PATH,
     dataFileExt: JSON_EXT,
     logicFileExt: LOGIC_EXT,
+    autoCreateMockLogicFile = false,
   } = options || {};
   const loadLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
   const DATA_BASE_PATH = formatPath(join(mockDir, MOCK_DATA_DIR_NAME));
@@ -72,8 +73,12 @@ export function createDataResolver(options: MihawkOptions) {
           Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't export a convertor-function!"), Colors.gray(logicPath4log));
         }
       } else {
-        Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
-        // TODO: auto create logic file
+        if (autoCreateMockLogicFile) {
+          Printer.warn('MockDataResolver:', "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
+          // TODO: auto create logic file
+        } else {
+          Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
+        }
       }
     }
     //

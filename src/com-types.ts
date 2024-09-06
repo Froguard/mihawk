@@ -67,7 +67,13 @@ export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (ctx
  * https 配置
  */
 export interface HttpsConfig {
+  /**
+   * key 文件路径
+   */
   key: string;
+  /**
+   * cert 文件路径
+   */
   cert: string;
 }
 
@@ -116,7 +122,7 @@ export interface MihawkRC {
   mockDataFileType?: 'json' | 'json5';
 
   /**
-   * mock 逻辑文件类型，默认 js|cjs
+   * mock 逻辑文件类型，默认 none
    */
   mockLogicFileType?: 'none' | 'js' | 'cjs' | 'javascript' | 'ts' | 'typescript';
 

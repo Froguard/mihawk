@@ -52,6 +52,7 @@
       "import": "./dist/esm/src/com-types/index.js",
       "types": "./dist/types/src/com-types/index.d.ts"
     },
+    "./assets/schema/root-config.json": "./assets/schema/root-config.json",
     "./package.json": "./package.json"
   },
   "dependencies": {
