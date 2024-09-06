@@ -8,7 +8,7 @@ import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, relPathToCWD } from '../utils/path';
-import { Printer, Debugger } from '../utils/print';
+import { Printer } from '../utils/print';
 import { isObjStrict } from '../utils/is-type';
 import type { IPackageJson } from 'package-json-type';
 
@@ -39,6 +39,15 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 }
 
 /**
+ * 刷新 json 文件缓存
+ * @param {string} jsonFilePath json文件路径
+ * @returns
+ */
+export function refreshJson(jsonFilePath: string) {
+  return _cacheJson.del(jsonFilePath);
+}
+
+/**
  * 加载&执行 js 文件，返回执行结果
  * @param {string} jsFilePath
  * @returns {Promise<T|null>}
@@ -46,8 +55,8 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
-    // clearSelfAndAncestorsCache(jsFilePath);
-    clearRequireCache(jsFilePath);
+    // _clearSelfAndAncestorsCache(jsFilePath);
+    _clearRequireCache(jsFilePath);
   }
   try {
     // @ts-ignore
@@ -73,8 +82,8 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
   }
   //
   if (!noCache) {
-    // clearSelfAndAncestorsCache(tsFilePath);
-    clearRequireCache(tsFilePath);
+    // _clearSelfAndAncestorsCache(tsFilePath);
+    _clearRequireCache(tsFilePath);
   }
   try {
     // @ts-ignore
@@ -87,12 +96,21 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
 }
 
 /**
+ * 刷新 js|ts 文件缓存（以便于下次加载的时候，采用最新的文件）
+ * @param {string} filePath
+ */
+export function refreshTsOrJs(filePath: string) {
+  // return _clearSelfAndAncestorsCache(filePath);
+  return _clearRequireCache(filePath);
+}
+
+/**
  * 启用 require ts 文件
  * - 对 require.extensions['.ts'] 封装，以便于能够直接进行 require
  */
 export function enableRequireTsFile(tsconfig?: TsConfig) {
   if (!require.extensions['.ts']) {
-    require.extensions['.ts'] = _createTsFileRequireHandle(tsconfig || {});
+    require.extensions['.ts'] = _genTsFileRequireHandle(tsconfig || {});
   }
 }
 
@@ -179,7 +197,7 @@ type TsConfig = Record<string, any>; // Partial<TranspileOptions>
  * @param {TsConfig} tsconfig
  * @returns {function} .ts 文件的 require 处理函数
  */
-function _createTsFileRequireHandle(tsconfig: TsConfig) {
+function _genTsFileRequireHandle(tsconfig: TsConfig) {
   tsconfig = (tsconfig || {}) as Partial<TranspileOptions>;
   const tsTranspileOption: TranspileOptions = {
     // input
@@ -238,10 +256,11 @@ function _createTsFileRequireHandle(tsconfig: TsConfig) {
 
 /**
  * 清理 require cache
+ * @private
  * @param {string} filename
  * r@returns {void}
  */
-export function clearRequireCache(filename: string) {
+function _clearRequireCache(filename: string) {
   if (CWD === filename) {
     return;
   }
@@ -283,17 +302,17 @@ export function clearRequireCache(filename: string) {
  * - 删除父引用模块对应的缓存
  * @param {string} filename
  */
-export function clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
+function _clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
   filename = absifyPath(filename);
   if (filename === CWD || filename === stopPath) {
     return;
   }
-  Printer.log('clearSelfAndAncestorsCache:', filename);
+  Printer.log('_clearSelfAndAncestorsCache:', filename);
   const mod = require.cache[filename];
   const parent = mod?.parent;
   const parentId = parent?.id;
   // clear self
-  clearRequireCache(filename);
+  _clearRequireCache(filename);
   // clear parent
-  parentId && clearSelfAndAncestorsCache(parentId, stopPath);
+  parentId && _clearSelfAndAncestorsCache(parentId, stopPath);
 }

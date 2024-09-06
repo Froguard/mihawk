@@ -175,7 +175,6 @@ async function initMockRoutesFile(fileType: MihawkRC['mockLogicFileType'] = 'non
       '/**',
       ` * ${PKG_NAME}'s routes file:`, //
       ' */',
-      '//',
     ];
     switch (fileType) {
       case 'js':
@@ -233,7 +232,14 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
       ` * ${PKG_NAME}'s middleware file:`, //
       ' * - just a Koa Middleware',
       ' */',
-      '//',
+    ];
+    const methodCommentCode = [
+      '/**',
+      ` * 中间件函数，可以在次实现一些特殊的路由拦截处理逻辑`,
+      ' * @param {KoaContext} ctx ',
+      ' * @param {KoaNext} next', //
+      ' * @returns {Promise<void>}', //
+      ' */',
     ];
     let initContent = '';
     switch (fileType) {
@@ -243,9 +249,12 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
           ...comPrefixs,
           `import { Context, Next } from 'koa';`,
           // `import { KoaContext, KoaNext } from '${PKG_NAME}/com-types';`,
-          '//',
+          '',
+          ...methodCommentCode,
           'export default async function middleware(ctx: Context, next: Next) {',
           '  // do something here', //
+          '  console.log(ctx.url);',
+          '  await next();',
           '}',
           '',
         ].join('\n');
@@ -257,8 +266,12 @@ async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileType'] = 
       default:
         initContent = [
           ...comPrefixs,
+          '',
+          ...methodCommentCode,
           'module.exports = async function middleware(ctx, next) {',
           '  // do something here', //
+          '  console.log(ctx.url);',
+          '  await next();',
           '}',
           '',
         ].join('\n');
