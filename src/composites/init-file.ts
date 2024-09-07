@@ -163,7 +163,6 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
           `// import type { KoaContext, KoaNext } from '${PKG_NAME}/com-types';`,
           '',
           ...methodCommentCode, // comment code
-          // 'export default async function middleware(ctx: Context, next: Next) {',
           'export default async function middleware(ctx: KoaContext, next: KoaNext) {',
           ...methodBodyCode, // body code
           '}',
