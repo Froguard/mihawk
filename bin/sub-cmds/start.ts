@@ -15,15 +15,21 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
   Debugger.log('RootConfig:', rootConfig);
   const finalConfig = deepmerge<Loosify<MihawkRC>>(rootConfig, args);
   Debugger.log('FinalConfig:', finalConfig);
+  //
+  // TODO: 实现文件监控，检测到文件变化，刷新文件缓存（js|cjs|ts|json|json5）
+
+  //
   try {
+    //
     await mihawk(finalConfig);
+    //
   } catch (error) {
-    Printer.error('Exec function mihawk(config) occurs error:', error);
+    Printer.error('Occurs error during runing async-function mihawk(config):', error);
     Printer.warn('Please check your config or try again.');
     Printer.log('Will exiit process...');
+    console.log();
     process.exit(1);
   }
-  // TODO: 实现文件监控，检测到文件变化，刷新文件缓存（js|cjs|ts|json|json5）
 };
 
 //

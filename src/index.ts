@@ -29,7 +29,9 @@ const PKG_ROOT_PATH = getRootAbsPath();
 
 /**
  * mihawk
+ * - start a mock server
  * @param {Loosify<MihawkRC>} config
+ * @returns {Promise<void>}
  */
 export default async function mihawk(config?: Loosify<MihawkRC>) {
   delete config._;

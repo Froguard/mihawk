@@ -63,6 +63,7 @@ export type KoaResponse = Response;
 
 /**
  * Mock 数据转换器函数中 tools 参数的类型
+ * - 包含 ctx 上的 url,method,path,query,body 等属性
  */
 export interface MhkCvtrExtra {
   /**
@@ -108,7 +109,8 @@ export type MockDataConvertor<T extends Record<string, any> = JSONObject> = (
    */
   originData: T,
   /**
-   * tools 对象，包含 Colors, deepMerge, JSON5 等工具
+   * extra 对象，包含 ctx 上的 url,method,path,query,body 等属性
+   * - 注意，但不等价于 ctx 对象，而是一个只读对象，值从 ctx 上获取而已
    */
   extra: MhkCvtrExtra,
 ) => Promise<T>;
@@ -153,11 +155,23 @@ export interface MihawkRC {
 
   /**
    * 是否开启 watch（mock 文件变化的时候，进行刷新），默认 true
+   * - watch=true 时，无论是否设置 cache，文件变化必然触发缓存刷新
+   * - watch=false 时，是否走缓存，则完全看 cache 字段的逻辑
+   *
+   * 所以，watch 和 cache 并不冲突（ watch 控制文件变化时候的缓存策略,cache 控制常规情况的缓存策略 ）
    */
   watch?: boolean;
 
   /**
    * 对 mock 文件进行缓存，默认 true
+   * - true: mock 文件的加载，会走缓存，不会每次都重新加载文件（缓存的生成为第一次加载时产生）
+   * - false: mock 文件的加载，不会走缓存，每次都重新加载文件
+   *
+   * 其他：当 watch=true 时
+   * - 只要 mock 文件变化，缓存必刷新
+   * - 但 mock 文件不变化时，是否走缓存，就看 cache 字段的设置（即：同上逻辑）
+   *
+   * 所以，cache 和 watch 并不冲突（ cache 控制常规情况的缓存策略，watch 控制文件变化时候的缓存策略 ）
    */
   cache?: boolean;
 

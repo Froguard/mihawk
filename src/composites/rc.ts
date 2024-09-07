@@ -132,75 +132,79 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
 
 /**
  * 格式化 rc 配置
- * @param {any} oldConfig
+ * @param {any} config
  */
-export function formatOptionsByConfig(oldConfig: Loosify<MihawkRC>) {
-  const config: Loosify<MihawkOptions> = deepmerge({}, { ...oldConfig });
+export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
+  // const options = Object.assign({}, DEFAULT_OPTIONS, config);
+  const options = deepmerge<Loosify<MihawkOptions>>(
+    {},
+    {
+      ...DEFAULT_OPTIONS, // default
+      ...config, // override default by user config
+    },
+  );
 
   // 1.remove invalid keys
-  ['_', '--', 'h', 'H', 'help', 'v', 'V', 'version'].forEach(key => delete config[key]);
+  ['_', '--', 'h', 'H', 'help', 'v', 'V', 'version'].forEach(key => delete options[key]);
 
   // 2.resolve alias
-  if (config.p !== undefined) {
+  if (options.p !== undefined) {
     // p alias for port
-    config.port = config.p;
-    delete config.p;
+    options.port = options.p;
+    delete options.p;
   }
-  if (config.d !== undefined) {
+  if (options.d !== undefined) {
     // d alias for mockDir
-    config.mockDir = config.d || MOCK_DIR_NAME;
-    delete config.d;
+    options.mockDir = options.d || MOCK_DIR_NAME;
+    delete options.d;
   }
-  if (config.w !== undefined) {
+  if (options.w !== undefined) {
     // w alias for watch
-    config.watch = config.w;
-    delete config.w;
+    options.watch = options.w;
+    delete options.w;
   }
 
-  // 3.set default values
-  deepmerge(config, DEFAULT_OPTIONS);
-
-  // 4.reset | format speaially keys
-  const { mockDataFileType, mockLogicFileType } = config || {};
+  // 3.reset | format speaially keys
+  const { mockDataFileType, mockLogicFileType } = options || {};
   // - port mockDirPath mockDataDirPath
-  config.port = Number(config.port); // port
-  config.mockDirPath = absifyPath(config.mockDir || MOCK_DIR_NAME); // mockDirPath
-  config.mockDataDirPath = join(config.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
+  options.port = Number(options.port); // port: make sure it is a number
+  options.mockDirPath = absifyPath(options.mockDir || MOCK_DIR_NAME); // mockDirPath
+  options.mockDataDirPath = join(options.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
 
   // - isTypesctiptMode
   const isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
-  config.isTypesctiptMode = isTypesctiptMode;
+  options.isTypesctiptMode = isTypesctiptMode;
   // - tsconfigPath
   if (isTypesctiptMode) {
-    if (config.tsconfigPath) {
-      config.tsconfigPath = absifyPath(config.tsconfigPath);
+    if (options.tsconfigPath) {
+      options.tsconfigPath = absifyPath(options.tsconfigPath);
     } else {
-      config.tsconfigPath = join(config.mockDirPath, 'tsconfig.json');
+      options.tsconfigPath = join(options.mockDirPath, 'tsconfig.json');
     }
   }
 
   // - dataFileExt
   const dataFileExt = mockDataFileType;
-  config.dataFileExt = dataFileExt;
+  options.dataFileExt = dataFileExt;
 
   // - useLogicFile
   const useLogicFile = mockLogicFileType !== 'none';
-  config.useLogicFile = useLogicFile;
+  options.useLogicFile = useLogicFile;
   // - logicFileExt
   const logicFileExt = getLogicFileExt(mockLogicFileType);
-  config.logicFileExt = logicFileExt;
+  options.logicFileExt = logicFileExt;
 
   // - middlewareFilePath
   if (useLogicFile) {
-    config.middlewareFilePath = join(config.mockDirPath, `./middleware.${logicFileExt}`);
+    options.middlewareFilePath = join(options.mockDirPath, `./middleware.${logicFileExt}`);
   }
 
   // - routesFilePath
-  config.routesFilePath = join(config.mockDirPath, `./routes.${logicFileExt || dataFileExt}`);
+  options.routesFilePath = join(options.mockDirPath, `./routes.${logicFileExt || dataFileExt}`);
 
   // - useHttps
-  config.useHttps = !!config.https || isObjStrict(config.https); // https 为 true，或者为一个对象 { key,cert }
+  options.useHttps = !!options.https || isObjStrict(options.https); // https 为 true，或者为一个对象 { key,cert }
   //
   //
-  return config as MihawkOptions;
+  return options as MihawkOptions;
 }

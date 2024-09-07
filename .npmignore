@@ -70,6 +70,12 @@ jest.config.ts
 jest.config.js
 jest.config.json
 
+# mihawkrc file
+.mihawkrc
+.mihawkrc.ts
+.mihawkrc.js
+.mihawkrc.json
+
 # other config files
 .*rc
 .*rc.ts
