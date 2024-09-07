@@ -76,7 +76,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   }
 
   /**
-   * 1.ensure mock data dir exists, scan it's json files to get routes
+   * 1.ensure mock data dir exists, scan its json files to get routes
    */
   ensureDirSync(mockDataDirPath);
 

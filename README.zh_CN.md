@@ -147,7 +147,7 @@ module.exports = async function (oldJson) {
 
 ## Mock 文件示例
 
-### `routes` 文件 t's
+### `routes` 文件 ts
 
 ```ts
 /**
