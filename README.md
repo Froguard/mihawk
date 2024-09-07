@@ -106,7 +106,7 @@ About root config props:
 - `mockDataFileType`: string `json` | `json5`, default `json`, the file type of mock data
 - `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic
 
-> More detail -> [src/com-types.ts](dist/types/src/com-types.d.ts)
+> More detail -> [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts)
 
 ## Example
 
