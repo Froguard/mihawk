@@ -99,7 +99,7 @@ yarn build
 
 ## problems
 
-> 详见 [problem.md](./problem.md) 文件
+> 详见 [problems.md](./problems.md) 文件
 
 ## warning
 
