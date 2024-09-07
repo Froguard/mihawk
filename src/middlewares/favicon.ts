@@ -1,7 +1,7 @@
 'use strict';
 import { readFileSync, existsSync } from 'fs-extra';
 import { absifyPath } from '../utils/path';
-import { isNil } from '../utils/is-type';
+import { isNil } from '../utils/is';
 import { Debugger } from '../utils/print';
 import type { KoaContext, KoaNext } from '../com-types';
 

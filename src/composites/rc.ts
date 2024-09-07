@@ -12,7 +12,7 @@ import { CWD, DEFAULT_OPTIONS, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } fro
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Debugger, Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
-import { isObjStrict } from '../utils/is-type';
+import { isObjStrict } from '../utils/is';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';

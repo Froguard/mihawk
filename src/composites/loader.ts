@@ -9,7 +9,7 @@ import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
 import { Debugger, Printer } from '../utils/print';
-import { isNil, isObjStrict } from '../utils/is-type';
+import { isNil, isObjStrict } from '../utils/is';
 import type { IPackageJson } from 'package-json-type';
 
 // 缓存的 json 数据

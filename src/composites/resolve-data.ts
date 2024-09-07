@@ -6,7 +6,7 @@ import { writeJSONSafeSync } from '../utils/file';
 import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
-import { isObjStrict } from '../utils/is-type';
+import { isObjStrict } from '../utils/is';
 import { MOCK_DATA_DIR_NAME } from '../consts';
 import { initMockLogicFile } from './init-file';
 import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';

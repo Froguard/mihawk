@@ -21,7 +21,7 @@ import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
 import { enhanceServer } from './utils/server';
-import { isObjStrict } from './utils/is-type';
+import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
 

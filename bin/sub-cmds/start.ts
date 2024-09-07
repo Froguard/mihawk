@@ -5,7 +5,7 @@ import { Debugger, Printer } from '../../src/utils/print';
 import { getRcData } from '../../src/composites/rc';
 import { PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
-import { isObjStrict } from '../../src/utils/is-type';
+import { isObjStrict } from '../../src/utils/is';
 import { createWatcher } from '../../src/composites/watcher';
 import { processExit } from '../../src/utils/process';
 import type { SubCmdCallback, MihawkRC, Loosify } from '../../src/com-types';
