@@ -83,8 +83,13 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
    */
   if (isTypesctiptMode) {
     // 启用 ts 模式
-    const tsconfig = require(tsconfigPath) || {};
-    enableRequireTsFile(tsconfig);
+    let tsconfig = null;
+    if (existsSync(tsconfigPath)) {
+      tsconfig = require(tsconfigPath);
+    } else {
+      Printer.log(Colors.gray(`Cannot find tsconfig.json file in "${relPathToCWD(tsconfigPath)}", will use default build-in tsconfig.json`));
+    }
+    enableRequireTsFile(tsconfig || {});
   }
 
   /**

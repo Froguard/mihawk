@@ -238,19 +238,23 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
     ' */',
   ];
   switch (logicFileExt) {
-    case 'ts':
+    case 'ts': {
       // typescript dode
+      const useTypeDefine = false;
       initContent = [
         ...commentCode,
-        `import { MhkCvtrExtra } from "${PKG_NAME}/com-types";`,
+        useTypeDefine ? `import { MhkCvtrExtra } from "${PKG_NAME}/com-types";` : '',
         '',
         ...methodCommentCode,
-        'export default async function convertData(originData: any, extra: MhkCvtrExtra) {',
+        useTypeDefine
+          ? 'export default async function convertData(originData: any, extra: MhkCvtrExtra) {'
+          : 'export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {',
         '  // write your logic here', //
         '  return originData;',
-        '};',
+        '}',
       ].join('\n');
       break;
+    }
     case 'js':
     case 'cjs':
       // commonjs code

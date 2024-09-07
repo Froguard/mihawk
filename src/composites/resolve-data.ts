@@ -81,11 +81,12 @@ export function createDataResolver(options: MihawkOptions) {
             body: ctx.request.body,
           });
           ctx.set('X-Mock-Use-Logic', '1');
-          if (isObjStrict(mockJson)) {
+          if (!isObjStrict(mockJson)) {
             Printer.warn('MockDataResolver:', Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
-          Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't export a convert-function!"), Colors.gray(logicPath4log));
+          const exportInfo = isTypesctiptMode ? 'export default' : 'module.exports';
+          Printer.warn('MockDataResolver:', Colors.yellow(`MockLogicFile isn't ${exportInfo} a convert-function!`), Colors.gray(logicPath4log));
         }
       } else {
         if (autoCreateMockLogicFile) {

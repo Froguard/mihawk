@@ -9,7 +9,7 @@ import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, relPathToCWD } from '../utils/path';
 import { Printer } from '../utils/print';
-import { isObjStrict } from '../utils/is-type';
+import { isNil, isObjStrict } from '../utils/is-type';
 import type { IPackageJson } from 'package-json-type';
 
 // 缓存的 json 数据
@@ -61,6 +61,7 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   try {
     // @ts-ignore
     const mod = require(jsFilePath); // eslint-disable-line
+    Printer.log(`LoadJS(${noCache ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(jsFilePath))}`);
     return mod as T;
   } catch (error) {
     Printer.error(Colors.red('load js file failed!'), jsFilePath, error);
@@ -70,6 +71,7 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
 
 /**
  * 加载&执行 ts 文件，返回执行结果
+ * - 注意，被加载的文件，最好有一个默认导出
  * @param {string} tsFilePath
  * @param {LoadTsOptions | boolean} options
  * @returns {Promise<T|null>}
@@ -81,14 +83,20 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
     return null;
   }
   //
-  if (!noCache) {
+  if (noCache) {
     // _clearSelfAndAncestorsCache(tsFilePath);
     _clearRequireCache(tsFilePath);
   }
   try {
     // @ts-ignore
     const mod = require(tsFilePath); // eslint-disable-line
-    return mod as T;
+    Printer.log(`LoadTS(${noCache ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(tsFilePath))}`);
+    const res = mod?.default as T;
+    if (isNil(res)) {
+      // ts shoul export default
+      Printer.warn(Colors.yellow('ts file should export default, but not found'), res);
+    }
+    return res;
   } catch (error) {
     Printer.error(Colors.red('load ts file failed!'), tsFilePath, error);
     return null;
@@ -175,7 +183,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     try {
       if (isFileExist) {
         fileContent = readFileSync(filePath, 'utf-8');
-        Printer.log(`ForceRefresh: Read load from ${Colors.gray(relPathToCWD(filePath))}`);
+        Printer.log(`LoadJson(${forceRefresh ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(filePath))}`);
       }
     } catch (error) {
       Printer.error('read file failed!', filePath, error);
@@ -231,10 +239,9 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
       fileName: tsFilePath,
     });
     const jsCode = result.outputText;
-    // 方案一：直接 eval （不可取）
+    // 方案一：直接 eval或者 new Function（不可取，不安全）
     // module.exports = eval(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
-
     // vm 执行
     vm.runInNewContext(
       // source code
