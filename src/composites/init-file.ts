@@ -159,8 +159,8 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
       case 'typescript':
         initContent = [
           ...comPrefixs,
-          // `import { Context, Next } from 'koa';`,
-          `import { KoaContext, KoaNext } from '${PKG_NAME}/com-types';`,
+          `import typs { Context: KoaContext, Next: KoaNext } from 'koa';`,
+          `// import type { KoaContext, KoaNext } from '${PKG_NAME}/com-types';`,
           '',
           ...methodCommentCode, // comment code
           // 'export default async function middleware(ctx: Context, next: Next) {',
