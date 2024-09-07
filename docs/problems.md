@@ -28,7 +28,7 @@ git config --global core.autocrlf false
 
 **注意**: `.eslintrc.js` 和 `.prettierrc.js`, `tsconfig.json` 中，对于 `newLine` 都需要设置成 `lf`，以便于确保打包产物的换行符为 LF
 
-### 问题2：执行 bin 的时候，提示全系不足 `Permission denied`
+### 问题2：执行 bin 的时候，提示权限不足 `Permission denied`
 
 检查下对应的 bin 目录，其权限是否和其他 bin 文件一样
 
