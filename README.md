@@ -2,6 +2,8 @@
 
 > 中文版说明 → [README.zh-CN.md](./README.zh_CN.md)
 
+> Recommend: use version@`v1.0.0`+
+
 Make a easy mock-server to mock api, with `GET /a/b/c` -> `./mocks/data/GET/a/b/c.json` mapping
 
 - Support https protocol
@@ -66,7 +68,7 @@ mock-file  :  data/get/a/b/c/d.js
 
 Finally, the return data will be the data after processing mock-file (the `mock-file`) with origin data (the `JSON-file`)
 
-## others
+## Usage-Recommend
 
 > A more recommended way to use it is to write all config props into the `.mihawkrc.json` in the root directory
 >
@@ -142,3 +144,70 @@ Start `mihawk` server now, if request `GET /api/fetch_a_random_number`，return 
 > - Both support `js` | `cjs` | `ts`, the process is same。Attention to `export default` is necessary in `ts` file!
 > - Recommend to set `autoCreateMockLogicFile` to `true` in `.mihawkrc.json`, then, if request a not exists mock data file, it will auto create a mock logic file for you
 > - Of course, it is worth mentioning that **MockLogic files aren't necessary files**. If there is no logical demand for data processing, **using only JSON files can also simulate the request**
+
+## More example of mocks files
+
+### `routes` file demo in ts
+
+```ts
+/**
+ * mihawk's routes file:
+ */
+const routes: Record<string, string> = {
+  'GET /test': './GET/test',
+  'GET /test-*': './GET/test', // key: routePath，support glob expression; value:  mock data file path (no ext)
+};
+//
+export default routes;
+```
+
+### `middleware` file demo in ts
+
+```ts
+/**
+ * mihawk's middleware file:
+ * - just a Koa Middleware
+ */
+import { Context, Next } from 'mihawk/com-types';
+
+/**
+ * Middleware functions, to implement some special data deal logic,
+ * - This function exec before the default-mock-logic. Simply return or don`t call "await next()" could skip default-mock-logic
+ * - This function is a standard KOA middleware that follows the KOA onion ring model
+ * - see more：https://koajs.com/#middleware
+ * @param {Context} ctx
+ * @param {Next} next
+ * @returns {Promise<void>}
+ */
+export default async function middleware(ctx: Context, next: Next) {
+  // do something here
+  console.log(ctx.url);
+  if (ctx.peth === '/diy') {
+    ctx.body = 'it is my diy logic';
+  } else {
+    await next(); // default logic (such like mock json logic)
+  }
+}
+```
+
+### `mock-logic` file demo in ts
+
+```ts
+'use strict;';
+/**
+ * GET /xxx
+ * This file isn‘t mandatory. If it is not needed (such as when there is no need to modify response data), it can be deleted directly
+ */
+
+/**
+ * Mock data resolve function, the original data source is the JSON file with the same name as this file
+ * @param {object} originData (mocks/data/GET/xxx.json)
+ * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }
+ * @returns {object} newData
+ */
+export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {
+  // write your logic here...
+  originData.newProp = 'newPropXxx';
+  return originData; // return data, it is required
+}
+```

@@ -243,8 +243,7 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
       const useTypeDefine = false;
       initContent = [
         ...commentCode,
-        useTypeDefine ? `import { MhkCvtrExtra } from "${PKG_NAME}/com-types";` : '',
-        '',
+        useTypeDefine ? `import { MhkCvtrExtra } from "${PKG_NAME}/com-types";\n` : '',
         ...methodCommentCode,
         useTypeDefine
           ? 'export default async function convertData(originData: any, extra: MhkCvtrExtra) {'

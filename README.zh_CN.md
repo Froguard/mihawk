@@ -2,6 +2,8 @@
 
 > English → [README.md](./README.md)
 
+> 推荐使用版本 `v1.0.0`+
+
 采用 `GET /a/b/c` -> `./mocks/data/GET/a/b/c.json` 方式去做 api 请求的 mock server 工具
 
 - 支持 https 协议
@@ -66,7 +68,7 @@ mock-file  :  data/get/a/b/c/d.js
 
 最终请求的返回结果，将会是经由 mock-file 处理 JSON-file 后的数据
 
-## 其他
+## 推荐用法
 
 > 比较推荐的办法是，通过在根目录下，自定义一个 `.mihawkrc.json` 文件，用来完成配置项的编写
 >
@@ -142,3 +144,69 @@ module.exports = async function (oldJson) {
 > - 关于 MockLogic 文件，除了支持 js(cjs相同) 外，还支持 `ts`, 创建 `ts` 文件一样的效果，这里不在赘述，唯一需要注意的是，需要在 ts 文件中进行 `export default` 操作
 > - 推荐可以在 `.mihawkrc.json` 中，配置 `autoCreateMockLogicFile` 为 `true`，这样，当请求一个不存在的 mock 数据文件时，会自动创建一个对应的 mock logic 文件，方便后续开发
 > - 当然，值得一提的时，**MockLogic 文件，并非必** 要文件，如果没有数据的处理逻辑诉求，**只使用 json 文件也是可以的**
+
+## Mock 文件示例
+
+### `routes` 文件 t's
+
+```ts
+/**
+ * mihawk's routes file:
+ */
+const routes: Record<string, string> = {
+  'GET /test': './GET/test',
+  'GET /test-*': './GET/test', // key 为路由，支持 glob 表达式，value 为处理文件的路径（不加后缀）
+};
+//
+export default routes;
+```
+
+### `middleware` 文件 ts 示例
+
+```ts
+/**
+ * mihawk's middleware file:
+ * - just a Koa Middleware
+ */
+import { Context, Next } from 'mihawk/com-types';
+
+/**
+ *  koa 中间件函数
+ * - 标准的 koa2 中间件函数写法，遵循 koa 的洋葱圈模型
+ * - 注意：如果想要跳过内置的 mock 逻辑，如无需走 json mock 那一套，直接 return，或者不调用 await next() 语句接口
+ * - 更多文档：https://koajs.com/#middleware
+ * @param {Context} ctx
+ * @param {Next} next
+ * @returns {Promise<void>}
+ */
+export default async function middleware(ctx: Context, next: Next) {
+  console.log(ctx.url);
+  if (ctx.peth === '/diy') {
+    ctx.body = 'it is my diy logic';
+  } else {
+    await next(); // 默认的 json mock 逻辑，如果不需要，则不调用即可
+  }
+}
+```
+
+### `mock-logic` 文件 ts 示例
+
+```ts
+'use strict;';
+/**
+ * GET /xxx
+ *
+ */
+
+/**
+ * json 数据二次处理函数
+ * @param {object} originData (mocks/data/GET/xxx.json)
+ * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }, 请求相关的基本信息字段
+ * @returns {object} newData 处理后的新数据（需要显式进行 return）
+ */
+export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {
+  // 自定义处理逻辑
+  originData.newProp = 'newPropXxx';
+  return originData; // 需要进行显式 return
+}
+```
