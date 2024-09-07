@@ -5,7 +5,7 @@
  * @param {object} obj
  * @returns {void} change obj itself, no returns
  */
-export function delNillProps<T extends Record<string, any>>(obj: T): T {
+export function delNillProps<T extends Record<string, any>>(obj: T) {
   if (obj && typeof obj === 'object') {
     Object.entries(obj).forEach(([k, v]) => {
       if (v === null || v === undefined) {

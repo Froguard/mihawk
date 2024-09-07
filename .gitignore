@@ -175,3 +175,4 @@ index.d.ts
 # tmp test dir
 /mocks/**
 !/mocks/**/.gitkeep
+package-lock.json
