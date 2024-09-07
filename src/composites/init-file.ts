@@ -135,10 +135,10 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
     ];
     const methodCommentCode = [
       '/**',
-      ' * 中间件函数，可以在次实现一些特殊的路由拦截处理逻辑',
-      ' * - 本函数执行顺序将会在默认的 mock 逻辑执行之前，如果不想执行默认逻辑，直接 return，或者不调用 next() 即可',
-      ' * - 本函数为标准的 koa 中间件函数，遵循 koa 洋葱圈模型',
-      ' * - 详细文档可参考：https://koajs.com/#middleware',
+      ' * Middleware functions, to implement some special data deal logic,',
+      ' * - This function exec before the default-mock-logic. Simply return or don`t call "await next()" could skip default-mock-logic',
+      ' * - This function is a standard KOA middleware that follows the KOA onion ring model',
+      ' * - see more：https://koajs.com/#middleware',
       ' * @param {KoaContext} ctx',
       ' * @param {KoaNext} next', //
       ' * @returns {Promise<void>}', //
@@ -226,12 +226,12 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
     '"use strict;"',
     '/**', //
     ` * ${routePath}`, //
-    ' * 本文件并非必须，如无需要（比如 json 不需要修改的场景）可直接删除即可',
+    ' * This file isn‘t mandatory. If it is not needed (such as when there is no need to modify response data), it can be deleted directly',
     ' */',
   ];
   const methodCommentCode = [
     '/**',
-    ' * Mock 数据处理函数，原始数据来源为本文件的同名 json 文件',
+    ' * Mock data resolve function, the original data source is the JSON file with the same name as this file',
     ` * @param {object} originData (${jsonPath4log})`, //
     ' * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }',
     ' * @returns {object} newData',

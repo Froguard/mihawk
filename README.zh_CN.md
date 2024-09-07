@@ -131,7 +131,7 @@ mihawk init
 ```js
 module.exports = async function (oldJson) {
   oldJson.data = Math.floor(Math.random() * 1000000); // 随机生成一个 6 位的数字
-  return oldJson;
+  return oldJson; // 必要的返回
 };
 ```
 
@@ -141,3 +141,4 @@ module.exports = async function (oldJson) {
 >
 > - 关于 MockLogic 文件，除了支持 js(cjs相同) 外，还支持 `ts`, 创建 `ts` 文件一样的效果，这里不在赘述，唯一需要注意的是，需要在 ts 文件中进行 `export default` 操作
 > - 推荐可以在 `.mihawkrc.json` 中，配置 `autoCreateMockLogicFile` 为 `true`，这样，当请求一个不存在的 mock 数据文件时，会自动创建一个对应的 mock logic 文件，方便后续开发
+> - 当然，值得一提的时，**MockLogic 文件，并非必** 要文件，如果没有数据的处理逻辑诉求，**只使用 json 文件也是可以的**

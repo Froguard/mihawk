@@ -131,7 +131,7 @@ Now, if request `GET /api/fetch_a_random_number`，return data is `123456`, it i
 ```js
 module.exports = async function (oldJson) {
   oldJson.data = Math.floor(Math.random() * 1000000); // generate random number
-  return oldJson;
+  return oldJson; // return data, it is required
 };
 ```
 
@@ -141,4 +141,4 @@ Start `mihawk` server now, if request `GET /api/fetch_a_random_number`，return 
 >
 > - Both support `js` | `cjs` | `ts`, the process is same。Attention to `export default` is necessary in `ts` file!
 > - Recommend to set `autoCreateMockLogicFile` to `true` in `.mihawkrc.json`, then, if request a not exists mock data file, it will auto create a mock logic file for you
-> - If you want to use `ts` file, you need to install `typescript` and `@types/node`
+> - Of course, it is worth mentioning that **MockLogic files aren't necessary files**. If there is no logical demand for data processing, **using only JSON files can also simulate the request**
