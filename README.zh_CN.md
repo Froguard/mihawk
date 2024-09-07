@@ -168,7 +168,7 @@ export default routes;
  * mihawk's middleware file:
  * - just a Koa Middleware
  */
-import { Context, Next } from 'mihawk/com-types';
+import { Context, Next } from 'koa';
 
 /**
  *  koa 中间件函数
