@@ -106,7 +106,10 @@ async function initRootConfigFileViaCli(configFileName: string) {
     }
   }
   // autoCreateMockLogicFile
-  config.autoCreateMockLogicFile = await confirmInCLI('Auto create mock logic file(js|cjs|ts)?', DEFAULT_RC.autoCreateMockLogicFile);
+  if (config.mockLogicFileType !== 'none') {
+    config.autoCreateMockLogicFile = await confirmInCLI('Auto create mock logic file(js|cjs|ts)?', DEFAULT_RC.autoCreateMockLogicFile);
+  }
+
   //
   // delete null|undfined props in config
   delNillProps(config);
