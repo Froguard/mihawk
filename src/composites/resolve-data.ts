@@ -11,7 +11,9 @@ import { MOCK_DATA_DIR_NAME } from '../consts';
 import { initMockLogicFile } from './init-file';
 import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
-const LOGFLAG_RESOLVER = `${Colors.cyan('[MockDataResolver]')}${Colors.gray(':')}`;
+// only for log
+const RESOLVER_NAME = '[MockDataResolver]';
+const LOGFLAG_RESOLVER = `${Colors.cyan(RESOLVER_NAME)}${Colors.gray(':')}`;
 
 /**
  *
@@ -84,7 +86,7 @@ export function createDataResolver(options: MihawkOptions) {
           });
           ctx.set('X-Mock-Use-Logic', '1');
           if (!isObjStrict(mockJson)) {
-            Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
+            Printer.warn(RESOLVER_NAME, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
           const exportInfo = isTypesctiptMode ? 'export default' : 'module.exports';
