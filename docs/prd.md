@@ -22,7 +22,7 @@
     - [x] 加载 tsconfig 的时候，需要强制将其中的打包输出配置覆盖掉，如 `outDir`,`declaration`,`paths`,`include`,`ts-node`
 - [x] 当 json,js,ts 文件同时存在的时候，json 作为原始数据，ts|js 作为中间件处理数据
   - [x] 当 mock 目录中，同时存在 js 和 ts 时，根据配置项中的 `mockLogicFileType` 选择处理方式
-    - [ ] 验证一下 js 和 ts 文件的逻辑
+    - [x] 验证一下 js 和 ts 文件的逻辑
   - [x] mock 数据文件，同时支持 `json` 和 `json5`
   - [x] `json 文件自定义加载解析`，不走 require|import，而是走文件内容解析，即 fs 加载文本，JSON5.parse
     - 这样好处是，即便是 json 文件，也能按照 json5 标准去写，能够支持注释等语法
@@ -34,9 +34,9 @@
   - `k`: 标识路由
   - `v`: 标识 mock 文件路径
 - [x] 日志输出时，遍历所有可用的路由，进行输出
-- [ ] `watch` 能力默认开启 **实现方案待定！**
-  - [ ] 方案1：可以考虑使用 nodemon 完成
-  - [ ] 方案2：自己实现：
+- [x] `watch` 能力默认开启 **实现方案待定！**
+  - [ ] ~~方案1：可以考虑使用 nodemon 完成~~
+  - [x] 方案2：自己实现：
     - 使用 chokidar 监控文件变化，当文件变化时，重新加载 mock 相关文件，并重新执行新逻辑
     - 使用 lru-cache 算法，缓存 mock 文件的内容，避免重复加载
 
