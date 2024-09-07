@@ -273,7 +273,7 @@ function _clearRequireCache(filename: string) {
   if (CWD === filename || !isPathInDir(filename, CWD)) {
     return;
   }
-  Debugger.log('_clearRequireCache:', Colors.gray(filename));
+  Debugger.log('_clearRequireCache:', filename);
   filename = absifyPath(filename);
   const mod = require.cache[filename];
   if (!mod) {
@@ -283,6 +283,7 @@ function _clearRequireCache(filename: string) {
   // 1. 删除自己（确保 parent 已经获取到，才删除自己）
   mod.loaded = false;
   delete require.cache[filename];
+  Debugger.log('_clearRequireCache: √ clear require.cache success!', filename, 'parent:', parent?.filename);
   // 2. 删除父模块的引用
   if (parent && isObjStrict(parent)) {
     try {
@@ -304,7 +305,7 @@ function _clearRequireCache(filename: string) {
         });
       }
     } catch (error) {
-      Printer.error('clear require.cache failed!', filename, error);
+      Printer.error('Clear require.cache failed!', Colors.gray(filename), error);
     }
   }
 }
@@ -320,7 +321,7 @@ function _clearSelfAndAncestorsCache(filename: string) {
   if (filename === CWD || !isPathInDir(filename, CWD)) {
     return;
   }
-  Debugger.log('_clearSelfAndAncestorsCache:', Colors.gray(filename));
+  Debugger.log('_clearSelfAndAncestorsCache:', filename);
   const mod = require.cache[filename];
   if (!mod) {
     return;

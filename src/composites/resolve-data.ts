@@ -56,7 +56,7 @@ export function createDataResolver(options: MihawkOptions) {
     if (existsSync(mockJsonAbsPath)) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
     } else {
-      Debugger.log('[MockDataResolver]:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
+      Debugger.log('[MockDataResolver]:', `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
       // ★ Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, initData);
       //
