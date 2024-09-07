@@ -168,7 +168,8 @@ export default routes;
  * mihawk's middleware file:
  * - just a Koa Middleware
  */
-import { Context, Next } from 'koa';
+import type { Context: KoaContext, Next: KoaNext } from 'koa';
+// import type { KoaContext, KoaNext } from 'mihawk/con-types';
 
 /**
  * Middleware functions, to implement some special data deal logic,
@@ -179,7 +180,7 @@ import { Context, Next } from 'koa';
  * @param {Next} next
  * @returns {Promise<void>}
  */
-export default async function middleware(ctx: Context, next: Next) {
+export default async function middleware(ctx: KoaContext, next: KoaNext) {
   // do something here
   console.log(ctx.url);
   if (ctx.peth === '/diy') {
