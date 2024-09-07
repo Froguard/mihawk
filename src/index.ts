@@ -92,6 +92,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
       Printer.log(Colors.gray(`Cannot find tsconfig.json file in "${relPathToCWD(tsconfigPath)}", will use default build-in tsconfig.json`));
     }
     enableRequireTsFile(tsconfig || {});
+    Printer.log(Colors.success('Enable typescript mode success!'), Colors.gray('You can write logic in routes.ts, middleware.ts, data/**/*.ts'));
   }
 
   /**

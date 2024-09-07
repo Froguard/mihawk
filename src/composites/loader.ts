@@ -7,8 +7,8 @@ import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
-import { absifyPath, getRootAbsPath, relPathToCWD } from '../utils/path';
-import { Printer } from '../utils/print';
+import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
+import { Debugger, Printer } from '../utils/print';
 import { isNil, isObjStrict } from '../utils/is-type';
 import type { IPackageJson } from 'package-json-type';
 
@@ -44,7 +44,7 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
  * @returns
  */
 export function refreshJson(jsonFilePath: string) {
-  return _cacheJson.del(jsonFilePath);
+  return _cacheJson.has(jsonFilePath) && _cacheJson.del(jsonFilePath);
 }
 
 /**
@@ -56,12 +56,13 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
   jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
     // _clearSelfAndAncestorsCache(jsFilePath);
-    _clearRequireCache(jsFilePath);
+    // _clearRequireCache(jsFilePath);
+    refreshJson(jsFilePath);
   }
   try {
     // @ts-ignore
     const mod = require(jsFilePath); // eslint-disable-line
-    Printer.log(`LoadJS(${noCache ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(jsFilePath))}`);
+    Printer.log(`LoadJS${noCache ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(jsFilePath))}`);
     return mod as T;
   } catch (error) {
     Printer.error(Colors.red('load js file failed!'), jsFilePath, error);
@@ -85,12 +86,13 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
   //
   if (noCache) {
     // _clearSelfAndAncestorsCache(tsFilePath);
-    _clearRequireCache(tsFilePath);
+    // _clearRequireCache(tsFilePath);
+    refreshTsOrJs(tsFilePath);
   }
   try {
     // @ts-ignore
     const mod = require(tsFilePath); // eslint-disable-line
-    Printer.log(`LoadTS(${noCache ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(tsFilePath))}`);
+    Printer.log(`LoadTS${noCache ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(tsFilePath))}`);
     const res = mod?.default as T;
     if (isNil(res)) {
       // ts shoul export default
@@ -108,8 +110,8 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
  * @param {string} filePath
  */
 export function refreshTsOrJs(filePath: string) {
-  // return _clearSelfAndAncestorsCache(filePath);
-  return _clearRequireCache(filePath);
+  return _clearSelfAndAncestorsCache(filePath);
+  // return _clearRequireCache(filePath);
 }
 
 /**
@@ -183,7 +185,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     try {
       if (isFileExist) {
         fileContent = readFileSync(filePath, 'utf-8');
-        Printer.log(`LoadJson(${forceRefresh ? 'no' : ''}cache): from ${Colors.gray(relPathToCWD(filePath))}`);
+        Printer.log(`LoadJson${forceRefresh ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(filePath))}`);
       }
     } catch (error) {
       Printer.error('read file failed!', filePath, error);
@@ -268,16 +270,23 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
  * r@returns {void}
  */
 function _clearRequireCache(filename: string) {
-  if (CWD === filename) {
+  if (CWD === filename || !isPathInDir(filename, CWD)) {
     return;
   }
-  Printer.log(`Clearing require cache for ${filename}`);
+  Debugger.log('_clearRequireCache:', Colors.gray(filename));
   filename = absifyPath(filename);
   const mod = require.cache[filename];
-  const parent = mod?.parent;
+  if (!mod) {
+    return;
+  }
+  const parent = mod?.parent; // 对父对象的获取必须在删除自己之前，否则会报错
+  // 1. 删除自己（确保 parent 已经获取到，才删除自己）
+  mod.loaded = false;
+  delete require.cache[filename];
+  // 2. 删除父模块的引用
   if (parent && isObjStrict(parent)) {
     try {
-      // 1. 删除父模块式对自己的引用
+      // 2.1. 删除父模块式对自己的引用
       const parentChildList = parent.children;
       if (Array.isArray(parentChildList)) {
         const index = parentChildList.findIndex(item => item.filename === filename);
@@ -285,10 +294,7 @@ function _clearRequireCache(filename: string) {
           parentChildList.splice(index, 1);
         }
       }
-      // 2. 删除自己
-      mod.loaded = false;
-      delete require.cache[filename];
-      // 3. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
+      // 2.2. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
       const pathCache = (module?.constructor as any)?._pathCache;
       if (pathCache && isObjStrict(pathCache)) {
         Object.keys(pathCache).forEach(key => {
@@ -304,22 +310,25 @@ function _clearRequireCache(filename: string) {
 }
 
 /**
- * 递归向上删除缓存
- * - 删除自己对应的缓存
- * - 删除父引用模块对应的缓存
+ * 递归向上做如下的”删除缓存“操作
+ * - 1.删除自己对应的缓存
+ * - 2.删除父引用模块对应的缓存
  * @param {string} filename
  */
-function _clearSelfAndAncestorsCache(filename: string, stopPath = CWD) {
+function _clearSelfAndAncestorsCache(filename: string) {
   filename = absifyPath(filename);
-  if (filename === CWD || filename === stopPath) {
+  if (filename === CWD || !isPathInDir(filename, CWD)) {
     return;
   }
-  Printer.log('_clearSelfAndAncestorsCache:', filename);
+  Debugger.log('_clearSelfAndAncestorsCache:', Colors.gray(filename));
   const mod = require.cache[filename];
+  if (!mod) {
+    return;
+  }
   const parent = mod?.parent;
   const parentId = parent?.id;
   // clear self
   _clearRequireCache(filename);
   // clear parent
-  parentId && _clearSelfAndAncestorsCache(parentId, stopPath);
+  parentId && _clearSelfAndAncestorsCache(parentId);
 }

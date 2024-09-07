@@ -3,13 +3,15 @@ import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
 import { writeJSONSafeSync } from '../utils/file';
-import { Printer } from '../utils/print';
+import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is-type';
 import { MOCK_DATA_DIR_NAME } from '../consts';
 import { initMockLogicFile } from './init-file';
 import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
+
+const LOGFLAG_RESOLVER = `${Colors.cyan('[MockDataResolver]')}${Colors.gray(':')}`;
 
 /**
  *
@@ -41,7 +43,7 @@ export function createDataResolver(options: MihawkOptions) {
      */
     // 0.format mock path
     const mockRelPathNoExt = formatMockPath(mockRelPath);
-    !disableLogPrint && Printer.log('MockDataResolver:', `${Colors.cyan(routePath)} -> ${Colors.green(mockRelPathNoExt)}`);
+    !disableLogPrint && Printer.log(LOGFLAG_RESOLVER, `${Colors.cyan(routePath)} -> ${Colors.green(mockRelPathNoExt)}`);
 
     // 1.load mock data from json|json5 file
     const jsonPath = `${mockRelPathNoExt}.${JSON_EXT}`;
@@ -52,7 +54,7 @@ export function createDataResolver(options: MihawkOptions) {
     if (existsSync(mockJsonAbsPath)) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
     } else {
-      Printer.warn('MockDataResolver:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
+      Debugger.log('[MockDataResolver]:', `MockDataFile isn't exists, will auto create it...`, Colors.gray(jsonPath4log));
       // ★ Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, initData);
       //
@@ -66,7 +68,7 @@ export function createDataResolver(options: MihawkOptions) {
       const logicPath4log = `${DATA_BASE_PATH}/${logicPath}`; // only for log
       const mockLogicAbsPath = join(MOCK_DATA_DIR_PATH, logicPath);
       if (existsSync(mockLogicAbsPath)) {
-        Printer.log('MockDataResolver:', 'Load logic file:', Colors.gray(logicPath4log));
+        // Printer.log(LOGFLAG_RESOLVER, 'LoadLogicFile:', Colors.gray(logicPath4log));
         // get convertor function via loadJS/loadTS
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
@@ -82,20 +84,20 @@ export function createDataResolver(options: MihawkOptions) {
           });
           ctx.set('X-Mock-Use-Logic', '1');
           if (!isObjStrict(mockJson)) {
-            Printer.warn('MockDataResolver:', Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
+            Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
           const exportInfo = isTypesctiptMode ? 'export default' : 'module.exports';
-          Printer.warn('MockDataResolver:', Colors.yellow(`MockLogicFile isn't ${exportInfo} a convert-function!`), Colors.gray(logicPath4log));
+          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow(`MockLogicFile isn't ${exportInfo} a convert-function!`), Colors.gray(logicPath4log));
         }
       } else {
         if (autoCreateMockLogicFile) {
-          Printer.warn('MockDataResolver:', "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
+          Printer.warn(LOGFLAG_RESOLVER, "MockLogicFile isn't exists, will auto ctreate it...", Colors.gray(logicPath4log));
           // ★ Auto create logic file
           initMockLogicFile(mockLogicAbsPath, { routePath, jsonPath4log, logicPath4log, logicFileExt: LOGIC_EXT, overwrite: false });
           //
         } else {
-          Printer.warn('MockDataResolver:', Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
+          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("MockLogicFile isn't exists!"), Colors.gray(logicPath4log));
         }
       }
     }

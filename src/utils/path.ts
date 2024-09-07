@@ -178,3 +178,18 @@ export function getRouteByJsonPath(jsonRelPath: string, jsonExt: DataFileExt = '
     path: `/${others.join('/')}`,
   };
 }
+
+/**
+ * 判断 targetPath 是否在 dirPath 目录下
+ * - eg: isPathInDir('a/b/c/d.txt', 'a/b/c'); // true
+ * - eg: isPathInDir('a/b/c', 'a/b/c'); // false
+ * - 注意，如果 targetPath === dirPath，会返回 false (因为自己不能在自己里面)
+ * @param {string} targetPath
+ * @param {string} dirPath
+ * @returns {boolean}
+ */
+export function isPathInDir(targetPath: string, dirPath: string) {
+  targetPath = unixifyPath(resolve(targetPath));
+  dirPath = unixifyPath(resolve(dirPath));
+  return targetPath !== dirPath && targetPath?.length >= dirPath?.length && targetPath?.startsWith(dirPath);
+}
