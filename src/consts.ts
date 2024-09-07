@@ -52,7 +52,7 @@ export const DEFAULT_RC: MihawkRC = Object.freeze({
   mockLogicFileType: 'none',
   autoCreateMockLogicFile: false,
   // typescript
-  tsconfigPath: `./${MOCK_DIR_NAME}/tsconfig.json`,
+  tsconfigPath: null, // `./${MOCK_DIR_NAME}/tsconfig.json`,
   //
   logConfig: null,
 });
