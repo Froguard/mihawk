@@ -8,7 +8,6 @@
   "mockDir": "mocks",
   "mockDataFileType": "json",
   "mockLogicFileType": "ts",
-  "autoCreateMockLogicFile": false,
-  "tsconfigPath": "./mocks/tsconfig.json",
+  "autoCreateMockLogicFile": true,
   "logConfig": null
 }

@@ -7,6 +7,7 @@ import { inputNumInCLI, inputTxtInCLI, singleSelectInCli, confirmInCLI } from '.
 import { initRCfile, getRcData } from '../../src/composites/rc';
 import { Printer } from '../../src/utils/print';
 import { initMockDataDir, initMockRoutesFile, initMockMiddlewareFile } from '../../src/composites/init-file';
+import { delNillProps } from '../../src/utils/obj';
 import type { SubCmdCallback, MihawkRC } from '../../src/com-types';
 
 /**
@@ -70,7 +71,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
   // https
   config.https = DEFAULT_RC.https;
   // cors
-  config.cors = await confirmInCLI('use cors?', DEFAULT_RC.cors);
+  config.cors = await confirmInCLI('enable cors?', DEFAULT_RC.cors);
   // cache
   config.cache = await confirmInCLI('enable file cache?', DEFAULT_RC.cache);
   // watch
@@ -100,10 +101,16 @@ async function initRootConfigFileViaCli(configFileName: string) {
   // tsconfigPath
   if (config.mockLogicFileType === 'typescript') {
     const defTsConfigPath = path.join(config.mockDir, './tsconfig.json');
-    config.tsconfigPath = await inputTxtInCLI(`type in tsconfig.json filepath`, defTsConfigPath);
+    if (defTsConfigPath && existsSync(defTsConfigPath)) {
+      config.tsconfigPath = await inputTxtInCLI(`type in tsconfig.json filepath`, defTsConfigPath);
+    }
   }
   // autoCreateMockLogicFile
   config.autoCreateMockLogicFile = await confirmInCLI('Auto create mock logic file(js|cjs|ts)?', DEFAULT_RC.autoCreateMockLogicFile);
+  //
+  // delete null|undfined props in config
+  delNillProps(config);
+  //
   //
   const configFileExt = 'json';
   const configFileNameWithExt = `${configFileName}.${configFileExt}`;
