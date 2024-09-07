@@ -99,7 +99,7 @@ async function initRootConfigFileViaCli(configFileName: string) {
     0, // 默认选中第一个，即 none
   )) as MihawkRC['mockLogicFileType'];
   // tsconfigPath
-  if (config.mockLogicFileType === 'typescript') {
+  if (config.mockLogicFileType === 'typescript' || config.mockLogicFileType === 'ts') {
     const defTsConfigPath = path.join(config.mockDir, './tsconfig.json');
     if (defTsConfigPath && existsSync(defTsConfigPath)) {
       config.tsconfigPath = await inputTxtInCLI(`type in tsconfig.json filepath`, defTsConfigPath);
