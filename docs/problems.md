@@ -40,5 +40,5 @@ ls -l
 正常应该是 `drwxr-xr-x` 即 `755` 如果不对，重新设置
 
 ```sh
-chmod -R 755 ./bin
+chmod -R 755 ./node_modules/bin/mihawk
 ```
