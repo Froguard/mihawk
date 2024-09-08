@@ -203,7 +203,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 /**
  * Mock data resolve function, the original data source is the JSON file with the same name as this file
  * @param {object} originData (mocks/data/GET/xxx.json)
- * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }
+ * @param {MhkCvtrExtra} extra { url,method,path,query,body }
  * @returns {object} newData
  */
 export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {

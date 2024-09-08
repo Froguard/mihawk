@@ -202,7 +202,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 /**
  * json 数据二次处理函数
  * @param {object} originData (mocks/data/GET/xxx.json)
- * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }, 请求相关的基本信息字段
+ * @param {MhkCvtrExtra} extra { url,method,path,query,body }, 请求相关的基本信息字段
  * @returns {object} newData 处理后的新数据（需要显式进行 return）
  */
 export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {

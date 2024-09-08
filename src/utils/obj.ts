@@ -14,3 +14,23 @@ export function delNillProps<T extends Record<string, any>>(obj: T) {
     });
   }
 }
+
+/**
+ * 深度冻结对象
+ * @param {any} obj
+ * @return {void}
+ */
+export function deepFreeze(obj: any) {
+  if (obj) {
+    // 1.冻结当前对象
+    Object.freeze(obj);
+    // 2.遍历对象的所有属性
+    Object.getOwnPropertyNames(obj).forEach(prop => {
+      const value = obj[prop];
+      // 如果属性值是对象并且不是 RegExp 对象（正则表达式会被识别为对象，但不需要冻结）
+      if (value && typeof value === 'object' && !(value instanceof RegExp)) {
+        deepFreeze(value); // 递归调用 deepFreeze
+      }
+    });
+  }
+}

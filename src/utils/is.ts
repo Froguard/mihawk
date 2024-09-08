@@ -84,11 +84,34 @@ export function isNaNStrict(obj: unknown): boolean {
 
 /**
  * 严格判定对象
+ * - 排除掉空：undefined
+ * - 针对 typeof 操作后返回 ’object‘ 的情况，做如下排除：
+ *   - 排除掉 null
+ *   - 排除掉特殊对象实例：正则表达式 Regex, 错误 Error，日期 Date 的实例
+ *   - 排除掉集合对象实例：Map, Set, WeakMap, WeakSet
+ *   - 排除掉TypedArray 实例，如 Uint8Array, Uint16Array, Uint32Array 等特殊数组实例
+ *   - 排除掉 Object.prototype.toString.call(obj) 判断后，不是 object 的情况，如自定义的 class 实例
+ * - 否则，判定为 false，非对象
  * @param {unknown} obj
  * @returns {boolean}
  */
 export function isObjStrict(obj: unknown): obj is NonNullable<Record<string, any>> {
-  return obj !== null && typeof obj === 'object' && !Array.isArray(obj);
+  if (isNil(obj)) return false;
+  if (typeof obj === 'object') {
+    if (Array.isArray(obj)) {
+      return false;
+    } else if (obj instanceof RegExp || obj instanceof Date || obj instanceof Error) {
+      return false;
+    } else if (obj instanceof Map || obj instanceof Set || obj instanceof WeakMap || obj instanceof WeakSet) {
+      return false;
+    } else if (obj instanceof Uint8Array || obj instanceof Uint16Array || obj instanceof Uint32Array) {
+      return false;
+    } else {
+      return isType(obj, 'object'); // use Object.prototype.toString.call(obj) 方式去判断;
+      // return true;
+    }
+  }
+  return false;
 }
 
 // 空对象

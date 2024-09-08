@@ -8,8 +8,9 @@ import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { MOCK_DATA_DIR_NAME } from '../consts';
+import { deepFreeze } from '../utils/obj';
 import { initMockLogicFile } from './init-file';
-import type { KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { KoaContext, MhkCvtrExtra, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
 const RESOLVER_NAME = '[MockDataResolver]';
@@ -74,17 +75,15 @@ export function createDataResolver(options: MihawkOptions) {
         // get convertor function via loadJS/loadTS
         const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
-          mockJson = await dataConvertor(mockJson, {
-            url: ctx.url,
-            method: ctx.method,
-            path: ctx.path,
-            host: ctx.host,
-            headers: ctx.headers,
-            params: ctx.params,
-            query: ctx.query,
-            body: ctx.request.body,
-          });
+          const { request } = ctx || {};
+          const extra: MhkCvtrExtra = {
+            ...request,
+          };
+          // 防止被篡改，进行深度冻结
+          deepFreeze(extra);
+          mockJson = await dataConvertor(mockJson, extra);
           ctx.set('X-Mock-Use-Logic', '1');
+          // TODO: 待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
           if (!isObjStrict(mockJson)) {
             Printer.warn(RESOLVER_NAME, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }

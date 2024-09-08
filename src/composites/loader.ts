@@ -9,7 +9,7 @@ import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
 import { Debugger, Printer } from '../utils/print';
-import { isNil, isObjStrict } from '../utils/is';
+import { isNil } from '../utils/is';
 import type { IPackageJson } from 'package-json-type';
 
 // 缓存的 json 数据
@@ -285,7 +285,7 @@ function _clearRequireCache(filename: string) {
   delete require.cache[filename];
   Debugger.log('_clearRequireCache: √ clear require.cache success!', filename, 'parent:', parent?.filename);
   // 2. 删除父模块的引用
-  if (parent && isObjStrict(parent)) {
+  if (parent && typeof parent === 'object') {
     try {
       // 2.1. 删除父模块式对自己的引用
       const parentChildList = parent.children;
@@ -297,7 +297,7 @@ function _clearRequireCache(filename: string) {
       }
       // 2.2. 删除全局模块上，关于自己的缓存 module.constructor._pathCache
       const pathCache = (module?.constructor as any)?._pathCache;
-      if (pathCache && isObjStrict(pathCache)) {
+      if (pathCache && typeof pathCache === 'object') {
         Object.keys(pathCache).forEach(key => {
           if (pathCache[key]?.includes(filename)) {
             delete pathCache[key];

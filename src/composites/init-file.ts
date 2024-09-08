@@ -232,7 +232,7 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
     '/**',
     ' * Mock data resolve function, the original data source is the JSON file with the same name as this file',
     ` * @param {object} originData (${jsonPath4log})`, //
-    ' * @param {MhkCvtrExtra} extra { url,method,path,params,query,body }',
+    ' * @param {MhkCvtrExtra} extra { url,method,path,query,body }',
     ' * @returns {object} newData',
     ' */',
   ];

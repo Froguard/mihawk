@@ -14,7 +14,7 @@ import type { ParsedArgs } from 'minimist';
 //   Request as KoaRequest, // Koa.Request
 //   Response as KoaResponse, // Koa.Response
 // } from 'koa';
-import type { Middleware, Context, Next, Request, Response } from 'koa';
+import type { Middleware, Context, Next, BaseRequest, Request, Response } from 'koa';
 // koa-bodyparser options
 export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 
@@ -62,43 +62,14 @@ export type KoaRequest = Request;
 export type KoaResponse = Response;
 
 /**
- * Mock 数据转换器函数中 tools 参数的类型
- * - 包含 ctx 上的 url,method,path,query,body 等属性
+ * Mock 数据转换器函数中 extra 参数的类型
+ * - 包含 ctx.request 上的 url,method,path,query,body 等属性
  */
-export interface MhkCvtrExtra {
-  /**
-   * ctx.url
-   */
-  readonly url: string;
-  /**
-   * ctx.method
-   */
-  readonly method: string;
-  /**
-   * ctx.path
-   */
-  readonly path: string;
-  /**
-   * ctx.query
-   */
-  readonly query: Readonly<Record<string, any>>;
-  /**
-   * ctx.params
-   */
-  readonly params?: Readonly<Record<string, any>>;
-  /**
-   * ctx.req.body
-   */
-  readonly body?: Readonly<Record<string, any>>;
-  /**
-   * ctx.headers
-   */
-  readonly headers: Readonly<Record<string, any>>;
-  /**
-   * ctx.host (hostname + port)
-   */
-  readonly host: string;
-}
+export type MhkCvtrExtra = Readonly<
+  BaseRequest & {
+    [k: string]: any;
+  }
+>;
 
 /**
  * Mock 数据转换器

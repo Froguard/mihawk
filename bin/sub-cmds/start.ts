@@ -5,7 +5,6 @@ import { Debugger, Printer } from '../../src/utils/print';
 import { getRcData } from '../../src/composites/rc';
 import { PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
-import { isObjStrict } from '../../src/utils/is';
 import { createWatcher } from '../../src/composites/watcher';
 import { processExit } from '../../src/utils/process';
 import type { SubCmdCallback, MihawkRC, Loosify } from '../../src/com-types';
@@ -36,7 +35,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
     Printer.error('Occurs error during runing async-function mihawk(config):', error);
     Printer.warn('Please check your config or try again.');
     // stop watcher
-    if (isObjStrict(watcher) && typeof watcher?.close === 'function') {
+    if (watcher && typeof watcher === 'object' && typeof watcher?.close === 'function') {
       Printer.log('Will close file watcher...');
       try {
         await watcher.close();
