@@ -48,18 +48,14 @@ yarn dev:bin -v # yarn dev:bin --version
 yarn dev:bin:init
 ```
 
-## Generate Exports code
-
-```sh
-yarn gen:exports
-```
+````
 
 ## Test
 
 ```sh
 yarn test
 yarn test:cover
-```
+````
 
 ## Build
 
@@ -99,7 +95,7 @@ yarn build
 
 ## problems
 
-> 详见 [problems.md](./problems.md) 文件
+> See more detail → [problems.md](./problems.md)
 
 ## warning
 
@@ -162,8 +158,3 @@ others:
 - [ ] 0.0.0-x
 - [ ] 0.0.0-y
 - [ ] 0.0.0-z
-
-### others
-
-- 本工程不使用 tslint，因为其在2019年已经废弃，停止更新，且tslint官方团队也推荐搭建使用eslint
-- 本工程宗旨，一切为了效率，如果涉及到的工具库，社区有就用社区的，避免自己从0到1手撸（节约时间）
