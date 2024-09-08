@@ -166,9 +166,9 @@ export default routes;
 ```ts
 /**
  * mihawk's middleware file:
- * - just a Koa Middleware
+ * - just a Koa2 Middleware
  */
-import type { Context: KoaContext, Next: KoaNext } from 'koa';
+import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+
 // import type { KoaContext, KoaNext } from 'mihawk/con-types';
 
 /**
@@ -189,6 +189,8 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
   }
 }
 ```
+
+> 其他一些稍微复杂点的 middleware demo，比如基于 koa-router 和 koa-compose, 详见 [middleware.md](./docs/middleware.md)
 
 ### `mock-logic` 文件 ts 示例
 

@@ -129,7 +129,7 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
     // create if not existed
     const comPrefixs = [
       '/**',
-      ` * ${PKG_NAME}'s middleware file:`, //
+      ` * ${PKG_NAME}'s custom koa2-middleware file:`, //
       ' * - just a Koa Middleware',
       ' */',
     ];
@@ -137,7 +137,7 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
       '/**',
       ' * Middleware functions, to implement some special data deal logic,',
       ' * - This function exec before the default-mock-logic. Simply return or don`t call "await next()" could skip default-mock-logic',
-      ' * - This function is a standard KOA middleware that follows the KOA onion ring model',
+      ' * - This function is a standard Koa2 middleware that follows the KOA-onion-ring-model',
       ' * - see more：https://koajs.com/#middleware',
       ' * @param {KoaContext} ctx',
       ' * @param {KoaNext} next', //
@@ -159,7 +159,7 @@ export async function initMockMiddlewareFile(fileType: MihawkRC['mockLogicFileTy
       case 'typescript':
         initContent = [
           ...comPrefixs,
-          `import typs { Context: KoaContext, Next: KoaNext } from 'koa';`,
+          `import typs { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+`,
           `// import type { KoaContext, KoaNext } from '${PKG_NAME}/com-types';`,
           '',
           ...methodCommentCode, // comment code

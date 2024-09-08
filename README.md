@@ -166,9 +166,9 @@ export default routes;
 ```ts
 /**
  * mihawk's middleware file:
- * - just a Koa Middleware
+ * - just a Koa2 Middleware
  */
-import type { Context: KoaContext, Next: KoaNext } from 'koa';
+import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+
 // import type { KoaContext, KoaNext } from 'mihawk/con-types';
 
 /**
@@ -190,6 +190,8 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
   }
 }
 ```
+
+> Other complex diy middleware demo, base on koa-router & koa-compose, [middleware.md](./docs/middleware.md)
 
 ### `mock-logic` file demo in ts
 
