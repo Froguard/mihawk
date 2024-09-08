@@ -110,7 +110,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   let diyMiddleware: KoaMiddleware | null = null;
   if (useLogicFile && existsSync(middlewareFilePath)) {
     Printer.log(`load diy middleware file: ${relPathToCWD(middlewareFilePath)}`);
-    diyMiddleware = (await loadLogicFile(middlewareFilePath)) as KoaMiddleware;
+    diyMiddleware = await loadLogicFile<KoaMiddleware>(middlewareFilePath);
   }
 
   /**

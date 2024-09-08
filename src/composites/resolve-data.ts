@@ -32,7 +32,8 @@ export function createDataResolver(options: MihawkOptions) {
     logicFileExt: LOGIC_EXT,
     autoCreateMockLogicFile = false,
   } = options || {};
-  const loadLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
+  // load convert-function logic file
+  const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
   const DATA_BASE_PATH = formatPath(join(mockDir, MOCK_DATA_DIR_NAME));
   /**
    * 执行 mock
@@ -73,7 +74,7 @@ export function createDataResolver(options: MihawkOptions) {
       if (existsSync(mockLogicAbsPath)) {
         // Printer.log(LOGFLAG_RESOLVER, 'LoadLogicFile:', Colors.gray(logicPath4log));
         // get convertor function via loadJS/loadTS
-        const dataConvertor = await loadLogicFile(mockLogicAbsPath, !cache);
+        const dataConvertor = await loadConvertLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
           const { request } = ctx || {};
           const extra: MhkCvtrExtra = {
