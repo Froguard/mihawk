@@ -58,7 +58,7 @@ export function createDataResolver(options: MihawkOptions) {
     if (existsSync(mockJsonAbsPath)) {
       mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
     } else {
-      Debugger.log('[MockDataResolver]:', `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
+      Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
       // ★ Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, initData);
       //
@@ -82,11 +82,12 @@ export function createDataResolver(options: MihawkOptions) {
           };
           // 防止被篡改，进行深度冻结
           deepFreeze(extra);
+          // 执行转换器，处理原始的 json 数据
           mockJson = await dataConvertor(mockJson, extra);
           ctx.set('X-Mock-Use-Logic', '1');
-          // TODO: 待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
           if (!isObjStrict(mockJson)) {
-            Printer.warn(RESOLVER_NAME, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
+            // TODO: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
+            Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
           const exportInfo = isTypesctiptMode ? 'export default' : 'module.exports';

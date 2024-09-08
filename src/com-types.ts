@@ -1,7 +1,4 @@
 'use strict';
-import Colors from 'color-cc';
-import deepmerge from 'deepmerge';
-import * as JSON5 from 'json5';
 import type { ParsedArgs } from 'minimist';
 
 /**
@@ -67,6 +64,17 @@ export type KoaResponse = Response;
  */
 export type MhkCvtrExtra = Readonly<
   BaseRequest & {
+    /**
+     * parsed body, define by koa-bodyparser
+     */
+    body?: any;
+    /**
+     * rawBody, string, define by koa-bodyparser
+     */
+    rawBody?: string;
+    /**
+     * others
+     */
     [k: string]: any;
   }
 >;
