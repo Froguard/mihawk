@@ -110,7 +110,7 @@ mihawk init
 - `mockDataFileType`: string 可选值为 `json` | `json5` 之一, 默认值为 `json`，表示 mock 数据的文件格式
 - `mockLogicFileType`: string 可选值为 `js` | `cjs` | `ts` | `none` 之一, 默认值为 `none`，表示 mock 数据的处理逻辑文件
 
-> 更多说明，详见 ts 定义文件 -> [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts)
+> 更多说明，详见 ts 定义文件 -> [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
 
 ## 示例
 
