@@ -28,10 +28,10 @@ mihawk --port=8888
 
 > 打开网页 `http://localhost:8888`
 >
-> mock 文件夹: `./data`
+> mock 文件夹: `./mocks/data`
 
 ```sh
-/data
+./mocks/data
    │
    ├── DELETE
    │     ├──/*.js    DELETE 请求处理逻辑
