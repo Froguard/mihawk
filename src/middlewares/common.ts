@@ -42,8 +42,9 @@ export default function (options?: MihawkOptions) {
     await next();
     //
     // ================================================
-    const keepTime = Date.now() - startTime;
-    ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}ms`);
+    const keepTime = `${Date.now() - startTime}ms`;
+    ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}`);
+    ctx.set('X-Mock-Time', keepTime);
     Debugger.log('mdw-com <<', routePath);
   };
 }
