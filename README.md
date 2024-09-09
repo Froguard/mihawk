@@ -28,10 +28,10 @@ mihawk --port=8888
 
 > then open browser and visit `http://localhost:8888`
 >
-> mock data directory: `./data`
+> mock data directory: `./mocks/data`
 
 ```sh
-/data
+./mocks/data
    │
    ├── DELETE
    │     ├──/*.js    DELETE request resolve logic
