@@ -58,13 +58,15 @@ export function createDataResolver(options: MihawkOptions) {
     const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
-      let dataInJson = await loadJson(mockJsonAbsPath, !cache);
-      if (!cache) {
+      let jsonData = await loadJson(mockJsonAbsPath, !cache);
+      if (jsonData && typeof jsonData === 'object') {
         // 不开启缓存时，每次都会保证返回的时 json 里边的数据（这里使用 deepMerge 做一次通过拷贝创建副本的操作，防止老 json 数据被修改）
-        dataInJson = dataInJson ? deepMerge({}, dataInJson) : initData;
+        jsonData = cache ? jsonData : deepMerge({}, jsonData);
+      } else {
+        Printer.warn(LOGFLAG_RESOLVER, Colors.yellow(`MockDataFile isn't a normal json file!`), Colors.gray(jsonPath4log), Colors.yellow('Unexception value='), jsonData);
       }
       // 采用备份形式
-      mockJson = dataInJson;
+      mockJson = jsonData || initData;
     } else {
       Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
       // ★ Auto create json file
