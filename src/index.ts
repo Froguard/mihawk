@@ -20,7 +20,7 @@ import mdw404 from './middlewares/404';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp } from './utils/net';
-import { enhanceServer } from './utils/server';
+import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
@@ -155,7 +155,9 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   /**
    * 6.server configuration
    */
-  let server: http.Server | https.Server | null = null;
+  const protocol = useHttps ? 'https' : 'http';
+  const addr1 = `${protocol}://${host}:${port}`;
+  let server: EnhancedServer<http.Server | https.Server> | null = null;
   // create http|https server
   if (useHttps) {
     const httpsOptions: Record<'key' | 'cert', any> | null = { key: null, cert: null };
@@ -216,8 +218,6 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     const existedCount = existedRoutePaths.length;
     Printer.log(`Existed all routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
     //
-    const protocol = useHttps ? 'https' : 'http';
-    const addr1 = `${protocol}://${host}:${port}`;
     const addr2 = `${protocol}://${getMyIp()}:${port}`;
     Printer.log(`🚀 Mock Server address:`);
     Printer.log(`- ${Colors.cyan(addr1)}`);
@@ -230,4 +230,10 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
 
   // start
   server.listen(port, host); // or 443(https) 80(http)
+
+  return {
+    destory: () => {
+      server.destory(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
+    },
+  };
 }

@@ -26,22 +26,34 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
       watcher = createWatcher(finalConfig);
     }, 0);
   //
+  let serverHandle: Awaited<ReturnType<typeof mihawk>> | null = null;
   try {
     //
     // run main logic
-    await mihawk(finalConfig);
+    serverHandle = await mihawk(finalConfig);
+    //
     //
   } catch (error) {
     Printer.error('Occurs error during runing async-function mihawk(config):', error);
     Printer.warn('Please check your config or try again.');
     // stop watcher
-    if (watcher && typeof watcher === 'object' && typeof watcher?.close === 'function') {
+    if (typeof watcher?.close === 'function') {
       Printer.log('Will close file watcher...');
       try {
         await watcher.close();
       } catch (error) {
         // exit process
-        processExit(1, () => Printer.warn('Error occurs during close watcher:', error));
+        Printer.warn('Error occurs during close watcher:', error);
+      }
+    }
+    // destroy server
+    if (typeof serverHandle?.destory === 'function') {
+      Printer.log('Will destory server...');
+      try {
+        await serverHandle.destory();
+      } catch (error) {
+        // exit process
+        Printer.warn('Error occurs during destory server:', error);
       }
     }
     // exit process

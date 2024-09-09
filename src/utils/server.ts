@@ -4,7 +4,7 @@ import type { Server as HttpsServer } from 'https';
 import type { Socket } from 'net';
 
 export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
-  destory: (callback: (...args: any[]) => any) => void;
+  destory: (callback?: (...args: any[]) => any) => void;
 };
 
 /**
@@ -29,7 +29,7 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
     // close server
     server.close(() => {
       connectMap.clear();
-      callback();
+      typeof callback === 'function' && callback();
     });
     // destroy all connection
     connectMap.forEach(socket => {
