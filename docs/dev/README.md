@@ -112,7 +112,7 @@ Greek:
 - [x] gamma (Γ, γ)
 - [x] delta (Δ, δ)
 - [x] epsilon (Ε, ε)
-- [ ] zeta (Ζ, ζ)
+- [x] zeta (Ζ, ζ)
 - [ ] eta (Η, η)
 - [ ] theta (Θ, θ)
 - [ ] iota (Ι, ι)
