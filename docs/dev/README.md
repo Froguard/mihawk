@@ -101,36 +101,38 @@ yarn build
 
 ### allow versions
 
-> 在正式版本 1.0.0 发布之前，采用 24 个希腊字母作为临时版本号
-
 > Before the release of version 0.0.1, there were 24 Greek letters representing versions that could be used as temporary versions
+>
+> 在正式版本 1.0.0 发布之前，采用 50 个代号（24 个希腊字母 + 26 个英文字母），作为临时版本号
 
-- [ ] Alpha (Α, α)
-- [ ] Beta (Β, β)
-- [ ] Gamma (Γ, γ)
-- [ ] Delta (Δ, δ)
-- [ ] Epsilon (Ε, ε)
-- [ ] Zeta (Ζ, ζ)
-- [ ] Eta (Η, η)
-- [ ] Theta (Θ, θ)
-- [ ] Iota (Ι, ι)
-- [ ] Kappa (Κ, κ)
-- [ ] Lambda (Λ, λ)
-- [ ] Mu (Μ, μ)
-- [ ] Nu (Ν, ν)
-- [ ] Xi (Ξ, ξ)
-- [ ] Omicron (Ο, ο)
-- [ ] Pi (Π, π)
-- [ ] Rho (Ρ, ρ)
-- [ ] Sigma (Σ, σ/ς)
-- [ ] Tau (Τ, τ)
-- [ ] Upsilon (Υ, υ)
-- [ ] Phi (Φ, φ)
-- [ ] Chi (Χ, χ)
-- [ ] Psi (Ψ, ψ)
-- [ ] Omega (Ω, ω)
+Greek:
 
-others:
+- [ ] alpha (Α, α)
+- [ ] beta (Β, β)
+- [ ] gamma (Γ, γ)
+- [ ] delta (Δ, δ)
+- [ ] epsilon (Ε, ε)
+- [ ] zeta (Ζ, ζ)
+- [ ] eta (Η, η)
+- [ ] theta (Θ, θ)
+- [ ] iota (Ι, ι)
+- [ ] kappa (Κ, κ)
+- [ ] lambda (Λ, λ)
+- [ ] mu (Μ, μ)
+- [ ] nu (Ν, ν)
+- [ ] xi (Ξ, ξ)
+- [ ] omicron (Ο, ο)
+- [ ] pi (Π, π)
+- [ ] rho (Ρ, ρ)
+- [ ] sigma (Σ, σ/ς)
+- [ ] tau (Τ, τ)
+- [ ] upsilon (Υ, υ)
+- [ ] phi (Φ, φ)
+- [ ] chi (Χ, χ)
+- [ ] psi (Ψ, ψ)
+- [ ] omega (Ω, ω)
+
+Others:
 
 - [ ] 0.0.0-a
 - [ ] 0.0.0-b
