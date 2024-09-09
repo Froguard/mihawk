@@ -111,7 +111,7 @@ Greek:
 - [x] beta (Β, β)
 - [x] gamma (Γ, γ)
 - [x] delta (Δ, δ)
-- [ ] epsilon (Ε, ε)
+- [x] epsilon (Ε, ε)
 - [ ] zeta (Ζ, ζ)
 - [ ] eta (Η, η)
 - [ ] theta (Θ, θ)

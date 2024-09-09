@@ -157,7 +157,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
    */
   const protocol = useHttps ? 'https' : 'http';
   const addr1 = `${protocol}://${host}:${port}`;
-  let server: EnhancedServer<http.Server | https.Server> | null = null;
+  let server: http.Server | https.Server | null = null;
   // create http|https server
   if (useHttps) {
     const httpsOptions: Record<'key' | 'cert', any> | null = { key: null, cert: null };
@@ -234,9 +234,12 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   /**
    * return handle obj with a "destory" method prop
    */
+  const destoryServer = (server as EnhancedServer<http.Server | https.Server>).destory;
   return {
     destory: () => {
-      server.destory(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
+      if (typeof destoryServer === 'function') {
+        destoryServer(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
+      }
     },
   };
 }
