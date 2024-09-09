@@ -110,7 +110,7 @@ Greek:
 - [x] alpha (Α, α)
 - [x] beta (Β, β)
 - [x] gamma (Γ, γ)
-- [ ] delta (Δ, δ)
+- [x] delta (Δ, δ)
 - [ ] epsilon (Ε, ε)
 - [ ] zeta (Ζ, ζ)
 - [ ] eta (Η, η)
