@@ -1,10 +1,11 @@
 'use strict';
+import { promisify } from 'util';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import type { Socket } from 'net';
 
 export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
-  destory: (callback?: (...args: any[]) => any) => void;
+  destory: (callback?: (...args: any[]) => any) => Promise<void>;
 };
 
 /**
@@ -25,16 +26,28 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
     });
   });
   // add a destory method
-  (server as EnhancedServer<T>).destory = (callback: (...args: any[]) => any) => {
-    // close server
-    server.close(() => {
-      connectMap.clear();
-      typeof callback === 'function' && callback();
-    });
-    // destroy all connection
+  (server as EnhancedServer<T>).destory = async (callback: (...args: any[]) => any) => {
+    const closeServer = promisify(server.close).bind(server);
+    // 1.close server
+    await closeServer();
+    // 2.destroy & clear all connection
+    const destroyPromises: Promise<any>[] = [];
     connectMap.forEach(socket => {
-      socket.destroy();
+      try {
+        destroyPromises.push(
+          new Promise((resolve, reject) => {
+            socket.on('close', resolve);
+            socket.destroy();
+          }),
+        );
+      } catch (error) {
+        console.error('Failed to destroy socket:', error);
+      }
     });
+    await Promise.allSettled(destroyPromises);
+    connectMap.clear();
+    // 3.invoke callback
+    typeof callback === 'function' && callback();
   };
   //
   return server as EnhancedServer<T>;

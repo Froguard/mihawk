@@ -236,9 +236,9 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
    */
   const destoryServer = (server as EnhancedServer<http.Server | https.Server>).destory;
   return {
-    destory: () => {
+    destory: async () => {
       if (typeof destoryServer === 'function') {
-        destoryServer(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
+        await destoryServer(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
       }
     },
   };
