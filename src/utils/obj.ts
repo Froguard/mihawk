@@ -55,7 +55,6 @@ export function createReadonlyProxy<T = any>(obj: T) {
   function _createProxy<T = any>(target: T): DeepReadonly<Unfixedify<T>> {
     // 情况1: 如果目标是一个普通对象（非null且不是原始类型）
     if (typeof target === 'object' && target !== null) {
-      console.log('target', target);
       if (Array.isArray?.(target) || target instanceof Array) {
         // 情况1.1: 如果目标是数组
         return new Proxy(target, {

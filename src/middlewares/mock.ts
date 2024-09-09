@@ -36,8 +36,10 @@ export default function (options?: MihawkOptions) {
       ctx.set('X-Mock-Hit', '1');
       //
       const mockJson = await calcMockData(ctx);
+      ctx.hitDefaultMock = true; // 打个标记，方便后续判断
       Debugger.log('mdw-mock mockData=', mockJson);
-      ctx.body = JSON.stringify(mockJson);
+      // 直接写 json 对象，不进行序列化，也能识别
+      ctx.body = mockJson; // ctx.body = JSON.stringify(mockJson);
       //
     }
     //

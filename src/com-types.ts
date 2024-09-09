@@ -19,14 +19,15 @@ export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 declare module 'koa' {
   interface Context {
     /**
-     * 跳过执行默认的 mock 逻辑，默认为 false，即：都是需要处理的
-     */
-    skipDefaultMock?: boolean;
-
-    /**
      * 默认为 false，即：需要打印
      */
     disableLogPrint?: boolean;
+
+    /**
+     * 跳过执行默认的 mock 逻辑，默认为 false，即：都是需要处理的
+     * - default mock 逻辑的中间件 middleware/mock.ts 是最后一个执行的中间件，如果设置 skipDefaultMock 为 true，该部分逻辑将会跳过
+     */
+    skipDefaultMock?: boolean;
 
     /**
      * Method + Path
@@ -40,6 +41,12 @@ declare module 'koa' {
      * - 可通过动态设置 `ctx.mockRelPath` 来覆盖，比如 middlewares/route.ts 中就是通过动态设置 `ctx.mockRelPath` 来达到 route 重定向的效果
      */
     mockRelPath: string;
+
+    /**
+     * 是否已经采取默认的 mock 逻辑，默认为 false，即：还未处理过
+     * - 在执行完 middleware/mock 这个中间件之后，如果走的是默认逻辑，这个值会被设置为 true，详见 middlewares/mock.ts
+     */
+    hitDefaultMock?: boolean;
   }
   interface Request {
     //

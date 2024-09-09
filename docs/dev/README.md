@@ -107,9 +107,9 @@ yarn build
 
 Greek:
 
-- [ ] alpha (Α, α)
-- [ ] beta (Β, β)
-- [ ] gamma (Γ, γ)
+- [x] alpha (Α, α)
+- [x] beta (Β, β)
+- [x] gamma (Γ, γ)
 - [ ] delta (Δ, δ)
 - [ ] epsilon (Ε, ε)
 - [ ] zeta (Ζ, ζ)

@@ -3,7 +3,7 @@
   "port": 8888,
   "https": false,
   "cors": true,
-  "cache": true,
+  "cache": false,
   "watch": true,
   "mockDir": "mocks",
   "mockDataFileType": "json",

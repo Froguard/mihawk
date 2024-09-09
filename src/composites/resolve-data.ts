@@ -2,15 +2,16 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
+import deepMerge from 'deepmerge';
 import { writeJSONSafeSync } from '../utils/file';
 import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { MOCK_DATA_DIR_NAME } from '../consts';
-import { createReadonlyProxy, deepFreeze } from '../utils/obj';
+import { createReadonlyProxy } from '../utils/obj';
 import { initMockLogicFile } from './init-file';
-import type { BaseRequestEx, KoaContext, MhkCvtrExtra, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
 const RESOLVER_NAME = '[MockDataResolver]';
@@ -53,10 +54,17 @@ export function createDataResolver(options: MihawkOptions) {
     const jsonPath = `${mockRelPathNoExt}.${JSON_EXT}`;
     const jsonPath4log = `${DATA_BASE_PATH}/${jsonPath}`; // only for log
     const mockJsonAbsPath = absifyPath(join(MOCK_DATA_DIR_PATH, jsonPath));
+    // 确保每次初始化的 initData 都是新声明定义并赋值的，方式多次访问时出现逻辑混乱
     const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
-      mockJson = (await loadJson(mockJsonAbsPath, !cache)) || initData;
+      let dataInJson = await loadJson(mockJsonAbsPath, !cache);
+      if (!cache) {
+        // 不开启缓存时，每次都会保证返回的时 json 里边的数据（这里使用 deepMerge 做一次通过拷贝创建副本的操作，防止老 json 数据被修改）
+        dataInJson = dataInJson ? deepMerge({}, dataInJson) : initData;
+      }
+      // 采用备份形式
+      mockJson = dataInJson;
     } else {
       Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
       // ★ Auto create json file
