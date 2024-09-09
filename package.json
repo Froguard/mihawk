@@ -42,6 +42,8 @@
     "postpublish": "pinst --enable"
   },
   "exports": {
+    "./package.json": "./package.json",
+    "./assets/schema/root-config.json": "./assets/schema/root-config.json",
     ".": {
       "require": "./dist/cjs/src/index.js",
       "import": "./dist/esm/src/index.js",
@@ -51,9 +53,7 @@
       "require": "./dist/cjs/src/com-types/index.js",
       "import": "./dist/esm/src/com-types/index.js",
       "types": "./dist/types/src/com-types/index.d.ts"
-    },
-    "./assets/schema/root-config.json": "./assets/schema/root-config.json",
-    "./package.json": "./package.json"
+    }
   },
   "dependencies": {
     "@types/debug": "^4.1.12",
