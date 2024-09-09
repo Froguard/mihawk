@@ -31,27 +31,29 @@ mihawk --port=8888
 > mock data directory: `./mocks/data`
 
 ```sh
-./mocks/data
-   │
-   ├── DELETE
-   │     ├──/*.js    DELETE request resolve logic
-   │     └──/*.json  DELETE request resolve data
-   │
-   ├── GET
-   │     ├──/*.js    GET request resolve logic
-   │     └──/*.json  GET request resolve data
-   │
-   ├── POST
-   │     ├──/*.js    POST request resolve logic
-   │     └──/*.json  POST request resolve data
-   │
-   ├── PUT
-   │     ├──/*.js    PUT request resolve logic
-   │     └──/*.json  PUt request resolve data
-   │
-   ├── middleware.js    [optional] resolve middleware
-   │
-   └── routes.json   [optional] common routes
+./mocks
+    │
+    ├── /data
+    │   │
+    │   ├── DELETE
+    │   │     ├──/*.js    DELETE request resolve logic
+    │   │     └──/*.json  DELETE request resolve data
+    │   │
+    │   ├── GET
+    │   │     ├──/*.js    GET request resolve logic
+    │   │     └──/*.json  GET request resolve data
+    │   │
+    │   ├── POST
+    │   │     ├──/*.js    POST request resolve logic
+    │   │     └──/*.json  POST request resolve data
+    │   │
+    │   └── PUT
+    │         ├──/*.js    PUT request resolve logic
+    │         └──/*.json  PUt request resolve data
+    │
+    ├── middleware.js    [optional] resolve middleware
+    │
+    └── routes.json   [optional] common routes
 ```
 
 > mapping：

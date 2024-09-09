@@ -31,27 +31,29 @@ mihawk --port=8888
 > mock 文件夹: `./mocks/data`
 
 ```sh
-./mocks/data
-   │
-   ├── DELETE
-   │     ├──/*.js    DELETE 请求处理逻辑
-   │     └──/*.json  DELETE 请求对应的数据
-   │
-   ├── GET
-   │     ├──/*.js    GET 请求处理逻辑
-   │     └──/*.json  GET 请求对应的数据
-   │
-   ├── POST
-   │     ├──/*.js    POST 请求处理逻辑
-   │     └──/*.json  POST 请求对应的数据
-   │
-   ├── PUT
-   │     ├──/*.js    PUT 请求处理逻辑
-   │     └──/*.json  PUt 请求对应的数据
-   │
-   ├── middleware.js    [可选] 公共逻辑中间件
-   │
-   └── routes.json   [可选] 自定义的路由映射
+./mocks
+    │
+    ├── /data
+    │   │
+    │   ├── DELETE
+    │   │     ├──/*.js    DELETE 请求处理逻辑
+    │   │     └──/*.json  DELETE 请求对应的数据
+    │   │
+    │   ├── GET
+    │   │     ├──/*.js    GET 请求处理逻辑
+    │   │     └──/*.json  GET 请求对应的数据
+    │   │
+    │   ├── POST
+    │   │     ├──/*.js    POST 请求处理逻辑
+    │   │     └──/*.json  POST 请求对应的数据
+    │   │
+    │   └── PUT
+    │         ├──/*.js    PUT 请求处理逻辑
+    │         └──/*.json  PUt 请求对应的数据
+    │
+    ├── middleware.js    [optional] 自定义koa2中间件，用以实现自定义逻辑
+    │
+    └── routes.json   [optional] 全局路由映射，用以进行路由逻辑复用（将多个路由通过glob表达式映射到相同文件）
 ```
 
 > 路由与文件的映射关系
