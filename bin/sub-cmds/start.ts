@@ -42,7 +42,6 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
       try {
         await watcher.close();
       } catch (error) {
-        // exit process
         Printer.warn('Error occurs during close watcher:', error);
       }
     }
@@ -52,7 +51,6 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
       try {
         await serverHandle.destory();
       } catch (error) {
-        // exit process
         Printer.warn('Error occurs during destory server:', error);
       }
     }
