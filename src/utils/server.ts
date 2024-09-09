@@ -31,20 +31,12 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
     // 1.close server
     await closeServer();
     // 2.destroy & clear all connection
-    const destroyPromises: Promise<any>[] = [];
-    connectMap.forEach(socket => {
-      try {
-        destroyPromises.push(
-          new Promise((resolve, reject) => {
-            socket.on('close', resolve);
-            socket.destroy();
-          }),
-        );
-      } catch (error) {
-        console.error('Failed to destroy socket:', error);
-      }
-    });
-    await Promise.allSettled(destroyPromises);
+    for (const [key, socket] of connectMap.entries()) {
+      await new Promise(resolve => {
+        socket.on('close', resolve);
+        socket.destroy();
+      }).catch(err => console.error(`Failed to destroy socket(${key}):`, err));
+    }
     connectMap.clear();
     // 3.invoke callback
     typeof callback === 'function' && callback();
