@@ -1,4 +1,5 @@
 'use strict';
+import Colors from 'color-cc';
 import deepmerge from 'deepmerge';
 import * as chokidar from 'chokidar';
 import { Debugger, Printer } from '../../src/utils/print';
@@ -54,6 +55,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
         Printer.warn('Error occurs during destory server:', error);
       }
     }
+    Printer.warn(Colors.yellow('Will exit process...'));
     // exit process
     processExit(1);
   }
