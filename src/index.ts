@@ -231,6 +231,9 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   // start
   server.listen(port, host); // or 443(https) 80(http)
 
+  /**
+   * return handle obj with a "destory" method prop
+   */
   return {
     destory: () => {
       server.destory(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
