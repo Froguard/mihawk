@@ -8,9 +8,9 @@ import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { MOCK_DATA_DIR_NAME } from '../consts';
-import { deepFreeze } from '../utils/obj';
+import { createReadonlyProxy, deepFreeze } from '../utils/obj';
 import { initMockLogicFile } from './init-file';
-import type { KoaContext, MhkCvtrExtra, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { BaseRequestEx, KoaContext, MhkCvtrExtra, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
 const RESOLVER_NAME = '[MockDataResolver]';
@@ -77,11 +77,11 @@ export function createDataResolver(options: MihawkOptions) {
         const dataConvertor = await loadConvertLogicFile(mockLogicAbsPath, !cache);
         if (typeof dataConvertor === 'function') {
           const { request } = ctx || {};
-          const extra: MhkCvtrExtra = {
-            ...request,
-          };
-          // 防止被篡改，进行深度冻结
-          deepFreeze(extra);
+          // 定义 extra 方式1: 防止被篡改，进行深度冻结
+          // const extra: MhkCvtrExtra = { ...request };
+          // deepFreeze(extra);
+          // 定义 extra 方式2: 防止被篡改，进行深度代理
+          const extra = createReadonlyProxy(request as BaseRequestEx);
           // 执行转换器，处理原始的 json 数据
           mockJson = await dataConvertor(mockJson, extra);
           ctx.set('X-Mock-Use-Logic', '1');

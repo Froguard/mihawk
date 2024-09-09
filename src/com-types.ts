@@ -59,25 +59,25 @@ export type KoaRequest = Request;
 export type KoaResponse = Response;
 
 /**
- * Mock 数据转换器函数中 extra 参数的类型
- * - 包含 ctx.request 上的 url,method,path,query,body 等属性
+ * 将 koa 的 BaseRequest 进行扩展，添加 body 和 rawBody 属性
  */
-export type MhkCvtrExtra = Readonly<
-  BaseRequest & {
-    /**
-     * parsed body, define by koa-bodyparser
-     */
-    body?: any;
-    /**
-     * rawBody, string, define by koa-bodyparser
-     */
-    rawBody?: string;
-    /**
-     * others
-     */
-    [k: string]: any;
-  }
->;
+export type BaseRequestEx = BaseRequest & {
+  /**
+   * parsed body, define by koa-bodyparser
+   */
+  body?: any;
+  /**
+   * rawBody, string, define by koa-bodyparser
+   */
+  rawBody?: string;
+};
+
+/**
+ * Mock 数据转换器函数中 extra 参数的类型
+ * - extra 只是个代理对 ctx.request 的对象，包含 ctx.request 上的 url,method,path,query,body 等属性,
+ * - extra 上所有子属性，以及子属性的子属性，都是 Readonly 只读的
+ */
+export type MhkCvtrExtra = DeepReadonly<Unfixedify<BaseRequestEx>>;
 
 /**
  * Mock 数据转换器
@@ -282,6 +282,17 @@ export type CliArgs<T extends Record<string, any> = any> = Loosify<ParsedArgs & 
  */
 export type SubCmdCallback<T = any> = (cliArg?: CliArgs<T>) => Promise<void>;
 
+//
+//
+// =============================================== base types ===============================================
+//
+//
+
+/**
+ * any function
+ */
+export type AnyFunc = (...args: any[]) => any;
+
 /**
  * JSON 对象属性的 value 常规定义
  */
@@ -293,13 +304,35 @@ export type JSONValue = null | boolean | number | string | JSONValue[] | { [key:
 export type JSONObject = Record<string | number, JSONValue>;
 
 /**
+ * 深度递归式让复杂类型的所有子属性都变成可选的。此泛型声明式为了弥补 Partial<T> 的不足
+ */
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends AnyFunc ? T[P] : DeepPartial<T[P]>;
+};
+
+/**
+ * 深度递归式让复杂类型的所有子属性都变成只读的。此泛型声明式为了弥补 Readonly<T> 的不足
+ * - 兼容子属性为函数类型
+ */
+export type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends AnyFunc ? T[P] : DeepReadonly<T[P]>;
+};
+
+/**
+ * 让对象 T 中的子属性变成“松散”(可自定义)
+ */
+export type Unfixedify<T> = T & {
+  [k: string | number | symbol]: any;
+};
+
+/**
  * 让对象 T 中的子属性变成“宽松”(可选&可自定义)
  * - 1.子属性可选的
  * - 2.子属性可自定义，即 { [k: string | number | symbol]: any }
  *
  * 可用于“一些对象可能长得像某个类型时，但子属性又不局限于这个类型定义”的场景
  */
-export type Loosify<T> = Record<string | number | symbol, any> & Partial<T>;
+export type Loosify<T> = Unfixedify<DeepPartial<T>>;
 // export type Loosify<T extends Record<string | number | symbol, any>> = {
 //   [k: string | number | symbol]: any;
 // } & {
