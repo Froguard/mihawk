@@ -86,18 +86,12 @@ export function createDataResolver(options: MihawkOptions) {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);
             ctx.set('X-Mock-Use-Logic', '1');
-            if (!isObjStrict(mockJson)) {
-              // TODO: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
-              Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
-            }
           } catch (error) {
             Printer.error(LOGFLAG_RESOLVER, Colors.error(`Convert-function of MockLogicFile, exec failed!`), Colors.yellow(logicPath4log), error);
-            mockJson = {
-              code: 500,
-              data: null,
-              msg: `Exec convert-function of MockLogicFile(${logicPath4log}) failed!`,
-              err: (error as any)?.message || error?.toString() || 'Unknown error!',
-            };
+          }
+          if (!isObjStrict(mockJson)) {
+            // TODO: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
+            Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {
           const exportInfo = isTypesctiptMode ? 'export default' : 'module.exports';
