@@ -76,6 +76,10 @@ jest.config.json
 .mihawkrc.js
 .mihawkrc.json
 
+# mocks
+mock/
+mocks/
+
 # other config files
 .*rc
 .*rc.ts
