@@ -40,9 +40,11 @@ export default callback;
 
 /**
  * 通过命令行交互，去初始化 rc-file
+ * @param {string} configFileName 文件名，包含 . 前缀
  * @returns {Promise<void>}
  */
 async function initRootConfigFileViaCli(configFileName: string) {
+  configFileName = configFileName.replace(/^\.+/, '.'); // 避免多个.前缀出现
   const config: Partial<MihawkRC> = {
     // logConfig: {
     //   ignoreRoutes: ['OPTIONS /*'],
