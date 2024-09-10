@@ -113,7 +113,7 @@ Greek:
 - [x] delta (Δ, δ)
 - [x] epsilon (Ε, ε)
 - [x] zeta (Ζ, ζ)
-- [ ] eta (Η, η)
+- [x] eta (Η, η)
 - [ ] theta (Θ, θ)
 - [ ] iota (Ι, ι)
 - [ ] kappa (Κ, κ)
