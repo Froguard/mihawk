@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge';
 import * as chokidar from 'chokidar';
 import { Debugger, Printer } from '../../src/utils/print';
 import { getRcData } from '../../src/composites/rc';
-import { PKG_NAME } from '../../src/consts';
+import { DEFAULT_RC, PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
 import { createWatcher } from '../../src/composites/watcher';
 import { processExit } from '../../src/utils/process';
@@ -15,7 +15,7 @@ import type { SubCmdCallback, MihawkRC, Loosify } from '../../src/com-types';
  */
 const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
   Debugger.log('CliConfig:', args);
-  const rootConfig = await getRcData<MihawkRC>(`.${PKG_NAME}rc`);
+  const rootConfig = await getRcData<MihawkRC>(`.${PKG_NAME}rc`, { initConfig: { ...DEFAULT_RC } });
   Debugger.log('RootConfig:', rootConfig);
   const finalConfig = deepmerge<Loosify<MihawkRC>>(rootConfig || {}, args);
   Debugger.log('FinalConfig:', finalConfig);

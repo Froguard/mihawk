@@ -36,6 +36,7 @@ const PKG_ROOT_PATH = getRootAbsPath();
 export default async function mihawk(config?: Loosify<MihawkRC>) {
   delete config._;
   delete config['--'];
+  delete config.$schema;
   Printer.log('config:', config);
   const options = formatOptionsByConfig(config);
   Debugger.log('formated options:', options);

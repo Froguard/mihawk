@@ -119,7 +119,7 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
       return (config as Partial<T>) || defConfig;
     } else {
       // 未检测到rc文件时，进行自动创建
-      Printer.log(Colors.warn(`Can't found rc-file(.${name}.js|json|ts). Will auto create & init it..`)); // prettier-ignore
+      Printer.log(Colors.yellow(`Can't found rc-file(.${name}.js|json|ts). Will auto create & init it..`)); // prettier-ignore
       await initRCfile(name, { fileType: 'json', initConfig: defConfig, overwrite: false });
       return defConfig;
     }
