@@ -8,7 +8,8 @@
     },
     "port": {
       "description": "监听端口, 默认 8888",
-      "type": "number"
+      "type": "number",
+      "default": 8888
     },
     "https": {
       "description": "是否开启 https，默认 false",
