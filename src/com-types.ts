@@ -149,7 +149,7 @@ export interface MihawkRC {
   watch?: boolean;
 
   /**
-   * 对 mock 文件进行缓存，默认 true
+   * 对 mock 文件进行缓存，默认 false
    * - true: mock 文件的加载，会走缓存，不会每次都重新加载文件（缓存的生成为第一次加载时产生）
    * - false: mock 文件的加载，不会走缓存，每次都重新加载文件
    *

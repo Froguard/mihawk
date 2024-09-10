@@ -20,7 +20,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
   const finalConfig = deepmerge<Loosify<MihawkRC>>(rootConfig || {}, args);
   Debugger.log('FinalConfig:', finalConfig);
   //
-  // create watcher if needed (config.cache=true)
+  // create watcher if needed (config.watch=true)
   let watcher: chokidar.FSWatcher | null = null;
   finalConfig.watch &&
     setTimeout(() => {

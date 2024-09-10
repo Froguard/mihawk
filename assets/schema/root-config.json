@@ -44,9 +44,9 @@
       "default": true
     },
     "cache": {
-      "description": "对 mock 文件进行缓存，默认 true",
+      "description": "对 mock 文件进行缓存，默认 false",
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "mockDir": {
       "description": "mock 目录，默认为 `./mocks`",
