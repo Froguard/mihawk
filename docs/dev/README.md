@@ -115,7 +115,7 @@ Greek:
 - [x] zeta (Ζ, ζ)
 - [x] eta (Η, η)
 - [x] theta (Θ, θ)
-- [ ] iota (Ι, ι)
+- [x] iota (Ι, ι)
 - [ ] kappa (Κ, κ)
 - [ ] lambda (Λ, λ)
 - [ ] mu (Μ, μ)
