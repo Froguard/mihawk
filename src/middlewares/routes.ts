@@ -38,7 +38,8 @@ export default function (routes: Record<string, string>) {
         }
       }
       if (matched && matched.mockFile) {
-        Printer.log('mdw-routes:', `Reset mockRelPath: ${Colors.cyan(mockRelPath)} ${LOG_ARROW} ${Colors.green(matched.mockFile)} ↩️`);
+        Printer.log('mdw-routes:', `Reset route-logic: ${Colors.cyan(mockRelPath)} ${LOG_ARROW} ${Colors.green(matched.mockFile)} ↩️`);
+        Debugger.log('mdw-routes:', `Reset mockRelPath: ${mockRelPath} -> ${matched.mockFile}`);
         ctx.mockRelPath = matched.mockFile;
       }
       // ================================================
