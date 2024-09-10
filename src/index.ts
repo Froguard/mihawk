@@ -25,6 +25,7 @@ import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
+// npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
 const PKG_ROOT_PATH = getRootAbsPath();
 
 /**
