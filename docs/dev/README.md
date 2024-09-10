@@ -116,7 +116,7 @@ Greek:
 - [x] eta (Η, η)
 - [x] theta (Θ, θ)
 - [x] iota (Ι, ι)
-- [ ] kappa (Κ, κ)
+- [x] kappa (Κ, κ)
 - [ ] lambda (Λ, λ)
 - [ ] mu (Μ, μ)
 - [ ] nu (Ν, ν)

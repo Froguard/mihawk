@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-iota",
+  "version": "0.1.0-kappa",
   "description": "A simple async api mock server tool, no render template",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
