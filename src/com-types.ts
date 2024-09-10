@@ -30,7 +30,7 @@ declare module 'koa' {
     skipDefaultMock?: boolean;
 
     /**
-     * Method + Path
+     * 格式为 Method + Path, 如 'GET /a/b/c'
      * - 初始化详见在 middlewares/common.ts  中逻辑代码
      */
     routePath: string;
