@@ -114,7 +114,7 @@ Greek:
 - [x] epsilon (Ε, ε)
 - [x] zeta (Ζ, ζ)
 - [x] eta (Η, η)
-- [ ] theta (Θ, θ)
+- [x] theta (Θ, θ)
 - [ ] iota (Ι, ι)
 - [ ] kappa (Κ, κ)
 - [ ] lambda (Λ, λ)
