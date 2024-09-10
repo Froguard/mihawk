@@ -66,6 +66,8 @@ __docs__/
 .prettierrc.ts
 .prettierrc.js
 .prettierrc.json
+.yarnrc
+.yarnrc.yml
 jest.config.ts
 jest.config.js
 jest.config.json

@@ -4,7 +4,7 @@
 'use strict';
 import path from 'path';
 import Colors from 'color-cc';
-import { removeSync, readdirSync } from 'fs-extra';
+import { removeSync, readdirSync, existsSync } from 'fs-extra';
 
 const LOG_PREFIX = `${Colors.magenta('[pre-build]')} ${Colors.gray('clearDistDir:')}`;
 const ROOT_DIR = path.resolve(__dirname, '../../');
@@ -17,6 +17,10 @@ export default function clearDistDir() {
   console.log(LOG_PREFIX, `清空 dist 目录下所有文件${Colors.gray('（保留 dist/.gitkeep）')}...`);
   //
   const distDir = path.resolve(ROOT_DIR, './dist');
+  if (!existsSync(distDir)) {
+    console.log(LOG_PREFIX, Colors.gray('dist 目录为空，无需清理...'));
+    return;
+  }
   const distFiles = readdirSync(distDir);
   distFiles.forEach(fileName => fileName !== '.gitkeep' && removeSync(path.resolve(distDir, fileName)));
 }
