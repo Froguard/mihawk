@@ -4,6 +4,7 @@ import * as chokidar from 'chokidar';
 import { Printer } from '../../src/utils/print';
 import { absifyPath, getLogicFileExt, relPathToCWD } from '../../src/utils/path';
 import { refreshJson, refreshTsOrJs } from '../../src/composites/loader';
+import { LOG_ARROW } from '../consts';
 import type { MihawkRC, Loosify } from '../../src/com-types';
 
 const WATCHER_IGNORES = [
@@ -96,7 +97,7 @@ export function createWatcher(config: Loosify<MihawkRC>) {
   });
   // listen file's rename event
   watcher.on('rename', (oldFilePath, newFilePath) => {
-    Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${Colors.gray(relPathToCWD(oldFilePath))} -> ${Colors.gray(relPathToCWD(newFilePath))}`);
+    Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${Colors.gray(relPathToCWD(oldFilePath))} ${LOG_ARROW} ${Colors.gray(relPathToCWD(newFilePath))}`);
     refreshModule(oldFilePath, logicFileExt);
     refreshModule(newFilePath, logicFileExt);
   });

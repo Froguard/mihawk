@@ -2,6 +2,7 @@
 import Colors from 'color-cc';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
+import { LOG_ARROW } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**
@@ -10,7 +11,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function (routes: Record<string, string>) {
-  Debugger.log('mdw-routes init...', routes);
+  Debugger.log('mdw-routes: init...', routes);
   const needCheckRoutes = Object.keys(routes)?.length > 0;
   const routeKvEntries = needCheckRoutes ? Object.entries(routes) : [];
 
@@ -21,8 +22,8 @@ export default function (routes: Record<string, string>) {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { disableLogPrint, skipDefaultMock, mockRelPath, routePath, path } = ctx;
-    Debugger.log('mdw-routes >>', routePath);
-    // !disableLogPrint && Printer.log('mdw-routes', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
+    Debugger.log('mdw-routes: >>', routePath);
+    // !disableLogPrint && Printer.log('mdw-routes:', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     //
     if (skipDefaultMock || !needCheckRoutes) {
       //
@@ -37,7 +38,7 @@ export default function (routes: Record<string, string>) {
         }
       }
       if (matched && matched.mockFile) {
-        Printer.log('mdw-routes', `Reset mockRelPath: ${mockRelPath} → ${matched.mockFile}`);
+        Printer.log('mdw-routes:', `👉🏻 Reset mockRelPath: ${Colors.gray(mockRelPath)} ${LOG_ARROW} ${Colors.green(matched.mockFile)}`);
         ctx.mockRelPath = matched.mockFile;
       }
       // ================================================
@@ -47,6 +48,6 @@ export default function (routes: Record<string, string>) {
       // ================================================
     }
     //
-    Debugger.log('mdw-routes <<', routePath);
+    Debugger.log('mdw-routes: <<', routePath);
   };
 }

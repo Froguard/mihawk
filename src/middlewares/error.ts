@@ -13,7 +13,7 @@ const ERR_HTML_PATH = resolve(getRootAbsPath(), './assets/50x.html');
  * @returns
  */
 export default function error() {
-  Debugger.log('mdw-err init...');
+  Debugger.log('mdw-err: init...');
   const errHtml = readFileSync(ERR_HTML_PATH, 'utf-8');
 
   /**
@@ -23,8 +23,8 @@ export default function error() {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { disableLogPrint, routePath } = ctx;
-    Debugger.log('mdw-err >>', routePath);
-    // !disableLogPrint && Printer.log('mdw-err', routePath);
+    Debugger.log('mdw-err: >>', routePath);
+    // !disableLogPrint && Printer.log('mdw-err:', routePath);
     // ================================================
     try {
       //
@@ -34,12 +34,12 @@ export default function error() {
       // ctx.throw(500, err);
       const { message, stack } = (err || {}) as Error;
       const errMsg = message || err?.toString() || 'Something wrong...';
-      Printer.error('mdw-err', `Occurs error: ${errMsg}`, err);
+      Printer.error('mdw-err:', `Occurs error: ${errMsg}`, err);
       ctx.status = 500;
       ctx.set('Content-Type', 'text/html');
       ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');
     }
     // ================================================
-    Debugger.log('mdw-err <<', routePath);
+    Debugger.log('mdw-err: <<', routePath);
   };
 }

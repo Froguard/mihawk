@@ -14,7 +14,7 @@ const HTML_FILE_PATH = path.resolve(getRootAbsPath(), './assets/404.html');
  * @returns
  */
 export default function notFound() {
-  Debugger.log('mdw-404 init...');
+  Debugger.log('mdw-404: init...');
   const html = readFileSync(HTML_FILE_PATH, 'utf-8');
 
   /**
@@ -24,7 +24,7 @@ export default function notFound() {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { disableLogPrint, routePath, mockRelPath, request, url } = ctx || {};
-    Debugger.log('mdw-404 >>', routePath);
+    Debugger.log('mdw-404: >>', routePath);
 
     // ================================================
     //
@@ -35,7 +35,7 @@ export default function notFound() {
     // 如果没有匹配到任何路由
     if (ctx.status === 404) {
       const { accept } = request.headers || {};
-      // !disableLogPrint && Printer.log('mdw-404', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
+      // !disableLogPrint && Printer.log('mdw-404:', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
         // html
         ctx.set('Content-Type', 'text/html');
@@ -52,7 +52,7 @@ export default function notFound() {
       }
     }
 
-    Debugger.log('mdw-404 <<', routePath);
+    Debugger.log('mdw-404: <<', routePath);
     //
   };
 }

@@ -133,6 +133,7 @@ export function removeSpecialExt(filePath: string) {
 /**
  * 格式化路径
  * - 注意，如果末尾有 / 会保留，并不会删除掉，这个和 absifyPath 有区别
+ * - 会有 normalize 的效果，即删除 . 和 .. 等内容
  * - 返回的路径是 unix 样式的
  * @param {string} targetPath
  * @returns {string} newPath formated
@@ -147,7 +148,8 @@ export function formatPath(targetPath: string) {
  * - 对于 `/test/a/b`，会返回 `/test/a/b`
  * - 对于 `/test/a/b.xxx`，会返回 `/test/a/b`
  * - 对于 `/test/a/b.json5`，会返回 `/test/a/b`
- * - 对于 `/test/a/`，会返回 `/test/a/index` 【特别注意】这里的末尾/或转化增加一个 index 后缀
+ * - 👉🏼 对于 `/test/a/`，会返回 `/test/a/index` 【特别注意】这里的末尾/或转化增加一个 index 后缀
+ * - 返回的内容，回事 normalize 的效果，即删除 . 和 .. 等内容
  * @private
  * @param mockPath
  * @returns

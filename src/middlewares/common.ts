@@ -13,7 +13,7 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (options?: MihawkOptions) {
-  Debugger.log('mdw-com init...', options);
+  Debugger.log('mdw-com: init...', options);
   const { logConfig } = options || {};
   let { ignoreRoutes } = logConfig || {};
   ignoreRoutes = dedupe(ignoreRoutes || []).map(ignRt => ignRt.trim().replace(/\s+/g, ' '));
@@ -25,12 +25,15 @@ export default function (options?: MihawkOptions) {
    * @param {KoaNext} next
    */
   return async function common(ctx: KoaContext, next: KoaNext) {
+    console.log();
     const { method, path } = ctx;
     const routePath = `${method.toUpperCase()} ${path}`;
-    Debugger.log('mdw-com >>', routePath);
+    Debugger.log('mdw-com: >>', routePath);
     const disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
-    // !disableLogPrint && Printer.log('mdw-com', routePath);
-    // set common props to ctx
+    // !disableLogPrint && Printer.log('mdw-com:', routePath);
+    /**
+     * set common props to ctx
+     */
     /**
      * 是一个相对路径，以 data 文件夹为起始目录
      */
@@ -55,6 +58,6 @@ export default function (options?: MihawkOptions) {
     const keepTime = `${Date.now() - startTime}ms`;
     ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}`);
     ctx.set('X-Mock-Time', keepTime);
-    Debugger.log('mdw-com <<', routePath);
+    Debugger.log('mdw-com: <<', routePath);
   };
 }

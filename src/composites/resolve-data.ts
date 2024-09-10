@@ -8,7 +8,7 @@ import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
-import { MOCK_DATA_DIR_NAME } from '../consts';
+import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
 import { createReadonlyProxy } from '../utils/obj';
 import { initMockLogicFile } from './init-file';
 import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
@@ -48,7 +48,7 @@ export function createDataResolver(options: MihawkOptions) {
      */
     // 0.format mock path
     const mockRelPathNoExt = formatMockPath(mockRelPath);
-    !disableLogPrint && Printer.log(LOGFLAG_RESOLVER, `${Colors.cyan(routePath)} -> ${Colors.green(mockRelPathNoExt)}`);
+    !disableLogPrint && Printer.log(LOGFLAG_RESOLVER, `${Colors.cyan(routePath)} ${LOG_ARROW} ${Colors.green(`./${mockRelPathNoExt}`)}`);
 
     // 1.load mock data from json|json5 file
     const jsonPath = `${mockRelPathNoExt}.${JSON_EXT}`;

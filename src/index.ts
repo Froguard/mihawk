@@ -103,7 +103,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
   let routes: Record<string, string> = {};
   if (existsSync(routesFilePath)) {
     routes = (await loadRoutesFile(routesFilePath)) as Record<string, string>;
-    Printer.log(`load routes file: ${relPathToCWD(routesFilePath)}`);
+    Printer.log(Colors.success('Load routes file!'), Colors.gray(relPathToCWD(routesFilePath)));
   }
 
   /**
@@ -111,8 +111,8 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
    */
   let diyMiddleware: KoaMiddleware | null = null;
   if (useLogicFile && existsSync(middlewareFilePath)) {
-    Printer.log(`load diy middleware file: ${relPathToCWD(middlewareFilePath)}`);
     diyMiddleware = await loadLogicFile<KoaMiddleware>(middlewareFilePath);
+    Printer.log(Colors.success('Load diy middleware file success!'), Colors.gray(relPathToCWD(middlewareFilePath)));
   }
 
   /**

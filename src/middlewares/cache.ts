@@ -8,7 +8,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function cache() {
-  Debugger.log('mdw-cache init...');
+  Debugger.log('mdw-cache: init...');
 
   /**
    * koa 中间件：

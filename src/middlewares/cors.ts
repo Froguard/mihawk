@@ -8,7 +8,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function cors() {
-  Debugger.log('mdw-cors init...');
+  Debugger.log('mdw-cors: init...');
 
   /**
    * koa 中间件：

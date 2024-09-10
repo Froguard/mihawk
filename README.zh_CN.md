@@ -4,7 +4,7 @@
 
 > 推荐使用版本 `v1.0.0`+
 
-采用 `GET /a/b/c` -> `./mocks/data/GET/a/b/c.json` 方式去做 api 请求的 mock server 工具
+采用 `GET /a/b/c` → `./mocks/data/GET/a/b/c.json` 方式去做 api 请求的 mock server 工具
 
 - 支持 https 协议
 - 支持所有有请求方法，例如 `GET`, `POST`, `PUT`, `DELETE` 等，通过文件路径方式自动映射请求路径
@@ -110,7 +110,7 @@ mihawk init
 - `mockDataFileType`: string 可选值为 `json` | `json5` 之一, 默认值为 `json`，表示 mock 数据的文件格式
 - `mockLogicFileType`: string 可选值为 `js` | `cjs` | `ts` | `none` 之一, 默认值为 `none`，表示 mock 数据的处理逻辑文件
 
-> 更多说明，详见 ts 定义文件 -> [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
+> 更多说明，详见 ts 定义文件 → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
 
 ## 示例
 

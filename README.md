@@ -4,7 +4,7 @@
 
 > Recommend: use version@`v1.0.0`+
 
-Make a easy mock-server to mock api, with `GET /a/b/c` -> `./mocks/data/GET/a/b/c.json` mapping
+Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b/c.json` mapping
 
 - Support https protocol
 - Support all methods, like `GET`, `POST`, `PUT`, `DELETE` etc.
@@ -110,7 +110,7 @@ About root config props:
 - `mockDataFileType`: string `json` | `json5`, default `json`, the file type of mock data
 - `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic
 
-> More detail -> [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
+> More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
 
 ## Example
 
