@@ -170,7 +170,7 @@ export default routes;
  * mihawk's middleware file:
  * - just a Koa2 Middleware
  */
-import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+
+import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+ (eg: koa@^2.15.3)
 // import type { KoaContext, KoaNext } from 'mihawk/con-types';
 
 /**
