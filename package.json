@@ -50,9 +50,9 @@
       "types": "./dist/types/src/index.d.ts"
     },
     "./com-types": {
-      "require": "./dist/cjs/src/com-types/index.js",
-      "import": "./dist/esm/src/com-types/index.js",
-      "types": "./dist/types/src/com-types/index.d.ts"
+      "require": "./dist/cjs/src/com-types.js",
+      "import": "./dist/esm/src/com-types.js",
+      "types": "./dist/types/src/com-types.d.ts"
     }
   },
   "dependencies": {
