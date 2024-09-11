@@ -121,7 +121,7 @@ Greek:
 - [x] mu (Μ, μ)
 - [x] nu (Ν, ν)
 - [x] xi (Ξ, ξ)
-- [ ] omicron (Ο, ο)
+- [x] omicron (Ο, ο)
 - [ ] pi (Π, π)
 - [ ] rho (Ρ, ρ)
 - [ ] sigma (Σ, σ/ς)

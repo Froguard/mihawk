@@ -7,22 +7,39 @@ import { refreshJson, refreshTsOrJs } from '../../src/composites/loader';
 import { LOG_ARROW } from '../consts';
 import type { MihawkRC, Loosify } from '../../src/com-types';
 
+/**
+ * 监控需要默认忽略的文件/文件夹路径
+ */
 const WATCHER_IGNORES = [
-  // hidden files
+  // hidden dot files
   '**/.*',
-  // markdown files
+  // dot files
+  '**/.DS_Store',
+  // markdown
   '**/*.md',
+  // txt
+  '**/*.txt',
+  // media files
+  '**/*.{jpg,jpeg,png,gif,bmp,webp,svg}', // image files
+  '**/*.{mp4,mpeg,mpg,avi,mov,flv,wmv,rmvb,mkv}', // video files
+  '**/*.{wav,mp3,ogg,aac,flac,wma,m4a}', // audio files
+  // office files
+  '**/*.{doc,docx,ppt,pptx,xls,xlsx,pdf}', // MS office files
+  '**/*.{pages,page,pagelet,pagelets,key,numbers}', // MacOS office files
+  // tsconfig
+  '**/tsconfig.json',
+  '**/tsconfig.*.json',
   // third part packages
   '**/node_modules/**',
-  '**/.DS_Store',
+  '**/bower_components/**',
+  // IDE config
+  '**/.idea/**',
+  '**/.vscode/**',
   // version controll
   '**/.git/**',
   '**/.gitkeep',
   '**/.gitignore',
   '**/.svn/**',
-  // tsconfig
-  '**/tsconfig.json',
-  '**/tsconfig.*.json',
   // // build output files:
   // '**/dist/**',
   // '**/build/**',
