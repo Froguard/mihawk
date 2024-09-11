@@ -319,12 +319,15 @@ function _clearRequireCache(filename: string) {
  */
 function _clearSelfAndAncestorsCache(filename: string) {
   filename = absifyPath(filename);
-  if (filename === CWD || !(isPathInDir(filename, CWD) || isPathInDir(filename, getRootAbsPath()))) {
+  Debugger.log('_clearSelfAndAncestorsCache:', filename);
+  const PKG_ROOT = getRootAbsPath();
+  if (!(filename === CWD || isPathInDir(filename, CWD) || filename === PKG_ROOT || isPathInDir(filename, PKG_ROOT))) {
+    Debugger.log('_clearSelfAndAncestorsCache Skip danger path:', filename);
     return;
   }
-  Debugger.log('_clearSelfAndAncestorsCache:', filename);
   const mod = require.cache[filename];
   if (!mod) {
+    Debugger.log('_clearSelfAndAncestorsCache Skip empty cache:', filename);
     return;
   }
   const parent = mod?.parent;

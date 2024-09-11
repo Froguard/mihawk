@@ -51,6 +51,7 @@ export function isExistedSync(targetPath: string, rootPath: string = CWD) {
   return existsSync(targetPath);
 }
 
+let _pkgRootAbsPath: string = '';
 /**
  * 获取本工程（mihawk）的根目录
  * - 作用：用于读取本工程根目录下的文件，如 package.json 文件
@@ -68,26 +69,29 @@ export function isExistedSync(targetPath: string, rootPath: string = CWD) {
  *   const rootAbsolutePath = getRootAbsPath();
  */
 export function getRootAbsPath() {
-  /**
-   * 无论在 ts 源码还是在 dist 的输出目录中，本文件的结构都会如下
-   * src/
-   *  ├ ...
-   *  ├ utils /
-   *  |  ├ ...
-   *  |  └ path.ts（本文件）
-   *  ├ ...
-   *  └ index.ts
-   * 差别在于，源码是直接在根目录之下有一个 `./src` 目录，而 dist 的输出目录是 `./dist/{cjs,esm,types}/src`
-   * 所以，这里只需要判断一下, src 之上的父目录，是不是在 cjs,esm,types 三者之一，就知道文件是否处于 dist 目录中
-   */
-  const curDirPath = join(__dirname, '../'); // dir(src) path
-  const curParentDirPath = join(curDirPath, '../'); // dir(src)'s parent dir path
-  const curParentDirName = basename(curParentDirPath); // dir(src)'s parent dir name
-  // detect whether in dist or not
-  const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => curParentDirName == distSubDir);
-  const rootPath = isInDist ? join(curParentDirPath, '../../') : curParentDirPath;
-  Debugger.log('getRootAbsPath', { __dirname, curDirPath, curParentDirPath, isInDist, rootPath });
-  return resolve(rootPath);
+  if (!_pkgRootAbsPath) {
+    /**
+     * 无论在 ts 源码还是在 dist 的输出目录中，本文件的结构都会如下
+     * src/
+     *  ├ ...
+     *  ├ utils /
+     *  |  ├ ...
+     *  |  └ path.ts（本文件）
+     *  ├ ...
+     *  └ index.ts
+     * 差别在于，源码是直接在根目录之下有一个 `./src` 目录，而 dist 的输出目录是 `./dist/{cjs,esm,types}/src`
+     * 所以，这里只需要判断一下, src 之上的父目录，是不是在 cjs,esm,types 三者之一，就知道文件是否处于 dist 目录中
+     */
+    const curDirPath = join(__dirname, '../'); // dir(src) path
+    const curParentDirPath = join(curDirPath, '../'); // dir(src)'s parent dir path
+    const curParentDirName = basename(curParentDirPath); // dir(src)'s parent dir name
+    // detect whether in dist or not
+    const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => curParentDirName == distSubDir);
+    const rootPath = isInDist ? join(curParentDirPath, '../../') : curParentDirPath;
+    Debugger.log('getRootAbsPath', { __dirname, curDirPath, curParentDirPath, isInDist, rootPath });
+    _pkgRootAbsPath = resolve(rootPath);
+  }
+  return _pkgRootAbsPath;
 }
 
 /**
