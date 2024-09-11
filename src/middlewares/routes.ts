@@ -3,6 +3,7 @@ import Colors from 'color-cc';
 import { Printer, Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { LOG_ARROW } from '../consts';
+import { unixifyPath } from '../utils/path';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**
@@ -38,9 +39,10 @@ export default function (routes: Record<string, string>) {
         }
       }
       if (matched && matched.mockFile) {
-        Printer.log('mdw-routes:', `Reset route-logic: ${Colors.cyan(mockRelPath)} ${LOG_ARROW} ${Colors.green(matched.mockFile)} ↩️`);
-        Debugger.log('mdw-routes:', `Reset mockRelPath: ${mockRelPath} -> ${matched.mockFile}`);
-        ctx.mockRelPath = matched.mockFile;
+        const newMockRelPath = unixifyPath(matched.mockFile);
+        Printer.log('mdw-routes:', `Reset route-logic: ${Colors.cyan(mockRelPath)} ${LOG_ARROW} ${Colors.green(newMockRelPath)} ↩️`);
+        Debugger.log('mdw-routes:', `Reset mockRelPath: ${mockRelPath} -> ${newMockRelPath}`);
+        ctx.mockRelPath = newMockRelPath;
       }
       // ================================================
       //
