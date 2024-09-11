@@ -29,8 +29,6 @@ export default function (options?: MihawkOptions) {
     const { method, path } = ctx;
     const routePath = `${method.toUpperCase()} ${path}`;
     Debugger.log('mdw-com: >>', routePath);
-    const disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
-    // !disableLogPrint && Printer.log('mdw-com:', routePath);
     /**
      * set common props to ctx
      */
@@ -42,11 +40,13 @@ export default function (options?: MihawkOptions) {
      * 格式为 Method + Path, 如 GET /a/b/c
      */
     ctx.routePath = routePath;
-    ctx.disableLogPrint = disableLogPrint;
-    //
-    ctx.set('X-Powered-By', PKG_NAME);
-    const startTime = Date.now();
+    /**
+     * 是否需要禁用打印日志，默认 false, 即：要打印
+     */
+    ctx.disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
 
+    //
+    const startTime = Date.now();
     //
     // ================================================
     //
@@ -54,10 +54,12 @@ export default function (options?: MihawkOptions) {
     //
     // ================================================
     //
-
     const keepTime = `${Date.now() - startTime}ms`;
-    ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}`);
     ctx.set('X-Mock-Time', keepTime);
-    Debugger.log('mdw-com: <<', routePath);
+    ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}`);
+    ctx.set('X-Powered-By', PKG_NAME);
+
+    //
+    Debugger.log(`mdw-com: << ${ctx.type}`, routePath);
   };
 }
