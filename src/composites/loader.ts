@@ -259,17 +259,20 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
     // 方案一：直接 eval或者 new Function（不可取，不安全）
     // module.exports = eval(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
-    // vm 执行
+    // 创建一个执行上下文，继承自 global
+    const vmContext = vm.createContext(global);
+    vmContext.require = require;
+    vmContext.global = vmContext;
+    vmContext.module = module;
+    vmContext.exports = module.exports;
+    vmContext.__dirname = path.dirname(tsFilePath);
+    vmContext.__filename = tsFilePath;
+    // 执行 jsCode
     vm.runInNewContext(
       // source code
       jsCode,
       // context
-      {
-        module,
-        exports: module.exports,
-        require,
-        console, // 方便执行 jscode 的时候，console 等语句能够正常输出
-      },
+      vmContext,
       // options
       {
         filename: tsFilePath,
