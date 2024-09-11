@@ -14,7 +14,7 @@ import { initMockLogicFile } from './init-file';
 import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
-const RESOLVER_NAME = '[dataResolver]';
+const RESOLVER_NAME = '[resolver]';
 const LOGFLAG_RESOLVER = `${Colors.cyan(RESOLVER_NAME)}${Colors.gray(':')}`;
 
 /**

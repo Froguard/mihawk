@@ -118,7 +118,7 @@ Greek:
 - [x] iota (Ι, ι)
 - [x] kappa (Κ, κ)
 - [x] lambda (Λ, λ)
-- [ ] mu (Μ, μ)
+- [x] mu (Μ, μ)
 - [ ] nu (Ν, ν)
 - [ ] xi (Ξ, ξ)
 - [ ] omicron (Ο, ο)
