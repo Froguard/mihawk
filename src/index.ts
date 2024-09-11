@@ -7,6 +7,7 @@ import Colors from 'color-cc';
 import mdwBodyParser from 'koa-bodyparser';
 import mdwSSL from 'koa-sslify';
 import { existsSync, ensureDirSync, readFileSync } from 'fs-extra';
+import dedupe from 'free-dedupe';
 import { Printer, Debugger } from './utils/print';
 import { formatOptionsByConfig } from './composites/rc';
 import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/loader';
@@ -32,13 +33,13 @@ const PKG_ROOT_PATH = getRootAbsPath();
  * mihawk
  * - start a mock server
  * @param {Loosify<MihawkRC>} config
- * @returns {Promise<void>}
+ * @returns {Promise<any>}
  */
-export default async function mihawk(config?: Loosify<MihawkRC>) {
+export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boolean = false) {
   delete config._;
   delete config['--'];
   delete config.$schema;
-  Printer.log('config:', config);
+  !isRestart && Printer.log('config:', config);
   const options = formatOptionsByConfig(config);
   Debugger.log('formated options:', options);
   //
@@ -213,12 +214,13 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
     Printer.log(Colors.green('Start mock-server success!'));
     //
     Printer.log('Mock Data directory: ', Colors.gray(unixifyPath(mockDir)));
-    const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt);
+    const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
     Debugger.log('Existed routes by scann:', existedRoutes);
-    const existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
+    let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
     existedRoutePaths.push(...Object.keys(routes));
+    existedRoutePaths = dedupe(existedRoutePaths);
     const existedCount = existedRoutePaths.length;
-    Printer.log(`Existed all routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
+    Printer.log(`Detected-Routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
     //
     const addr2 = `${protocol}://${getMyIp()}:${port}`;
     Printer.log(`🚀 Mock Server address:`);
@@ -242,6 +244,14 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
       if (typeof destoryServer === 'function') {
         await destoryServer(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
       }
+    },
+    close: async () => {
+      server.closeAllConnections();
+      server.closeIdleConnections();
+      await new Promise((res, rej) => {
+        server.close(err => (err ? rej(err) : res(null)));
+      }).catch(err => Printer.error(`Close Server Failed!\n`, err));
+      console.log(Colors.success('Close Mock-Server success!'));
     },
   };
 }

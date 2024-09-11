@@ -71,12 +71,15 @@ export function refreshModule(filePath: string, allowLogicFileExt: 'js' | 'cjs' 
   }
 }
 
+// 可监控的事件范围
+export type WatchEventType = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
+
 /**
  * 初始化一个文件监听器（）
  * @param {Loosify<MihawkRC>} config
  * @returns {chokidar.FSWatcher} watcher
  */
-export function createWatcher(config: Loosify<MihawkRC>) {
+export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: string | WatchEventType, ...args: any[]) => any) {
   const { mockDir, mockLogicFileType } = config;
   const watchTargetPath = absifyPath(mockDir);
   const logicFileExt = getLogicFileExt(mockLogicFileType);
@@ -85,25 +88,45 @@ export function createWatcher(config: Loosify<MihawkRC>) {
     ignored: WATCHER_IGNORES,
     persistent: true,
   });
-  // listen file's change event
-  watcher.on('change', filePath => {
-    console.log();
-    Printer.log(LOGFLAG_WATCHER, 'File has been changed!', Colors.gray(relPathToCWD(filePath)));
-    refreshModule(filePath, logicFileExt);
+  const cb = typeof callback === 'function' ? callback : () => {};
+  // addEventListeners
+  watcher.on('all', (eventName: string | WatchEventType, filePath) => {
+    if (eventName === 'rename') {
+      return;
+    }
+    switch (eventName) {
+      case 'change': {
+        // listen file's change event
+        console.log();
+        Printer.log(LOGFLAG_WATCHER, 'File has been changed!', Colors.gray(relPathToCWD(filePath)));
+        refreshModule(filePath, logicFileExt);
+        break;
+      }
+      case 'unlink': {
+        // listen file's unlink event
+        console.log();
+        Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', Colors.gray(relPathToCWD(filePath)));
+        refreshModule(filePath, logicFileExt);
+        break;
+      }
+      case 'add': // listen file's add event
+      default:
+        break;
+    }
+    //
+    cb(eventName, filePath);
   });
-  // listen file's unlink event
-  watcher.on('unlink', filePath => {
-    console.log();
-    Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', Colors.gray(relPathToCWD(filePath)));
-    refreshModule(filePath, logicFileExt);
-  });
+
   // listen file's rename event
   watcher.on('rename', (oldFilePath, newFilePath) => {
     console.log();
     Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${Colors.gray(relPathToCWD(oldFilePath))} ${LOG_ARROW} ${Colors.gray(relPathToCWD(newFilePath))}`);
     refreshModule(oldFilePath, logicFileExt);
     refreshModule(newFilePath, logicFileExt);
+    cb('rename', oldFilePath, newFilePath);
   });
+
+  //
   // log
   process.nextTick(() =>
     Printer.log(

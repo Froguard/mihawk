@@ -8,8 +8,14 @@ import { DEFAULT_RC, PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
 import { createWatcher } from '../../src/composites/watcher';
 import { processExit } from '../../src/utils/process';
+import { sleep, throttleAsync } from '../../src/utils/async';
 import type { SubCmdCallback, MihawkRC, Loosify } from '../../src/com-types';
 
+type ServerCtrl = Awaited<ReturnType<typeof mihawk>>;
+interface Controller {
+  watcher?: chokidar.FSWatcher | null;
+  serverHandle?: ServerCtrl | null;
+}
 /**
  * mihawk main
  */
@@ -20,37 +26,61 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
   const finalConfig = deepmerge<Loosify<MihawkRC>>(rootConfig || {}, args);
   Debugger.log('FinalConfig:', finalConfig);
   //
-  // create watcher if needed (config.watch=true)
-  let watcher: chokidar.FSWatcher | null = null;
-  finalConfig.watch &&
+  const controller: Controller = { watcher: null, serverHandle: null };
+  // 1.start a mock server
+  await _start(controller, finalConfig);
+
+  // 2.create watcher if needed (config.watch=true)
+  if (finalConfig.watch) {
     setTimeout(() => {
-      watcher = createWatcher(finalConfig);
+      const reload = throttleAsync(_restart, 500);
+      controller.watcher = createWatcher(finalConfig, (eventName: string, ...args: any[]) => {
+        const filePath = args[0];
+        const needReload = ['.js', '.cjs', '.ts'].some(ext => filePath.endsWith(ext));
+        if (!eventName.startsWith('add') && needReload) {
+          reload(controller, finalConfig);
+        }
+      });
     }, 0);
-  //
-  let serverHandle: Awaited<ReturnType<typeof mihawk>> | null = null;
+  }
+};
+
+//
+//
+// ============================================================ private functions ============================================================
+//
+//
+
+/**
+ * main logic, run mock server
+ * @param ctrl
+ * @param config
+ */
+async function _start(ctrl: Controller, config: Loosify<MihawkRC>, isRestart?: boolean) {
+  // start server
   try {
     //
     // run main logic
-    serverHandle = await mihawk(finalConfig);
+    ctrl.serverHandle = await mihawk(config, isRestart);
     //
     //
   } catch (error) {
     Printer.error('Occurs error during runing async-function mihawk(config):\n', error);
     Printer.warn('Please check your config or try to run it again.');
     // stop watcher
-    if (typeof watcher?.close === 'function') {
+    if (typeof ctrl.watcher?.close === 'function') {
       Printer.log('Will close file watcher...');
       try {
-        await watcher.close();
+        await ctrl.watcher.close();
       } catch (error) {
         Printer.warn('Error occurs during close watcher:', error);
       }
     }
     // destroy server
-    if (typeof serverHandle?.destory === 'function') {
+    if (typeof ctrl.serverHandle?.destory === 'function') {
       Printer.log('Will destory server...');
       try {
-        await serverHandle.destory();
+        await ctrl.serverHandle?.destory();
       } catch (error) {
         Printer.warn('Error occurs during destory server:', error);
       }
@@ -59,7 +89,27 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
     // exit process
     processExit(1);
   }
-};
+}
+
+/**
+ * restart mock server
+ * @param ctrl
+ * @param config
+ */
+async function _restart(ctrl: Controller, config: Loosify<MihawkRC>) {
+  if (typeof ctrl.serverHandle?.close === 'function') {
+    console.log();
+    console.log(Colors.def('Will restart the Mock-Server...'));
+    // close current one
+    await ctrl.serverHandle?.close();
+    // wait a while, mak sure server is closed!
+    await sleep(0);
+    // start main again
+    console.log('Will Start Mock-Server...\n');
+    await _start(ctrl, config, true);
+    //
+  }
+}
 
 //
 export default callback;

@@ -14,30 +14,40 @@ export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
  * @returns {EnhancedServer} sever self
  */
 export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
-  // recored all connection
-  const connectMap = new Map<string, Socket>();
+  // connection-recorder
+  let connectMap: Map<string, Socket> | null = null;
+  // recored all connections
   server.on('connection', socket => {
+    if (!connectMap) {
+      connectMap = new Map<string, Socket>(); // lazy init
+    }
     const { remoteAddress, remotePort } = socket || {};
     const key = `${remoteAddress}:${remotePort}@${Date.now()}`;
-    connectMap.set(key, socket);
+    connectMap?.set(key, socket);
     //
     socket.on('close', () => {
-      connectMap.has(key) && connectMap.delete(key);
+      connectMap?.has(key) && connectMap.delete(key);
     });
   });
   // add a destory method
   (server as EnhancedServer<T>).destory = async (callback: (...args: any[]) => any) => {
-    const closeServer = promisify(server.close).bind(server);
+    // 0.close all connections
+    server.closeAllConnections();
+    server.closeIdleConnections();
     // 1.close server
+    const closeServer = promisify(server.close).bind(server);
     await closeServer();
     // 2.destroy & clear all connection
-    for (const [key, socket] of connectMap.entries()) {
-      await new Promise(resolve => {
-        socket.on('close', resolve);
-        socket.destroy();
-      }).catch(err => console.error(`Failed to destroy socket(${key}):\n`, err));
+    if (connectMap) {
+      for (const [key, socket] of connectMap.entries()) {
+        await new Promise((res, rej) => {
+          socket.on('close', err => (err ? rej(err) : res(true)));
+          socket.destroy();
+        }).catch(err => console.error(`Failed to close & destroy socket(${key}):\n`, err));
+      }
+      connectMap.clear();
+      connectMap = null;
     }
-    connectMap.clear();
     // 3.invoke callback
     typeof callback === 'function' && callback();
   };

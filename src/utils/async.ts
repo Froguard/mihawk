@@ -40,6 +40,7 @@ type AnyAsyncFunc = (...args: any[]) => Promise<any>;
 
 /**
  * 节流 - 异步版本
+ * - 立即调用执行，并且确保这次执行完成之后，才允许下一次
  * @param {function} fn
  * @param {number} t
  * 本质：限流的一句话描述是它应尽可能频繁地调用提供的回调，但不应超过 t 毫秒的频率
