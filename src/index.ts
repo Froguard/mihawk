@@ -242,7 +242,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   return {
     destory: async () => {
       if (typeof destoryServer === 'function') {
-        await destoryServer(() => Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`)));
+        await destoryServer();
+        Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
       }
     },
     close: async () => {
