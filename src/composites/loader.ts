@@ -256,13 +256,14 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
       fileName: tsFilePath,
     });
     const jsCode = result.outputText;
+    Debugger.log('jsCode:\n', jsCode, '\n');
     // 方案一：直接 eval或者 new Function（不可取，不安全）
     // module.exports = eval(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
     // 创建一个执行上下文，继承自 global
-    const vmContext = vm.createContext(global);
+    const vmContext = vm.createContext({ ...global });
+    vmContext.global = global;
     vmContext.require = require;
-    vmContext.global = vmContext;
     vmContext.module = module;
     vmContext.exports = module.exports;
     vmContext.__dirname = path.dirname(tsFilePath);
