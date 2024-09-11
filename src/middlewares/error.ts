@@ -1,5 +1,6 @@
 'use strict';
 import { resolve } from 'path';
+import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
 import { Printer, Debugger } from '../utils/print';
 import { getRootAbsPath } from '../utils/path';
@@ -34,7 +35,7 @@ export default function error() {
       // ctx.throw(500, err);
       const { message, stack } = (err || {}) as Error;
       const errMsg = message || err?.toString() || 'Something wrong...';
-      Printer.error('mdw-err:', `Occurs error: ${errMsg}`, err);
+      Printer.error('mdw-err:', Colors.red(`Occurs error: ${errMsg}\n`), err);
       ctx.status = 500;
       ctx.set('Content-Type', 'text/html');
       ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');

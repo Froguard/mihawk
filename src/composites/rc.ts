@@ -125,7 +125,7 @@ export async function getRcData<T = any>(name: string, options?: GetRcOptions<Pa
     }
   } catch (error) {
     //
-    Printer.error(Colors.error('load config file error..'), error);
+    Printer.error(Colors.error('Load config file error..'), '\n', error);
     return defConfig;
   }
 }

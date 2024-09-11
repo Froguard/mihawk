@@ -67,7 +67,7 @@ export function refreshModule(filePath: string, allowLogicFileExt: 'js' | 'cjs' 
     }
     //
   } catch (error) {
-    Printer.error(LOGFLAG_WATCHER, Colors.fail('Refresh module failed!'), fileRelPath4log, '\n', error, '\n');
+    Printer.error(LOGFLAG_WATCHER, Colors.fail('Refresh module failed!'), fileRelPath4log, '\n', error);
   }
 }
 

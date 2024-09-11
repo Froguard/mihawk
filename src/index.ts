@@ -203,7 +203,7 @@ export default async function mihawk(config?: Loosify<MihawkRC>) {
         process.exit(1);
         break;
       default:
-        Printer.error(error);
+        Printer.error(Colors.red('Server Error:\n'), error);
         throw error;
     }
   });

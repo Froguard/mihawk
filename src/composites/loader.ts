@@ -29,7 +29,7 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
       try {
         jsonData = JsonStr ? json5.parse(JsonStr) : {};
       } catch (error) {
-        Printer.error('parse json file failed!', jsonFilePath, error);
+        Printer.error('Parse json file failed!', Colors.gray(jsonFilePath), '\n', error);
         jsonData = {};
       }
       return jsonData;
@@ -65,7 +65,7 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
     Printer.log(`LoadJS${noCache ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(jsFilePath))}`);
     return mod as T;
   } catch (error) {
-    Printer.error(Colors.red('load js file failed!'), jsFilePath, error);
+    Printer.error(Colors.red('Load js file failed!'), Colors.gray(jsFilePath), '\n', error);
     return null;
   }
 }
@@ -100,7 +100,7 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
     }
     return res;
   } catch (error) {
-    Printer.error(Colors.red('load ts file failed!'), tsFilePath, error);
+    Printer.error(Colors.red('Load ts file failed!'), Colors.gray(tsFilePath), '\n', error);
     return null;
   }
 }
@@ -188,7 +188,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
         Printer.log(`LoadJson${forceRefresh ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(filePath))}`);
       }
     } catch (error) {
-      Printer.error('read file failed!', filePath, error);
+      Printer.error('Read file failed!', Colors.gray(filePath), '\n', error);
     }
     if (typeof resolveData === 'function') {
       cacheData = await resolveData(fileContent);
@@ -306,7 +306,7 @@ function _clearRequireCache(filename: string) {
         });
       }
     } catch (error) {
-      Printer.error('Clear require.cache failed!', Colors.gray(filename), error);
+      Printer.error('Clear require.cache failed!', Colors.gray(filename), '\n', error);
     }
   }
 }
@@ -319,7 +319,7 @@ function _clearRequireCache(filename: string) {
  */
 function _clearSelfAndAncestorsCache(filename: string) {
   filename = absifyPath(filename);
-  if (filename === CWD || !isPathInDir(filename, CWD)) {
+  if (filename === CWD || !(isPathInDir(filename, CWD) || isPathInDir(filename, getRootAbsPath()))) {
     return;
   }
   Debugger.log('_clearSelfAndAncestorsCache:', filename);

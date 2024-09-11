@@ -35,7 +35,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
     //
     //
   } catch (error) {
-    Printer.error('Occurs error during runing async-function mihawk(config):', error);
+    Printer.error('Occurs error during runing async-function mihawk(config):\n', error);
     Printer.warn('Please check your config or try to run it again.');
     // stop watcher
     if (typeof watcher?.close === 'function') {

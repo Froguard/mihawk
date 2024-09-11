@@ -97,7 +97,8 @@ export function createDataResolver(options: MihawkOptions) {
             mockJson = await dataConvertor(mockJson, extra);
             ctx.set('X-Mock-Use-Logic', '1');
           } catch (error) {
-            Printer.error(LOGFLAG_RESOLVER, Colors.error(`Convert-function of MockLogicFile, exec failed!`), Colors.yellow(logicPath4log), error);
+            Printer.error(LOGFLAG_RESOLVER, Colors.error(`Convert-function of MockLogicFile exec failed!`), Colors.yellow(logicPath4log), '\n', error);
+            Printer.log(Colors.yellow(`Will return json (${jsonPath4log}) instead.`));
           }
           if (!isObjStrict(mockJson)) {
             // TODO: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object

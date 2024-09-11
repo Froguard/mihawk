@@ -35,7 +35,7 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
       await new Promise(resolve => {
         socket.on('close', resolve);
         socket.destroy();
-      }).catch(err => console.error(`Failed to destroy socket(${key}):`, err));
+      }).catch(err => console.error(`Failed to destroy socket(${key}):\n`, err));
     }
     connectMap.clear();
     // 3.invoke callback
