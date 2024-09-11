@@ -119,7 +119,7 @@ Greek:
 - [x] kappa (Κ, κ)
 - [x] lambda (Λ, λ)
 - [x] mu (Μ, μ)
-- [ ] nu (Ν, ν)
+- [x] nu (Ν, ν)
 - [ ] xi (Ξ, ξ)
 - [ ] omicron (Ο, ο)
 - [ ] pi (Π, π)
