@@ -37,13 +37,14 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
     // 1.close server
     const closeServer = promisify(server.close).bind(server);
     await closeServer();
-    // 2.destroy & clear all connection
+    // 2.destroy & clear all connected socket
     if (connectMap) {
       for (const [key, socket] of connectMap.entries()) {
-        await new Promise((res, rej) => {
-          socket.on('close', err => (err ? rej(err) : res(true)));
-          socket.destroy();
-        }).catch(err => console.error(`Failed to close & destroy socket(${key}):\n`, err));
+        // await new Promise((res, rej) => {
+        //   socket.on('close', err => (err ? rej(err) : res(true)));
+        //   socket.destroy();
+        // }).catch(err => console.error(`Failed to close & destroy socket(${key}):\n`, err));
+        socket.destroy();
       }
       connectMap.clear();
       connectMap = null;
