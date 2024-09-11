@@ -268,6 +268,9 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
     vmContext.exports = module.exports;
     vmContext.__dirname = path.dirname(tsFilePath);
     vmContext.__filename = tsFilePath;
+    vmContext.console = console;
+    vmContext.process = process;
+    vmContext.Buffer = Buffer;
     // 执行 jsCode
     vm.runInNewContext(
       // source code

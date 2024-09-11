@@ -123,7 +123,7 @@ Greek:
 - [x] xi (Ξ, ξ)
 - [x] omicron (Ο, ο)
 - [x] pi (Π, π)
-- [ ] rho (Ρ, ρ)
+- [x] rho (Ρ, ρ)
 - [ ] sigma (Σ, σ/ς)
 - [ ] tau (Τ, τ)
 - [ ] upsilon (Υ, υ)
