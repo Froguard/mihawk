@@ -40,6 +40,7 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
           const filePath = args[0];
           // 对于 js,cjs,ts 等代码的更改，不仅仅会需要刷新模块，还需让server重启（以便于重新执行加载逻辑，载入最新模块）
           const isLogicFile = ['.js', '.cjs', '.ts'].some(ext => filePath.endsWith(ext));
+          // 对于 routes 文件，即便它可能是 json|json5, 也需要刷新 server 程序
           const isRoutesFile = filePath.endsWith(`routes.${getRoutesFileExt(finalConfig.mockLogicFileType)}`);
           const needReload = isLogicFile || isRoutesFile;
           needReload && reload(controller, finalConfig);
