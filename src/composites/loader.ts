@@ -7,29 +7,40 @@ import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
-import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
+import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD } from '../utils/path';
 import { Debugger, Printer } from '../utils/print';
 import { isNil } from '../utils/is';
 import type { IPackageJson } from 'package-json-type';
 
+const LOGFLAG_LOADER = Colors.cyan('[loader]') + Colors.gray(':');
+
 // 缓存的 json 数据
 const _cacheJson = new LRUCache<string, Record<string, any>>({ max: 50 });
+
+interface BaseLoadOption {
+  noCache?: boolean;
+  noLogPrint?: boolean;
+}
 
 /**
  * 加载&执行 json 文件，返回数据
  * @param {string} jsonFilePath
+ * @param {BaseLoadOption} options load 配置项
+ * @returns {object}
  */
-export async function loadJson(jsonFilePath: string, noCache = false) {
+export async function loadJson(jsonFilePath: string, options?: BaseLoadOption) {
+  const { noCache = false, noLogPrint = false } = options || {};
   jsonFilePath = absifyPath(jsonFilePath);
   const json = await _loadFileWithCache<Record<string, any>>(jsonFilePath, {
     cacheObj: _cacheJson,
     forceRefresh: noCache,
+    noLogPrint,
     resolveData: async JsonStr => {
       let jsonData: Record<string, any> = {};
       try {
         jsonData = JsonStr ? json5.parse(JsonStr) : {};
       } catch (error) {
-        Printer.error('Parse json file failed!', Colors.gray(jsonFilePath), '\n', error);
+        Printer.error(LOGFLAG_LOADER, 'Parse json file failed!', Colors.gray(jsonFilePath), '\n', error);
         jsonData = {};
       }
       return jsonData;
@@ -39,33 +50,26 @@ export async function loadJson(jsonFilePath: string, noCache = false) {
 }
 
 /**
- * 刷新 json 文件缓存
- * @param {string} jsonFilePath json文件路径
- * @returns
- */
-export function refreshJson(jsonFilePath: string) {
-  return _cacheJson.has(jsonFilePath) && _cacheJson.del(jsonFilePath);
-}
-
-/**
  * 加载&执行 js 文件，返回执行结果
  * @param {string} jsFilePath
+ * @param {BaseLoadOption} options load 配置项
  * @returns {Promise<T|null>}
  */
-export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
+export async function loadJS<T = any>(jsFilePath: string, options?: BaseLoadOption) {
+  const { noCache = false, noLogPrint = false } = options || {};
   jsFilePath = absifyPath(jsFilePath);
   if (noCache) {
     // _clearSelfAndAncestorsCache(jsFilePath);
     // _clearRequireCache(jsFilePath);
-    refreshJson(jsFilePath);
+    refreshTsOrJs(jsFilePath);
   }
   try {
     // @ts-ignore
     const mod = require(jsFilePath); // eslint-disable-line
-    Printer.log(`LoadJS${noCache ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(jsFilePath))}`);
+    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(jsFilePath))}`);
     return mod as T;
   } catch (error) {
-    Printer.error(Colors.red('Load js file failed!'), Colors.gray(jsFilePath), '\n', error);
+    Printer.error(LOGFLAG_LOADER, Colors.red('Load js file failed!'), Colors.gray(jsFilePath), '\n', error);
     return null;
   }
 }
@@ -74,13 +78,14 @@ export async function loadJS<T = any>(jsFilePath: string, noCache = false) {
  * 加载&执行 ts 文件，返回执行结果
  * - 注意，被加载的文件，最好有一个默认导出
  * @param {string} tsFilePath
- * @param {LoadTsOptions | boolean} options
+ * @param {BaseLoadOption} options load 配置项
  * @returns {Promise<T|null>}
  */
-export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
+export async function loadTS<T = any>(tsFilePath: string, options?: BaseLoadOption) {
+  const { noCache = false, noLogPrint = false } = options || {};
   tsFilePath = absifyPath(tsFilePath);
   if (!require.extensions['.ts']) {
-    Printer.warn(Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
+    Printer.warn(LOGFLAG_LOADER, Colors.warn('Need to invoke enableRequireTsFile() first before load ts file'));
     return null;
   }
   //
@@ -92,17 +97,26 @@ export async function loadTS<T = any>(tsFilePath: string, noCache = false) {
   try {
     // @ts-ignore
     const mod = require(tsFilePath); // eslint-disable-line
-    Printer.log(`LoadTS${noCache ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(tsFilePath))}`);
+    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadTS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(tsFilePath))}`);
     const res = mod?.default as T;
     if (isNil(res)) {
       // ts shoul export default
-      Printer.warn(Colors.yellow('ts file should export default, but not found'), res);
+      Printer.warn(LOGFLAG_LOADER, Colors.yellow('ts file should export default, but not found'), res);
     }
     return res;
   } catch (error) {
-    Printer.error(Colors.red('Load ts file failed!'), Colors.gray(tsFilePath), '\n', error);
+    Printer.error(LOGFLAG_LOADER, Colors.red('Load ts file failed!'), Colors.gray(tsFilePath), '\n', error);
     return null;
   }
+}
+
+/**
+ * 刷新 json 文件缓存
+ * @param {string} jsonFilePath json文件路径
+ * @returns
+ */
+export function refreshJson(jsonFilePath: string) {
+  return _cacheJson.has(jsonFilePath) && _cacheJson.del(jsonFilePath);
 }
 
 /**
@@ -161,6 +175,7 @@ interface LoadWithCacheOptions<Data = any> {
   cacheObj: LRUCache<string, Data | string>;
   resolveData?: (fileContent: string | null) => Promise<Data | null>;
   forceRefresh?: boolean;
+  noLogPrint?: boolean;
 }
 /**
  * 加载数据，并缓存数据
@@ -175,7 +190,7 @@ interface LoadWithCacheOptions<Data = any> {
  * @returns {any}
  */
 async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWithCacheOptions<Data>) {
-  const { cacheObj, resolveData, forceRefresh } = options;
+  const { cacheObj, resolveData, forceRefresh = false, noLogPrint = false } = options;
   let cacheData: Data | string | null | undefined = null;
   if (!forceRefresh && cacheObj.has(filePath)) {
     cacheData = cacheObj.get(filePath);
@@ -185,10 +200,10 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     try {
       if (isFileExist) {
         fileContent = readFileSync(filePath, 'utf-8');
-        Printer.log(`LoadJson${forceRefresh ? '(nocache)' : ''}: ${Colors.gray(relPathToCWD(filePath))}`);
+        !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJson${forceRefresh ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(filePath))}`);
       }
     } catch (error) {
-      Printer.error('Read file failed!', Colors.gray(filePath), '\n', error);
+      Printer.error(LOGFLAG_LOADER, 'Read file failed!', Colors.gray(filePath), '\n', error);
     }
     if (typeof resolveData === 'function') {
       cacheData = await resolveData(fileContent);
@@ -306,7 +321,7 @@ function _clearRequireCache(filename: string) {
         });
       }
     } catch (error) {
-      Printer.error('Clear require.cache failed!', Colors.gray(filename), '\n', error);
+      Printer.error(LOGFLAG_LOADER, 'Clear require.cache failed!', Colors.gray(filename), '\n', error);
     }
   }
 }

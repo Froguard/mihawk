@@ -32,7 +32,8 @@ const PKG_ROOT_PATH = getRootAbsPath();
 /**
  * mihawk
  * - start a mock server
- * @param {Loosify<MihawkRC>} config
+ * @param {Loosify<MihawkRC>} config 启动所需得配置参数
+ * @param {boolean} isRestart 用以区分是否为重启
  * @returns {Promise<any>}
  */
 export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boolean = false) {
@@ -92,10 +93,10 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     if (existsSync(tsconfigPath)) {
       tsconfig = require(tsconfigPath);
     } else {
-      Printer.log(Colors.gray(`Cannot find tsconfig.json file in "${relPathToCWD(tsconfigPath)}", will use default build-in tsconfig.json`));
+      !isRestart && Printer.log(Colors.gray(`Cannot find tsconfig.json file in "${relPathToCWD(tsconfigPath)}", will use default build-in tsconfig.json`));
     }
     enableRequireTsFile(tsconfig || {});
-    Printer.log(Colors.success('Enable typescript mode success!'), Colors.gray('You can write logic in routes.ts, middleware.ts, data/**/*.ts'));
+    !isRestart && Printer.log(Colors.success('Enable typescript mode success!'), Colors.gray('You can write logic in routes.ts, middleware.ts, data/**/*.ts'));
   }
 
   /**
@@ -103,8 +104,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   let routes: Record<string, string> = {};
   if (existsSync(routesFilePath)) {
-    routes = (await loadRoutesFile(routesFilePath)) as Record<string, string>;
-    Printer.log(Colors.success('Load routes file!'), Colors.gray(relPathToCWD(routesFilePath)));
+    routes = (await loadRoutesFile(routesFilePath, { noLogPrint: true })) as Record<string, string>;
+    Printer.log(Colors.success('Load routes file success!'), Colors.gray(relPathToCWD(routesFilePath)));
   }
 
   /**
@@ -112,8 +113,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   let diyMiddleware: KoaMiddleware | null = null;
   if (useLogicFile && existsSync(middlewareFilePath)) {
-    diyMiddleware = await loadLogicFile<KoaMiddleware>(middlewareFilePath);
-    Printer.log(Colors.success('Load diy middleware file success!'), Colors.gray(relPathToCWD(middlewareFilePath)));
+    diyMiddleware = await loadLogicFile<KoaMiddleware>(middlewareFilePath, { noLogPrint: true });
+    Printer.log(Colors.success('Load custom middleware file success!'), Colors.gray(relPathToCWD(middlewareFilePath)));
   }
 
   /**
@@ -130,12 +131,13 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   // middleware: common middleware
   app.use(mdwCommon(options));
 
+  // middleware: error resolve
   app.use(mdwError());
 
-  // middleware: cors
+  // middleware: cors setting(ACAO,ACAM,ACAH)
   cors && app.use(mdwCors());
 
-  // middleware: cache middleware
+  // middleware: response cache setting (expire,cache-control,Pragma)
   app.use(mdwHdCache());
 
   // middleware: 404
@@ -175,12 +177,12 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       // use built-in https cert files
       httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
       httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.crt'));
-      Printer.log(Colors.gray(`Custom https cert files ware not found, use default build-in https cert files`));
+      !isRestart && Printer.log(Colors.gray(`Custom https cert files ware not found, use default build-in https cert files`));
     } else {
       // load custom https cert files
       httpsOptions.key = readFileSync(keyFilePath);
       httpsOptions.cert = readFileSync(certFilePath);
-      Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`${key} ${cert}`));
+      !isRestart && Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`${key} ${cert}`));
     }
     // create https server (SSL)
     server = https.createServer(httpsOptions, app.callback());
@@ -211,9 +213,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
 
   // server-event: listening
   server.on('listening', function () {
-    Printer.log(Colors.green('Start mock-server success!'));
+    Printer.log(Colors.green(`🚀 ${isRestart ? 'Restart' : 'Start'} mock-server success!`));
     //
-    Printer.log('Mock Data directory: ', Colors.gray(unixifyPath(mockDir)));
+    !isRestart && Printer.log('Mock directory: ', Colors.gray(unixifyPath(mockDir)));
     const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
     Debugger.log('Existed routes by scann:', existedRoutes);
     let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
@@ -223,9 +225,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     Printer.log(`Detected-Routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
     //
     const addr2 = `${protocol}://${getMyIp()}:${port}`;
-    Printer.log(`🚀 Mock Server address:`);
-    Printer.log(`- ${Colors.cyan(addr1)}`);
-    Printer.log(`- ${Colors.cyan(addr2)}`);
+    Printer.log(`Mock Server address:`);
+    Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr1)}`);
+    Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
     console.log();
   });
 
@@ -252,7 +254,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       await new Promise((res, rej) => {
         server.close(err => (err ? rej(err) : res(null)));
       }).catch(err => Printer.error(`Close Server Failed!\n`, err));
-      console.log(Colors.success('Close Mock-Server success!'));
+      Printer.log(Colors.success('Close Mock-Server success!'));
     },
   };
 }

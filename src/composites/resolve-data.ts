@@ -14,7 +14,7 @@ import { initMockLogicFile } from './init-file';
 import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
-const RESOLVER_NAME = '[MockDataResolver]';
+const RESOLVER_NAME = '[dataResolver]';
 const LOGFLAG_RESOLVER = `${Colors.cyan(RESOLVER_NAME)}${Colors.gray(':')}`;
 
 /**
@@ -58,7 +58,7 @@ export function createDataResolver(options: MihawkOptions) {
     const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
-      let jsonData = await loadJson(mockJsonAbsPath, !cache);
+      let jsonData = await loadJson(mockJsonAbsPath, { noCache: !cache });
       if (jsonData && typeof jsonData === 'object') {
         // 不开启缓存时，每次都会保证返回的时 json 里边的数据（这里使用 deepMerge 做一次通过拷贝创建副本的操作，防止老 json 数据被修改）
         jsonData = cache ? jsonData : deepMerge({}, jsonData);
@@ -84,7 +84,7 @@ export function createDataResolver(options: MihawkOptions) {
       if (existsSync(mockLogicAbsPath)) {
         // Printer.log(LOGFLAG_RESOLVER, 'LoadLogicFile:', Colors.gray(logicPath4log));
         // get convertor function via loadJS/loadTS
-        const dataConvertor = await loadConvertLogicFile(mockLogicAbsPath, !cache);
+        const dataConvertor = await loadConvertLogicFile(mockLogicAbsPath, { noCache: !cache });
         if (typeof dataConvertor === 'function') {
           const { request } = ctx || {};
           // 定义 extra 方式1: 防止被篡改，进行深度冻结
