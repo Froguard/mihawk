@@ -16,7 +16,9 @@ export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
 export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
   // connection-recorder
   let connectMap: Map<string, Socket> | null = null;
-  // recored all connections
+  /**
+   * recored all connections
+   */
   server.on('connection', socket => {
     if (!connectMap) {
       connectMap = new Map<string, Socket>(); // lazy init
@@ -29,7 +31,9 @@ export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
       connectMap?.has(key) && connectMap.delete(key);
     });
   });
-  // add a destory method
+  /**
+   * add a destory method
+   */
   (server as EnhancedServer<T>).destory = async (callback: (...args: any[]) => any) => {
     // 0.close all connections
     server.closeAllConnections();
