@@ -253,6 +253,7 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
         module,
         exports: module.exports,
         require,
+        console, // 方便执行 jscode 的时候，console 等语句能够正常输出
       },
       // options
       {

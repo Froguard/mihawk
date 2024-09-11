@@ -87,16 +87,19 @@ export function createWatcher(config: Loosify<MihawkRC>) {
   });
   // listen file's change event
   watcher.on('change', filePath => {
+    console.log();
     Printer.log(LOGFLAG_WATCHER, 'File has been changed!', Colors.gray(relPathToCWD(filePath)));
     refreshModule(filePath, logicFileExt);
   });
   // listen file's unlink event
   watcher.on('unlink', filePath => {
+    console.log();
     Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', Colors.gray(relPathToCWD(filePath)));
     refreshModule(filePath, logicFileExt);
   });
   // listen file's rename event
   watcher.on('rename', (oldFilePath, newFilePath) => {
+    console.log();
     Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${Colors.gray(relPathToCWD(oldFilePath))} ${LOG_ARROW} ${Colors.gray(relPathToCWD(newFilePath))}`);
     refreshModule(oldFilePath, logicFileExt);
     refreshModule(newFilePath, logicFileExt);
