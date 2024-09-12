@@ -30,7 +30,7 @@ export default function (options?: MihawkOptions) {
     const disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
     !disableLogPrint && console.log();
     Debugger.log('mdw-com: >>', routePath);
-    //set common props to ctx
+    // set common props to ctx
     /**
      * 是一个相对路径，以 data 文件夹为起始目录
      */
