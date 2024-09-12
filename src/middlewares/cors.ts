@@ -18,8 +18,8 @@ export default function cors() {
   return async function (ctx: KoaContext, next: KoaNext) {
     // 允许跨域
     ctx.set('Access-Control-Allow-Origin', '*');
-    ctx.set('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,HEAD,OPTIONS'); // *
-    ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
+    ctx.set('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,HEAD,OPTIONS,TRACE'); // *
+    ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Content-Range,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
 
     // ================================================
     //
