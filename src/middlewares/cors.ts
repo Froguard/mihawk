@@ -19,7 +19,7 @@ export default function cors() {
     // 允许跨域
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,HEAD,OPTIONS'); // *
-    ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Authorization,Accept,X-Requested-With'); // *
+    ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
 
     // ================================================
     //
