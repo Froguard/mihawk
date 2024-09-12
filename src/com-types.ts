@@ -33,14 +33,14 @@ declare module 'koa' {
      * 格式为 Method + Path, 如 'GET /a/b/c'
      * - 初始化详见在 middlewares/common.ts  中逻辑代码
      */
-    routePath: string;
+    routePath?: string;
 
     /**
      * mock 文件的相对路径(相对于 data 目录)，比如 'GET /a/b' => '/GET/a/b'
      * - 初始化详见在 middlewares/common.ts  中逻辑代码
      * - 可通过动态设置 `ctx.mockRelPath` 来覆盖，比如 middlewares/route.ts 中就是通过动态设置 `ctx.mockRelPath` 来达到 route 重定向的效果
      */
-    mockRelPath: string;
+    mockRelPath?: string;
 
     /**
      * 是否已经采取默认的 mock 逻辑，默认为 false，即：还未处理过
