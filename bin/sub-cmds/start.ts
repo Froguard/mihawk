@@ -36,13 +36,17 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
     setTimeout(() => {
       const reload = throttleAsync(_restart, 500);
       controller.watcher = createWatcher(finalConfig, (eventName: string, ...args: any[]) => {
+        // 除开文件夹的操作（新增，删除），其他都需要进行检查
         if (!['addDir', 'unlinkDir'].includes(eventName)) {
-          const filePath = args[0];
-          // 对于 js,cjs,ts 等代码的更改，不仅仅会需要刷新模块，还需让server重启（以便于重新执行加载逻辑，载入最新模块）
-          const isLogicFile = ['.js', '.cjs', '.ts'].some(ext => filePath.endsWith(ext));
-          // 对于 routes 文件，即便它可能是 json|json5, 也需要刷新 server 程序
+          const [filePath, newFilePath] = args || [];
+          // 1.对于 js,cjs,ts 等代码的更改，不仅仅会需要刷新模块，还需让server重启（以便于重新执行加载逻辑，载入最新模块）
+          const isLogicFile = _isLogicFile(filePath);
+          // 2.对于 routes 文件，即便它可能是 json|json5, 也需要刷新 server 程序
           const isRoutesFile = filePath.endsWith(`routes.${getRoutesFileExt(finalConfig.mockLogicFileType)}`);
-          const needReload = isLogicFile || isRoutesFile;
+          // 3.对于 rename 的事件，参数除了 filePath 外，还有一个 newFilePath （即改名字：filePath -> newFilePath ）
+          const isNewLigicFile = newFilePath && _isLogicFile(newFilePath);
+          // 综上三种情况，决定是否需要重启服务
+          const needReload = isLogicFile || isRoutesFile || isNewLigicFile;
           needReload && reload(controller, finalConfig);
         }
       });
@@ -55,6 +59,17 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
 // ============================================================ private functions ============================================================
 //
 //
+
+/**
+ * 判断文件是否为逻辑文件
+ * - 通过文件路径中的文件名判断
+ * - 后缀是否为 .js, .cjs, .ts 三者之一
+ * @param filePath
+ * @returns
+ */
+function _isLogicFile(filePath: string) {
+  return filePath && ['.js', '.cjs', '.ts'].some(ext => filePath.endsWith(ext));
+}
 
 /**
  * main logic, run mock server
