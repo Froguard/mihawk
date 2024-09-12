@@ -104,6 +104,7 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
   const watcher = chokidar.watch(watchTargetPath, {
     ignored: WATCHER_IGNORES,
     persistent: true,
+    ignoreInitial: true,
   });
   const cb = typeof callback === 'function' ? callback : () => {};
   // addEventListeners
@@ -126,7 +127,9 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
         refreshModule(filePath, logicFileExt);
         break;
       }
+      case 'unlinkDir': // listen dir's unlink event
       case 'add': // listen file's add event
+      case 'addDir': // listem dir's add event
       default:
         break;
     }
