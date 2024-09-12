@@ -125,7 +125,7 @@ Greek:
 - [x] pi (Π, π)
 - [x] rho (Ρ, ρ)
 - [x] sigma (Σ, σ/ς)
-- [ ] tau (Τ, τ)
+- [x] tau (Τ, τ)
 - [ ] upsilon (Υ, υ)
 - [ ] phi (Φ, φ)
 - [ ] chi (Χ, χ)
