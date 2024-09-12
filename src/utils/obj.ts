@@ -42,7 +42,7 @@ export function deepFreeze(obj: any) {
  * @param {T} obj
  * @returns {Readonly<T>} new proxy obj
  */
-export function createReadonlyProxy<T = any>(obj: T) {
+export function createReadonlyProxy<T = any>(obj: T, logFlag?: string) {
   if (!obj) {
     return obj;
   }
@@ -67,12 +67,12 @@ export function createReadonlyProxy<T = any>(obj: T) {
           },
           // 拒绝修改数组
           set: function (target: any, prop: string | number | symbol, value: any, receiver: any) {
-            console.warn(Colors.warn(`Modifying array property "${String(prop)}" is not allowed!`));
+            console.warn(logFlag, Colors.warn(`Modifying array property "${String(prop)}" is not allowed!`));
             return false;
           },
           // 拒绝删除数组属性
           deleteProperty: function (target: any, prop: string | number | symbol) {
-            console.warn(Colors.warn(`Deleting array property "${String(prop)}" is not allowed!`));
+            console.warn(logFlag, Colors.warn(`Deleting array property "${String(prop)}" is not allowed!`));
             return false;
           },
           // 拦截数组的方法 push, pop 等
@@ -82,7 +82,7 @@ export function createReadonlyProxy<T = any>(obj: T) {
             // 列出不允许调用的方法
             const forbiddenMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
             if (forbiddenMethods.includes(methodName as string)) {
-              console.warn(Colors.warn(`Modifying the readonly array property is not allowed! Don't use method ${methodName}`));
+              console.warn(logFlag, Colors.warn(`Modifying the readonly array property is not allowed! Don't use method ${methodName}`));
               return false;
             }
             return Reflect.apply(target, thisArg, argList);
@@ -95,18 +95,18 @@ export function createReadonlyProxy<T = any>(obj: T) {
           get: function (target: any, prop: string, receiver: any) {
             if (!(prop in target)) {
               // 不存在的时候，稍微提示下
-              console.warn(Colors.gray(`Property "${prop}" doesn't exist on the object!`));
+              console.warn(logFlag, Colors.yellow(`Property "${prop}" doesn't exist on the object!`));
             }
             return _createProxy(Reflect.get(target, prop, receiver));
           },
           // 拒绝修改属性
           set: function (target: any, prop: string, value: any, receiver: any) {
-            console.warn(Colors.warn(`Modifying the readonly property "${prop}" is not allowed!`));
+            console.warn(logFlag, Colors.warn(`Modifying the readonly property "${prop}" is not allowed!`));
             return false;
           },
           // 拒绝删除属性
           deleteProperty: function (target: any, prop: string) {
-            console.warn(Colors.warn(`Deleting the readonly property "${prop}" is not allowed!`));
+            console.warn(logFlag, Colors.warn(`Deleting the readonly property "${prop}" is not allowed!`));
             return false;
           },
         });

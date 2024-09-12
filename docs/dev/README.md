@@ -126,7 +126,7 @@ Greek:
 - [x] rho (Ρ, ρ)
 - [x] sigma (Σ, σ/ς)
 - [x] tau (Τ, τ)
-- [ ] upsilon (Υ, υ)
+- [x] upsilon (Υ, υ)
 - [ ] phi (Φ, φ)
 - [ ] chi (Χ, χ)
 - [ ] psi (Ψ, ψ)

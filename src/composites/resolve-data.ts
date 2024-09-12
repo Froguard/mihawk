@@ -8,7 +8,7 @@ import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
-import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
+import { LOG_ARROW, MOCK_DATA_DIR_NAME, LOG_FLAG } from '../consts';
 import { createReadonlyProxy } from '../utils/obj';
 import { initMockLogicFile } from './init-file';
 import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
@@ -91,7 +91,7 @@ export function createDataResolver(options: MihawkOptions) {
           // const extra: MhkCvtrExtra = { ...request };
           // deepFreeze(extra);
           // 定义 extra 方式2: 防止被篡改，进行深度代理
-          const extra = createReadonlyProxy(request as BaseRequestEx);
+          const extra = createReadonlyProxy(request as BaseRequestEx, `${LOG_FLAG} ${Colors.gray('[extra]:')}`);
           try {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);
