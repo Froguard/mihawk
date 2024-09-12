@@ -32,8 +32,8 @@ export default function notFound() {
     //
     // ================================================
 
-    // 如果没有匹配到任何路由
-    if (ctx.status === 404) {
+    // 如果没有匹配到任何路由，且 body 没有被设置
+    if (ctx.status === 404 && !ctx.body) {
       const { accept } = request.headers || {};
       // !disableLogPrint && Printer.log('mdw-404:', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
