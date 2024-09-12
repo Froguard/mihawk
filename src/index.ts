@@ -126,7 +126,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   useHttps && app.use(mdwSSL({ hostname: host, port }));
 
   // middleware: favicon
-  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
+  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/mihawk-v1.ico')));
 
   // middleware: common middleware
   app.use(mdwCommon(options));
