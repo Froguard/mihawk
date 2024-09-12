@@ -124,7 +124,7 @@ Greek:
 - [x] omicron (Ο, ο)
 - [x] pi (Π, π)
 - [x] rho (Ρ, ρ)
-- [ ] sigma (Σ, σ/ς)
+- [x] sigma (Σ, σ/ς)
 - [ ] tau (Τ, τ)
 - [ ] upsilon (Υ, υ)
 - [ ] phi (Φ, φ)
