@@ -127,7 +127,7 @@ Greek:
 - [x] sigma (Σ, σ/ς)
 - [x] tau (Τ, τ)
 - [x] upsilon (Υ, υ)
-- [ ] phi (Φ, φ)
+- [x] phi (Φ, φ)
 - [ ] chi (Χ, χ)
 - [ ] psi (Ψ, ψ)
 - [ ] omega (Ω, ω)

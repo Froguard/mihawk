@@ -17,6 +17,7 @@ export type { Options as KoaBodyParserOptions } from 'koa-bodyparser';
 
 // koa 扩展
 declare module 'koa' {
+  // 对于扩展，建议属性均为非必选，不然容易引起其他 koa 中间件的类型报错！
   interface Context {
     /**
      * 默认为 false，即：需要打印
