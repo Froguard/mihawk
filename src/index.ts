@@ -108,7 +108,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   let routes: Record<string, string> = {};
   if (existsSync(routesFilePath)) {
     routes = (await loadRoutesFile(routesFilePath, { noLogPrint: true })) as Record<string, string>;
-    Printer.log(Colors.success('Load routes file success!'), Colors.gray(unixifyPath(relPathToCWD(routesFilePath))));
+    !isRestart && Printer.log(Colors.success('Load routes file success!'), Colors.gray(unixifyPath(relPathToCWD(routesFilePath))));
   }
 
   /**
@@ -120,11 +120,12 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     const tmpFunction = await loadLogicFile<AnyFunc>(middlewareFilePath, { noLogPrint: true });
     const isExpressMiddleware = typeof tmpFunction === 'function' && !!(tmpFunction as any).isExpress;
     diyMiddleware = isExpressMiddleware ? mdwConnect(tmpFunction) : tmpFunction;
-    Printer.log(
-      Colors.success('Load custom middleware file success!'),
-      Colors.gray(unixifyPath(relPathToCWD(middlewareFilePath))),
-      isExpressMiddleware ? Colors.yellow('Express-Style-Middleware') : '',
-    );
+    !isRestart &&
+      Printer.log(
+        Colors.success('Load custom middleware file success!'),
+        Colors.gray(unixifyPath(relPathToCWD(middlewareFilePath))),
+        isExpressMiddleware ? Colors.yellow('Express-Style-Middleware') : '',
+      );
   }
 
   /**
@@ -227,16 +228,16 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     !isRestart && Printer.log('Mock directory: ', Colors.gray(unixifyPath(mockDir)));
     const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
-    existedRoutes.sort();
     Debugger.log('Existed routes by scann:', existedRoutes);
     let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
     existedRoutePaths.push(...Object.keys(routes));
     existedRoutePaths = dedupe(existedRoutePaths);
+    existedRoutePaths.sort();
     const existedCount = existedRoutePaths.length;
-    Printer.log(`Detected-Routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
+    !isRestart && Printer.log(`Detected-Routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
     //
     const addr2 = `${protocol}://${getMyIp()}:${port}`;
-    Printer.log(`Mock Server address:`);
+    !isRestart && Printer.log(`Mock Server address:`);
     Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr1)}`);
     Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
     console.log();

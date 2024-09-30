@@ -2,7 +2,7 @@
 import Colors from 'color-cc';
 import * as chokidar from 'chokidar';
 import { Printer } from '../../src/utils/print';
-import { absifyPath, getLogicFileExt, relPathToCWD } from '../../src/utils/path';
+import { absifyPath, getLogicFileExt, relPathToCWD, unixifyPath } from '../../src/utils/path';
 import { refreshJson, refreshTsOrJs } from '../../src/composites/loader';
 import { LOG_ARROW } from '../consts';
 import type { MihawkRC, Loosify } from '../../src/com-types';
@@ -69,7 +69,7 @@ const LOGFLAG_WATCHER = `${Colors.cyan('[watcher]')}${Colors.gray(':')}`;
 export function refreshModule(filePath: string, allowLogicFileExt: 'js' | 'cjs' | 'ts' | '') {
   if (!filePath) return;
   filePath = absifyPath(filePath);
-  const fileRelPath4log = Colors.gray(relPathToCWD(filePath));
+  const fileRelPath4log = Colors.gray(unixifyPath(relPathToCWD(filePath)));
   try {
     if (allowLogicFileExt && filePath.endsWith(`.${allowLogicFileExt}`)) {
       refreshTsOrJs(filePath);
@@ -112,18 +112,19 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
     if (eventName === 'rename') {
       return;
     }
+    const fileRelPath4log = Colors.gray(unixifyPath(relPathToCWD(filePath)));
     switch (eventName) {
       case 'change': {
         // listen file's change event
         console.log();
-        Printer.log(LOGFLAG_WATCHER, 'File has been changed!', Colors.gray(relPathToCWD(filePath)));
+        Printer.log(LOGFLAG_WATCHER, 'File has been changed!', fileRelPath4log);
         refreshModule(filePath, logicFileExt);
         break;
       }
       case 'unlink': {
         // listen file's unlink event
         console.log();
-        Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', Colors.gray(relPathToCWD(filePath)));
+        Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', fileRelPath4log);
         refreshModule(filePath, logicFileExt);
         break;
       }
@@ -140,7 +141,9 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
   // listen file's rename event
   watcher.on('rename', (oldFilePath, newFilePath) => {
     console.log();
-    Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${Colors.gray(relPathToCWD(oldFilePath))} ${LOG_ARROW} ${Colors.gray(relPathToCWD(newFilePath))}`);
+    const oldFilePath4Log = Colors.gray(unixifyPath(relPathToCWD(oldFilePath)));
+    const newFilePath4log = Colors.gray(unixifyPath(relPathToCWD(newFilePath)));
+    Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${oldFilePath4Log} ${LOG_ARROW} ${newFilePath4log}`);
     refreshModule(oldFilePath, logicFileExt);
     refreshModule(newFilePath, logicFileExt);
     cb('rename', oldFilePath, newFilePath);

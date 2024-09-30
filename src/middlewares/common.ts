@@ -55,7 +55,7 @@ export default function (options?: MihawkOptions) {
     //
     const keepTime = `${Date.now() - startTime}ms`;
     ctx.set('X-Mock-Time', keepTime);
-    ctx.set('Server-Timing', `do-mock-logic;dur=${keepTime}`);
+    ctx.set('Server-Timing', `inner;dur=${keepTime}`);
     ctx.set('X-Powered-By', PKG_NAME);
 
     //
