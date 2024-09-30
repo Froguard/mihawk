@@ -6,6 +6,7 @@ import Koa from 'koa';
 import Colors from 'color-cc';
 import mdwBodyParser from 'koa-bodyparser';
 import mdwSSL from 'koa-sslify';
+import mdwConnect from 'koa-connect';
 import { existsSync, ensureDirSync, readFileSync } from 'fs-extra';
 import dedupe from 'free-dedupe';
 import { Printer, Debugger } from './utils/print';
@@ -24,7 +25,8 @@ import { isPortInUse, getMyIp } from './utils/net';
 import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
-import type { KoaMiddleware, Loosify, MihawkRC } from './com-types';
+import { delNillProps } from './utils/obj';
+import type { AnyFunc, KoaMiddleware, Loosify, MihawkRC } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
 const PKG_ROOT_PATH = getRootAbsPath();
@@ -40,6 +42,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   delete config._;
   delete config['--'];
   delete config.$schema;
+  delNillProps(config);
   !isRestart && Printer.log('config:', config);
   const options = formatOptionsByConfig(config);
   Debugger.log('formated options:', options);
@@ -113,8 +116,15 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   let diyMiddleware: KoaMiddleware | null = null;
   if (useLogicFile && existsSync(middlewareFilePath)) {
-    diyMiddleware = await loadLogicFile<KoaMiddleware>(middlewareFilePath, { noLogPrint: true });
-    Printer.log(Colors.success('Load custom middleware file success!'), Colors.gray(relPathToCWD(middlewareFilePath)));
+    // use mdwConnect to wrap around, if it is express middleware (detect by functionVar.isExpress)
+    const tmpFunction = await loadLogicFile<AnyFunc>(middlewareFilePath, { noLogPrint: true });
+    const isExpressMiddleware = typeof tmpFunction === 'function' && !!(tmpFunction as any).isExpress;
+    diyMiddleware = isExpressMiddleware ? mdwConnect(tmpFunction) : tmpFunction;
+    Printer.log(
+      Colors.success('Load custom middleware file success!'),
+      Colors.gray(relPathToCWD(middlewareFilePath)),
+      isExpressMiddleware ? Colors.yellow('Express-Style-Middleware') : '',
+    );
   }
 
   /**
@@ -217,6 +227,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     !isRestart && Printer.log('Mock directory: ', Colors.gray(unixifyPath(mockDir)));
     const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
+    existedRoutes.sort();
     Debugger.log('Existed routes by scann:', existedRoutes);
     let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
     existedRoutePaths.push(...Object.keys(routes));

@@ -101,7 +101,7 @@ yarn build
 
 ### allow versions
 
-> Before the release of version 0.0.1, there were 24 Greek letters representing versions that could be used as temporary versions
+> Before the release of stable version, there were 24 Greek letters representing versions that could be used as temporary versions
 >
 > 在正式版本 1.0.0 发布之前，采用 50 个代号（24 个希腊字母 + 26 个英文字母），作为临时版本号
 
@@ -128,7 +128,7 @@ Greek:
 - [x] tau (Τ, τ)
 - [x] upsilon (Υ, υ)
 - [x] phi (Φ, φ)
-- [ ] chi (Χ, χ)
+- [x] chi (Χ, χ)
 - [ ] psi (Ψ, ψ)
 - [ ] omega (Ω, ω)
 

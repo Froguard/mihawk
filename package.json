@@ -1,7 +1,7 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-phi",
-  "description": "A simple async api mock server tool, no render template",
+  "version": "0.1.0-chi",
+  "description": "A tiny & simple mock server tool, support json,js,cjs,ts(typescript).",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
     "node": ">=12.0.0"
@@ -75,6 +75,7 @@
     "json5": "^2.2.3",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
+    "koa-connect": "^2.1.0",
     "koa-sslify": "^5.0.1",
     "lru-cache": "^5.0.0",
     "minimist": "^1.2.8",
@@ -112,7 +113,9 @@
   "keywords": [
     "mihawk",
     "mock",
-    "mock-server"
+    "mock-server",
+    "koa2",
+    "express"
   ],
   "repository": {
     "type": "git",

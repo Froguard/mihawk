@@ -10,7 +10,7 @@
 - 支持所有有请求方法，例如 `GET`, `POST`, `PUT`, `DELETE` 等，通过文件路径方式自动映射请求路径
 - 用以定义 mock 的数据文件，同时支持 `json` | `json5` 两种格式
 - 用以处理 mock 数据的逻辑文件，支持 `js` | `cjs` | `ts` 三种格式，可以对 json 请求进行二次修改，以便于支持一些动态逻辑处理
-- 在默认的文件映射功能之外，允许在 `middleware.{js|cjs|ts}` 文件中，通过暴露 koa2 middleware 函数的形式，完成自定义路由的复杂的处理逻辑
+- 在默认的文件映射功能之外，允许在 `middleware.{js|cjs|ts}` 文件中，通过暴露 koa2 middleware 函数的形式，完成自定义路由的复杂的处理逻辑 (express中间件也兼容，通过设置中间件函数func.isExpress=trye即可)
 - 允许自定义 `routes.json` 文件方式, 让多条路径映射到同一个文件，其中 key 允许 glob 表达式
 
 ## 安装
@@ -192,6 +192,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 }
 ```
 
+> 如果使用的是 express 风格的 中间件函数，需要给函数设置 `isExpress=true` 标明其是一个 express 中间件
 > 其他一些稍微复杂点的 middleware demo，比如基于 koa-router 和 koa-compose, 详见 [middleware.md](./docs/middleware.md)
 
 ### `mock-logic` 文件 ts 示例

@@ -9,7 +9,13 @@ const ICON_BASE64 = 'data:image/x-icon;base64,8J+YgQ==';
 const ICON_MIME = 'image/x-icon';
 
 interface FaviconOptions {
+  /**
+   * 默认为 image/x-icon
+   */
   mime?: string;
+  /**
+   * 单位 ms
+   */
   maxAge?: number;
 }
 

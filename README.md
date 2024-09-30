@@ -9,7 +9,7 @@ Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b
 - Support https protocol
 - Support all methods, like `GET`, `POST`, `PUT`, `DELETE` etc.
 - Support mock data file type: `json` | `json5`
-- Support custom your middleware in `middleware.{js|cjs|ts}`, write as koa2 middleware
+- Support custom your middleware in `middleware.{js|cjs|ts}`, write as `koa2 middleware` (or `express-middleware` both ok with `func.isExpress=true`)
 - Support custom special routes mapping in `routes.json`, mapping multiple request to same resolve file。 routes key align `glob` expression
 - Support mock logic file type: `js` | `cjs` | `ts`
 
@@ -193,6 +193,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 }
 ```
 
+> Set `middleware.isExpress=true` to explicit definition a express middleware function before export, if you write in express-stype
 > Other complex diy middleware demo, base on koa-router & koa-compose, [middleware.md](./docs/middleware.md)
 
 ### `mock-logic` file demo in ts
