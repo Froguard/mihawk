@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from 'fs-extra';
 import { absifyPath } from '../utils/path';
 import { isNil } from '../utils/is';
 import { Debugger } from '../utils/print';
+import { PKG_NAME } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
 const ICON_BASE64 = 'data:image/x-icon;base64,8J+YgQ==';
@@ -50,6 +51,7 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
         ctx.status = 'OPTIONS' == method ? 200 : 405;
         ctx.set('Allow', 'GET, HEAD, OPTIONS');
       } else {
+        ctx.set('X-Powered-By', PKG_NAME);
         ctx.set('Cache-Control', cacheControl);
         ctx.type = mime || ICON_MIME;
         ctx.body = iconFile;

@@ -76,7 +76,7 @@ export function createDataResolver(options: MihawkOptions) {
     ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
 
     // 2.convert data by logic file, if it exists & exec correctly
-    ctx.set('X-Mock-Use-Logic', '0');
+    ctx.set('X-Mock-Use-Logic', 'none');
     if (useLogicFile) {
       const logicPath = `${mockRelPathNoExt}.${LOGIC_EXT}`;
       const logicPath4log = `${DATA_BASE_PATH}/${logicPath}`; // only for log
@@ -95,7 +95,7 @@ export function createDataResolver(options: MihawkOptions) {
           try {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);
-            ctx.set('X-Mock-Use-Logic', '1');
+            ctx.set('X-Mock-Use-Logic', LOGIC_EXT);
           } catch (error) {
             Printer.error(LOGFLAG_RESOLVER, Colors.error(`Convert-function of MockLogicFile exec failed!`), Colors.yellow(logicPath4log), '\n', error);
             Printer.log(Colors.yellow(`Will return json (${jsonPath4log}) instead.`));
