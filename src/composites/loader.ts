@@ -7,7 +7,7 @@ import * as json5 from 'json5';
 import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
-import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD } from '../utils/path';
+import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
 import { Debugger, Printer } from '../utils/print';
 import { isNil } from '../utils/is';
 import type { IPackageJson } from 'package-json-type';
@@ -66,7 +66,7 @@ export async function loadJS<T = any>(jsFilePath: string, options?: BaseLoadOpti
   try {
     // @ts-ignore
     const mod = require(jsFilePath); // eslint-disable-line
-    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(jsFilePath))}`);
+    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(unixifyPath(relPathToCWD(jsFilePath)))}`);
     return mod as T;
   } catch (error) {
     Printer.error(LOGFLAG_LOADER, Colors.red('Load js file failed!'), Colors.gray(jsFilePath), '\n', error);
@@ -97,7 +97,7 @@ export async function loadTS<T = any>(tsFilePath: string, options?: BaseLoadOpti
   try {
     // @ts-ignore
     const mod = require(tsFilePath); // eslint-disable-line
-    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadTS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(tsFilePath))}`);
+    !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadTS${noCache ? Colors.gray('(nocache)') : ''}: ${Colors.gray(unixifyPath(relPathToCWD(tsFilePath)))}`);
     const res = mod?.default as T;
     if (isNil(res)) {
       // ts shoul export default
@@ -200,7 +200,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     try {
       if (isFileExist) {
         fileContent = readFileSync(filePath, 'utf-8');
-        !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJson${forceRefresh ? Colors.gray('(nocache)') : ''}: ${Colors.gray(relPathToCWD(filePath))}`);
+        !noLogPrint && Printer.log(LOGFLAG_LOADER, `LoadJson${forceRefresh ? Colors.gray('(nocache)') : ''}: ${Colors.gray(unixifyPath(relPathToCWD(filePath)))}`);
       }
     } catch (error) {
       Printer.error(LOGFLAG_LOADER, 'Read file failed!', Colors.gray(filePath), '\n', error);

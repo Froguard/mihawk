@@ -45,11 +45,11 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
   return async function (ctx: KoaContext, next: KoaNext) {
     const { path, method } = ctx || {};
     if (['/favicon.ico', '/favicon.png', '/favicon.svg'].some(p => p === path)) {
+      ctx.skipDefaultMock = true;
       if (!['GET', 'HEAD'].includes(method)) {
         ctx.status = 'OPTIONS' == method ? 200 : 405;
         ctx.set('Allow', 'GET, HEAD, OPTIONS');
       } else {
-        ctx.skipDefaultMock = true;
         ctx.set('Cache-Control', cacheControl);
         ctx.type = mime || ICON_MIME;
         ctx.body = iconFile;

@@ -19,8 +19,6 @@ module.exports = {
   ],
   // 需要覆盖上面配置中 rule 的规则
   rules: {
-    // all
-    //...
     // ts
     '@typescript-eslint/ban-types': ['warn'],
     '@typescript-eslint/no-empty-function': ['warn'], // 空函数警告下
@@ -33,7 +31,6 @@ module.exports = {
       groups: ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"]
     }],
     'import/no-named-as-default': ['off'],
-    // 'import/no-named-as-default-member': ['warn'],
     'no-var': 'error',
     'max-len': ['error', { code: 180 }],
     'max-statements': ['error', 100, { ignoreTopLevelFunctions: true }],
@@ -43,7 +40,7 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
     '@typescript-eslint/no-var-require': ['off', false],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^__' }],
-    '@typescript-eslint/ban-ts-comment': ['warn'],
+    '@typescript-eslint/ban-ts-comment': 0,
     "no-multiple-empty-lines": ["error", { "max": 1 }],
     "no-trailing-spaces": "error",
     //...
@@ -62,9 +59,6 @@ module.exports = {
     // ES6+
     Promise: true,
     DEBUG: true,
-    // // 前端 MVVM 框架
-    // React: true,
-    // Vue: true,
   },
   settings: {
     "import/resolver": {

@@ -96,7 +96,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     if (existsSync(tsconfigPath)) {
       tsconfig = require(tsconfigPath);
     } else {
-      !isRestart && Printer.log(Colors.gray(`Cannot find tsconfig.json file in "${relPathToCWD(tsconfigPath)}", will use default build-in tsconfig.json`));
+      !isRestart && Printer.log(Colors.gray(`Skip load "${unixifyPath(relPathToCWD(tsconfigPath))}"(file-not-existed), will use default build-in tsconfig.json`));
     }
     enableRequireTsFile(tsconfig || {});
     !isRestart && Printer.log(Colors.success('Enable typescript mode success!'), Colors.gray('You can write logic in routes.ts, middleware.ts, data/**/*.ts'));
@@ -108,7 +108,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   let routes: Record<string, string> = {};
   if (existsSync(routesFilePath)) {
     routes = (await loadRoutesFile(routesFilePath, { noLogPrint: true })) as Record<string, string>;
-    Printer.log(Colors.success('Load routes file success!'), Colors.gray(relPathToCWD(routesFilePath)));
+    Printer.log(Colors.success('Load routes file success!'), Colors.gray(unixifyPath(relPathToCWD(routesFilePath))));
   }
 
   /**
@@ -122,7 +122,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     diyMiddleware = isExpressMiddleware ? mdwConnect(tmpFunction) : tmpFunction;
     Printer.log(
       Colors.success('Load custom middleware file success!'),
-      Colors.gray(relPathToCWD(middlewareFilePath)),
+      Colors.gray(unixifyPath(relPathToCWD(middlewareFilePath))),
       isExpressMiddleware ? Colors.yellow('Express-Style-Middleware') : '',
     );
   }
@@ -136,7 +136,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   useHttps && app.use(mdwSSL({ hostname: host, port }));
 
   // middleware: favicon
-  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/mihawk-v1.ico')));
+  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
 
   // middleware: common middleware
   app.use(mdwCommon(options));
