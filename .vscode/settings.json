@@ -36,5 +36,6 @@
   },
   "todo-tree.tree.showBadges": false,
   "terminal.integrated.rightClickBehavior": "default",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.eol": "\n"
 }

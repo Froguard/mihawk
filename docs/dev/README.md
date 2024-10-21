@@ -129,7 +129,7 @@ Greek:
 - [x] upsilon (Υ, υ)
 - [x] phi (Φ, φ)
 - [x] chi (Χ, χ)
-- [ ] psi (Ψ, ψ)
+- [x] psi (Ψ, ψ)
 - [ ] omega (Ω, ω)
 
 Others:

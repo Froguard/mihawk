@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-chi",
+  "version": "0.1.0-psi",
   "description": "A tiny & simple mock server tool, support json,js,cjs,ts(typescript).",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
@@ -67,7 +67,7 @@
     "anymatch": "^3.1.3",
     "chokidar": "^3.6.0",
     "color-cc": "^0.0.7",
-    "cosmiconfig": "^9.0.0",
+    "cosmiconfig": "^8.3.6",
     "debug": "^4.3.6",
     "deepmerge": "^4.3.1",
     "free-dedupe": "^0.0.7",
@@ -79,15 +79,14 @@
     "koa-sslify": "^5.0.1",
     "lru-cache": "^5.0.0",
     "minimist": "^1.2.8",
-    "open": "^10.1.0",
     "package-json-type": "^1.0.3",
     "prettier": "^3.0.3",
     "prompts": "^2.4.2",
     "typescript": "^4.5.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.4.0",
-    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/cli": "^17.8.1",
+    "@commitlint/config-conventional": "^17.8.1",
     "@types/jest": "^27.4.0",
     "@types/node": "^20.8.7",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
@@ -111,11 +110,13 @@
     "typescript": "^4.5.5"
   },
   "keywords": [
-    "mihawk",
     "mock",
-    "mock-server",
+    "mihawk",
     "koa2",
-    "express"
+    "express",
+    "mock-server",
+    "http-mock",
+    "api-mock"
   ],
   "repository": {
     "type": "git",

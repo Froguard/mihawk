@@ -261,8 +261,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       }
     },
     close: async () => {
-      server.closeAllConnections();
-      server.closeIdleConnections();
+      typeof server.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
+      typeof server.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
       await new Promise((res, rej) => {
         server.close(err => (err ? rej(err) : res(null)));
       }).catch(err => Printer.error(`Close Server Failed!\n`, err));
