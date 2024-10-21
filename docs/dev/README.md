@@ -10,7 +10,7 @@
 npm i -g frogagu
 ```
 
-> frogagu@>=0.0.1-sigma
+> frogagu@>=0.0.1-omega
 
 then create a new root config file `.frogagurc.json`
 
