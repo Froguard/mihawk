@@ -250,16 +250,24 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   server.listen(port, host); // or 443(https) 80(http)
 
   /**
-   * return handle obj with a "destory" method prop
+   * return handle obj with "destory" & "close" method props
    */
   const destoryServer = (server as EnhancedServer<http.Server | https.Server>).destory;
   return {
+    /**
+     * destory server
+     * - use during error caught
+     */
     destory: async () => {
       if (typeof destoryServer === 'function') {
         await destoryServer();
         Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
       }
     },
+    /**
+     * close server
+     * - use during restart
+     */
     close: async () => {
       typeof server.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
       typeof server.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
