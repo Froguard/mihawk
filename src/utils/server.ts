@@ -4,16 +4,24 @@ import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
 import type { Socket } from 'net';
 
-export type EnhancedServer<S extends HttpServer | HttpsServer> = S & {
+/**
+ * http/https 服务实例
+ */
+export type HttpOrHttpsServer = HttpServer | HttpsServer;
+
+/**
+ * 增强版服务实例
+ */
+export type EnhancedServer<S extends HttpOrHttpsServer = HttpOrHttpsServer> = S & {
   destory: (callback?: (...args: any[]) => any) => Promise<void>;
 };
 
 /**
  * 增强版服务实例
- * @param {HttpServer} server
+ * @param {HttpOrHttpsServer} server
  * @returns {EnhancedServer} sever self
  */
-export function enhanceServer<T extends HttpServer | HttpsServer>(server: T) {
+export function enhanceServer<T extends HttpOrHttpsServer>(server: T) {
   // connection-recorder
   let connectMap: Map<string, Socket> | null = null;
   /**
