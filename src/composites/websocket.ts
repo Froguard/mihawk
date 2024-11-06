@@ -1,18 +1,35 @@
 'use strict';
-import WebSocket, { WebSocketServer, ServerOptions } from 'ws';
+import { ClientRequest, IncomingMessage } from 'http';
+import * as WS from 'ws';
 import { parseStompMsg } from '../utils/parser';
-import type { EnhancedServer, HttpOrHttpsServer } from '../utils/server';
-
-type EnhancedHttpOrHttpsServer = EnhancedServer<HttpOrHttpsServer>;
 
 /**
  * 构造器传参
  */
-export interface WebSocketServerOptions extends ServerOptions {
+export interface WsExOptions {
+  /**
+   * ws 配置
+   */
+  ws?: WS.ServerOptions;
+
   /**
    * 消息体数据，是否使用 stomp 协议，默认为 false
    */
   stomp?: boolean;
+
+  /**
+   * socket 监听器
+   */
+  socketListerner?: {
+    open?: () => void;
+    close?: (code?: number) => void;
+    message?: (data: WS.RawData, isBinary: boolean) => void;
+    ipgrade?: (request: IncomingMessage) => void;
+    ping?: (data: WS.RawData) => void;
+    pong?: (data: WS.RawData) => void;
+    error?: (error: Error) => void;
+    unexpectedResponse?: (request: ClientRequest, response: IncomingMessage) => void;
+  };
 }
 
 /**
@@ -21,45 +38,89 @@ export interface WebSocketServerOptions extends ServerOptions {
  */
 export default class WebSocketEx {
   private useStompMsg: boolean;
-  private httpOrHttpsServer?: EnhancedHttpOrHttpsServer; // 增强版的 httpServer 或 httpsServer 实例
-  private wss: WebSocketServer;
-
+  private wss?: WS.WebSocketServer | null; // 是一个 web socket sever 实例
+  private wsOptions: WS.ServerOptions;
   /**
    * 构造器
    */
-  constructor(private options: WebSocketServerOptions) {
-    const {
-      server = null,
-      stomp = false, //
-    } = options;
+  constructor(options: WsExOptions) {
+    const { stomp = false, ws } = options;
     // useStompMsg
     this.useStompMsg = !!stomp;
-    // httpOrHttpsServer
-    if (server) {
-      this.httpOrHttpsServer = server as EnhancedHttpOrHttpsServer;
-    } else {
-      throw new Error('WebSocketServer: httpServer or httpsServer instance must be provided as `server` param in options!');
-    }
+    // ws options
+    this.wsOptions = ws || {};
+    // wss
+    this.wss = null;
   }
 
   /**
    * start 函数
    */
   public start() {
-    // TODO: 待实现
+    if (this.wss) {
+      console.log('WS server is already running.');
+      return;
+    }
+    /**
+     * 疑惑点：wss 和 ws 啥区别？
+     * - wss 是一个 web socket sever 实例
+     * - ws 则是 web scoket 实例，为了便于理解，同时见啥误操作，命名上，不使用 ws，而直接用 socket 命名
+     */
+    this.wss = new WS.WebSocketServer(this.wsOptions);
+
+    this.wss.on('connection', (socket: WS.WebSocket) => {
+      console.log('Client connected.');
+
+      socket.on('message', (message: string) => {
+        console.log(`Received message => ${message}`);
+        socket.send(`Hello, you sent -> ${message}`);
+      });
+
+      socket.on('close', () => {
+        console.log('Client disconnected.');
+      });
+    });
+
+    console.log('WS server started on port 8080.');
   }
 
   /**
    * close 函数
    */
   public close() {
-    // TODO: 待实现
+    if (!this.wss) {
+      console.log('WebSocket server is not running.');
+      return;
+    }
+
+    const clients = this.wss.clients;
+    if (clients?.size) {
+      clients?.forEach(client => client.close());
+    }
+
+    this.wss.close(() => {
+      this.wss = null; // 清除引用以防止内存泄漏
+      console.log('WebSocket server stopped.');
+    });
   }
 
   /**
    * destory 函数
    */
   public destory() {
-    // TODO: 待实现
+    if (!this.wss) {
+      console.log('WebSocket server is not running.');
+      return;
+    }
+
+    const clients = this.wss.clients;
+    if (clients?.size) {
+      clients?.forEach(client => client.terminate());
+    }
+
+    this.wss.close(() => {
+      this.wss = null; // 清除引用以防止内存泄漏
+      console.log('WebSocket server destoryed.');
+    });
   }
 }
