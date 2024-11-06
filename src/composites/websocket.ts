@@ -106,13 +106,16 @@ export default class WsCtrl {
       Printer.log(LOGFLAG_WS, 'WS server is already running.');
       return;
     }
+    const port = this.port;
+    const addr = this.address;
+    const resolveFunc = this.resolveFunc;
     //
     // 1.创建对应的 WebsocketServer 实例
     this.wss = new WS.WebSocketServer(this.wssOptions);
     // 2.注册 wss 上的基础事件 (listerning,headers,connection,error,close)
     // 2.1.监听 WebSocket 服务器开始监听连接
     this.wss.on('listening', function listening() {
-      Printer.log(LOGFLAG_WS, 'WebSocket server is listening');
+      Printer.log(LOGFLAG_WS, 'WebSocket server is listening', `wss://${addr}:${port}`);
     });
     // 2.2.监听 headers 事件
     this.wss.on('headers', function headers(headers, req) {
@@ -126,7 +129,7 @@ export default class WsCtrl {
       const clientId = remoteAddress ? `${remoteAddress}:${remotePort}_${getTimeNowStr()}` : _createClientId();
       Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId: ${clientId}`));
       // socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
-      this.resolveFunc(socket, request);
+      resolveFunc(socket, request);
       //
     });
     // 2.4.监听 error 错误事件
@@ -199,14 +202,42 @@ function _createClientId() {
  * @param {IncomingMessage} request
  */
 function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage) {
-  //
-  socket.on('message', (message: string) => {
-    Printer.log(LOGFLAG_WS, `Received message => ${message}`);
-    socket.send(`Hello, you sent -> ${message}`);
+  const clientAddr = request.socket.remoteAddress;
+  socket.send(`Hi, ${clientAddr}`);
+  // open
+  socket.on('open', () => {
+    Printer.log(LOGFLAG_WS, `Client ${clientAddr} open.`);
   });
-  //
-  socket.on('close', () => {
-    Printer.log(LOGFLAG_WS, 'Client disconnected.');
+  // message
+  socket.on('message', (message: any, isBinary: boolean) => {
+    Printer.log(LOGFLAG_WS, `Received message => ${message}`, isBinary ? Colors.gray('binary') : '');
+    socket.send(`SocketServer: I have recived your message -> ${message}`); // send response
+  });
+  // upgrade
+  socket.on('upgrade', (request: IncomingMessage) => {
+    const clientAddr = request.socket.remoteAddress;
+    Printer.log(LOGFLAG_WS, `Client ${clientAddr} upgraded.`);
+  });
+  // ping
+  socket.on('ping', (data: Buffer) => {
+    Printer.log(LOGFLAG_WS, `Received ping => ${data}`);
+    socket.pong(`Pong: ${data?.toString()}`); // pong
+  });
+  // pong
+  socket.on('pong', (data: Buffer) => {
+    Printer.log(LOGFLAG_WS, `Received pong => ${data?.toString()}`);
+  });
+  // error
+  socket.on('error', (err: Error) => {
+    Printer.error(LOGFLAG_WS, `CLient error: ${err.message}`);
+  });
+  // unexpected-response
+  socket.on('unexpected-response', (request: IncomingMessage, response: IncomingMessage) => {
+    Printer.error(LOGFLAG_WS, `CLient unexpected-response: ${response.statusCode} ${response.statusMessage}`);
+  });
+  // close
+  socket.on('close', (code: number, reason: Buffer) => {
+    Printer.log(LOGFLAG_WS, `Client close connection.(with code=${code},reason=${reason.toString()})`);
   });
 }
 
