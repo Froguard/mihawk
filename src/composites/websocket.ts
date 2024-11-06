@@ -1,17 +1,13 @@
 'use strict';
-import { ClientRequest, IncomingMessage } from 'http';
+import { IncomingMessage } from 'http';
 import Colors from 'color-cc';
 import * as WS from 'ws';
+import { PKG_NAME } from '../consts';
 import { parseStompMsg } from '../utils/parser';
 import { Debugger, Printer } from '../utils/print';
 import { createRandId } from '../utils/str';
 import { getTimeNowStr } from '../utils/date';
-import { PKG_NAME } from '../consts';
-
-// 生成 clientId
-function createClientId() {
-  return `${getTimeNowStr()}-${createRandId()}`;
-}
+import { getAddressByServer, getPortByServer } from '../utils/server';
 
 const LOGFLAG_WS = `${Colors.cyan('[WS]')}${Colors.gray(':')}`;
 
@@ -37,18 +33,32 @@ export type WsWebSocket = WS.WebSocket;
 export type Socket = WS.WebSocket; // alias
 
 /**
+ * socket 逻辑处理函数
+ */
+export type SocketResolveFunc = (socket: WS.WebSocket, request: IncomingMessage) => void;
+
+/**
  * 构造器传参
  */
-export interface WsExOptions {
+export interface WsCtrlOptions {
   /**
-   * ws 配置
+   * http/https 服务对应的 ip 地址
    */
-  wssOptions?: WS.ServerOptions;
+  address?: string;
+  /**
+   * http/https 服务端口
+   */
+  port?: number;
 
   /**
    * 消息体数据，是否使用 stomp 协议，默认为 false
    */
-  stomp?: boolean;
+  stomp?: boolean; // TODO: 还没想好怎么暴露给用户使用
+
+  /**
+   * ws 配置
+   */
+  wssOptions?: WS.ServerOptions;
 
   /**
    * 自定义 socket 逻辑处理函数
@@ -56,7 +66,7 @@ export interface WsExOptions {
    * @param {IncomingMessage} request
    * @returns
    */
-  resolve?: (socket: WS.WebSocket, request: IncomingMessage) => void;
+  resolve?: SocketResolveFunc;
 }
 
 /**
@@ -64,21 +74,28 @@ export interface WsExOptions {
  */
 export default class WsCtrl {
   private useStompMsg: boolean;
-  private port: number;
+  private address: string; // http/https 服务对应地址
+  private port: number; // http/https 服务对应端口
+  private resolveFunc: SocketResolveFunc; // 自定义处理逻辑对应的函数
   private wss?: WS.WebSocketServer | null; // 是一个 web socket sever 实例
-  private wssOptions: WS.ServerOptions;
+  private wssOptions: WS.ServerOptions; // 创建 wss 实例所需要的 options 配置
   /**
    * 构造器
    */
-  constructor(options: WsExOptions) {
-    const { stomp = false, wssOptions } = options;
+  constructor(options: WsCtrlOptions) {
+    const { stomp = false, resolve, wssOptions, address, port } = options;
     // useStompMsg
     this.useStompMsg = !!stomp;
-    // ws options
-    this.wssOptions = wssOptions || {};
-    // TODO: 获取到 httpServer/httpsServer 实例上的 port 信息
-    // wss
+    // logic resolve function
+    this.resolveFunc = typeof resolve === 'function' ? resolve : _defaultResolveFunc;
+    // wss instance
     this.wss = null;
+    // wss options
+    this.wssOptions = wssOptions || {};
+    // address
+    this.address = _removeProtocol(address || getAddressByServer(this.wssOptions.server)) || '127.0.0.1';
+    // port
+    this.port = port || getPortByServer(this.wssOptions.server) || 0;
   }
 
   /**
@@ -89,48 +106,34 @@ export default class WsCtrl {
       Printer.log(LOGFLAG_WS, 'WS server is already running.');
       return;
     }
-    // 1. 创建对应的 WebsocketServer 实例
+    //
+    // 1.创建对应的 WebsocketServer 实例
     this.wss = new WS.WebSocketServer(this.wssOptions);
-
-    // 2. 注册 wss 上的基础事件 (listerning,headers,connection,error,close)
-
-    // 监听 WebSocket 服务器开始监听连接
+    // 2.注册 wss 上的基础事件 (listerning,headers,connection,error,close)
+    // 2.1.监听 WebSocket 服务器开始监听连接
     this.wss.on('listening', function listening() {
       Printer.log(LOGFLAG_WS, 'WebSocket server is listening');
     });
-
-    // 监听 headers 事件
+    // 2.2.监听 headers 事件
     this.wss.on('headers', function headers(headers, req) {
       Debugger.log('Headers:', headers);
       // 添加或修改响应头
       headers.push(`X-Powered-By: ${PKG_NAME}`);
     });
-
-    // 监听 connection 事件：当有新的客户端连接时的处理
+    // 2.3.监听 connection 事件：当有新的客户端连接时的处理
     this.wss.on('connection', (socket: WS.WebSocket, request: IncomingMessage) => {
       const { remoteAddress, remotePort } = request?.socket || {};
-      const clientId = remoteAddress ? `${remoteAddress}:${remotePort}_${getTimeNowStr()}` : createClientId();
+      const clientId = remoteAddress ? `${remoteAddress}:${remotePort}_${getTimeNowStr()}` : _createClientId();
       Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId: ${clientId}`));
-      /*
-      // socket 实例上的一系列事件
+      // socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
+      this.resolveFunc(socket, request);
       //
-      socket.on('message', (message: string) => {
-        Printer.log(LOGFLAG_WS, `Received message => ${message}`);
-        socket.send(`Hello, you sent -> ${message}`);
-      });
-      //
-      socket.on('close', () => {
-        Printer.log(LOGFLAG_WS, 'Client disconnected.');
-      });
-      */
     });
-
-    // 监听 error 错误事件
+    // 2.4.监听 error 错误事件
     this.wss.on('error', function error(err) {
       Printer.error(LOGFLAG_WS, 'WebSocket server error:', err);
     });
-
-    // 监听 close 关闭事件
+    // 2.5.监听 close 关闭事件
     this.wss.on('close', function close() {
       Printer.log(LOGFLAG_WS, 'WebSocket server closed');
     });
@@ -175,4 +178,43 @@ export default class WsCtrl {
       Printer.log(LOGFLAG_WS, 'WebSocket server destoryed.');
     });
   }
+}
+
+//
+//
+// ===== private methods =====
+//
+//
+/**
+ * 生成 clientId
+ * @returns {string}
+ */
+function _createClientId() {
+  return `${getTimeNowStr()}-${createRandId(3)}`;
+}
+
+/**
+ * 默认的 resolve 函数
+ * @param {WS.WebSocket} socket
+ * @param {IncomingMessage} request
+ */
+function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage) {
+  //
+  socket.on('message', (message: string) => {
+    Printer.log(LOGFLAG_WS, `Received message => ${message}`);
+    socket.send(`Hello, you sent -> ${message}`);
+  });
+  //
+  socket.on('close', () => {
+    Printer.log(LOGFLAG_WS, 'Client disconnected.');
+  });
+}
+
+/**
+ * 删除地址的协议头
+ * @param address
+ * @returns {string} 删除了协议头（https:// 或 http://）的地址
+ */
+function _removeProtocol(address: string) {
+  return address?.replace(/^(https?:\/\/)/, '').replace(/\/+$/, '') || '';
 }

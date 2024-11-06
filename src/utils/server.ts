@@ -2,7 +2,7 @@
 import { promisify } from 'util';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
-import type { Socket } from 'net';
+import type { Socket, AddressInfo } from 'net';
 
 /**
  * http/https 服务实例
@@ -66,4 +66,52 @@ export function enhanceServer<T extends HttpOrHttpsServer>(server: T) {
   };
   //
   return server as EnhancedServer<T>;
+}
+
+/**
+ * 判断地址信息是否为 AddressInfo 对象
+ * @param {any} obj
+ * @returns {boolean}
+ */
+export function isServerAddressInfo(obj: unknown): obj is AddressInfo {
+  if (typeof obj === 'object' && obj !== null && obj !== undefined) {
+    return 'address' in obj;
+  }
+  return false;
+}
+
+/**
+ * 获取 server 的地址相关信息
+ * @param {HttpOrHttpsServer} server
+ * @return {AddressInfo|null} obj|null
+ */
+export function getAddrInfoByServer(server: HttpOrHttpsServer) {
+  const addr = server.address();
+  if (isServerAddressInfo(addr)) {
+    return addr;
+  }
+  return null;
+}
+
+/**
+ * 获取服务的端口信息
+ * @param {HttpOrHttpsServer} server
+ * @returns {number|null} 端口
+ */
+export function getPortByServer(server: HttpOrHttpsServer) {
+  /**
+   * - 当 server 绑定的是 地址+端口 时，返回的是 AddressInfo 对象
+   * - 当 server 绑定的是 unix 套接字时，返回的是 string 路径字符串
+   * - 当 server 绑定不成功时，返回的是 null
+   */
+  return getAddrInfoByServer(server)?.port || null;
+}
+
+/**
+ * 获取 server 的地址字符串
+ * @param {HttpOrHttpsServer} server
+ * @returns {string|null}
+ */
+export function getAddressByServer(server: HttpOrHttpsServer) {
+  return getAddrInfoByServer(server)?.address || null;
 }
