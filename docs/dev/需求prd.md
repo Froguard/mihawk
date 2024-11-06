@@ -46,6 +46,8 @@
   - [x] 方案2：自己实现（轻量化办法）：√
     - 使用 chokidar 监控文件变化，当文件变化时，刷新 require.cache, 并重新启动整个 server（先 close 再 start，以便于加载 mock 相关文件，并重新执行新逻辑）
     - 使用 lru-cache 算法，缓存 mock 文件的内容，避免重复加载
+- [ ] 支持 websocket 链接的 mock 能力
+  - [ ] 自定义 socket 实例上的几个常见 listener 的处理函数
 
 ## mocks 目录说明
 
@@ -53,6 +55,7 @@
   - `文件`：routes.json ，全局路由配置，`路由→mock文件路径` 的映射关系，方便多条路由能够复用相同逻辑 `(可选)`
   - `文件`：middleware.ts|js，全局中间件，方便全局公共逻辑的处理，比如针对返回格式的处理 `(可选)`
   - `文件`：tsconfig.json，当选择了 ts 作为mock 类型时生效 `(可选，默认不写)`
+  - `文件`：scoket.ts|js，全局 websocket 处理逻辑，针对 socket 实例上的监听处理函数 `(可选)`
   - `目录`：data/ 存放所有接口的 mock 数据
     - `目录`：POST/ 存放所有 POST 请求的 mock 逻辑
     - `目录`：GET/ 存放所有 GET 请求的 mock 逻辑

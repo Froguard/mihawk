@@ -65,3 +65,12 @@ export function isMatchPatterns(target: string, patterns: string[] | string) {
 export function formatPatterns(filters: any[]) {
   return filters && Array.isArray(filters) ? filters.filter(flt => !!flt).map(flt => (typeof flt !== 'string' ? String(flt) : flt)) : [];
 }
+
+/**
+ * 获取随机 ID 字符串
+ * @param {number} len 字符长度
+ * @returns {string}
+ */
+export function createRandId(len: number = 6) {
+  return Math.random().toString(36).substring(2, 2 + len); // prettier-ignore
+}
