@@ -1,5 +1,4 @@
 'use strict';
-import { SocketResolveFunc } from './composites/websocket';
 import type { ParsedArgs } from 'minimist';
 
 /**
@@ -135,13 +134,6 @@ export interface MhkRCWsConfig {
    * 是否启用 stomp 协议
    */
   stomp?: boolean;
-  /**
-   * 自定义 socket 解析函数
-   * @param socket
-   * @param request
-   * @param clientId
-   */
-  resolve?: SocketResolveFunc;
 }
 
 /**
@@ -312,6 +304,12 @@ export type MihawkOptions = MihawkRC & {
    * 是否开启 websocket server
    */
   useWss?: boolean;
+
+  /**
+   * @extra
+   * websocket 相关 diy 处理路径
+   */
+  socketFilePath?: string;
 };
 
 /**

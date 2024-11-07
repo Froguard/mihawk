@@ -97,7 +97,15 @@ export default class WsCtrl {
     // port
     this._port = port || getPortByServer(this._wssOptions.server) || 0;
     // logic resolve function
-    this._resolveFunc = typeof resolve === 'function' ? resolve : _defaultResolveFunc;
+    const _resolve = typeof resolve === 'function' ? resolve : _defaultResolveFunc;
+    this._resolveFunc = function (socket: WS.WebSocket, request: IncomingMessage, clientId?: string) {
+      try {
+        const funcCtx = socket; // 函数执行上下文 context
+        _resolve.call(funcCtx, socket, request, clientId);
+      } catch (error) {
+        Printer.error(LOGFLAG_WS, 'Failed to exec socket logic resolveFunc:\n', error);
+      }
+    };
   }
 
   /**

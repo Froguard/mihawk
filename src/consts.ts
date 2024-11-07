@@ -66,7 +66,7 @@ export const DEFAULT_RC: MihawkRC = Object.freeze({
  * 默认的 mihawk options
  * - 在 rc 配置之上额外增加，方便逻辑计算，初始赋值逻辑详见 formatOptionsByConfig 方法
  */
-export const DEFAULT_OPTIONS: MihawkOptions = Object.freeze({
+const defOpts: MihawkOptions = {
   ...DEFAULT_RC,
   // base
   useHttps: false,
@@ -84,4 +84,8 @@ export const DEFAULT_OPTIONS: MihawkOptions = Object.freeze({
   routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
   // middleware file
   middlewareFilePath: null, // path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
-});
+  useWss: false,
+  // socketFilePath
+  socketFilePath: null,
+};
+export const DEFAULT_OPTIONS = Object.freeze(defOpts);

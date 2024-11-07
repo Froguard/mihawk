@@ -27,7 +27,7 @@ import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
-import WsCtrl, { WsCtrlOptions } from './composites/websocket';
+import WsCtrl, { SocketResolveFunc } from './composites/websocket';
 import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
@@ -73,6 +73,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     useWss,
     socketConfig,
+    socketFilePath,
   } = options;
   const loadLogicFile = isTypesctiptMode ? loadTS : loadJS;
   const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
@@ -259,7 +260,12 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   let wsController: WsCtrl | null = null;
   if (useWss) {
-    const { stomp, resolve } = socketConfig as MhkRCWsConfig;
+    const { stomp } = socketConfig as MhkRCWsConfig;
+    let resolveFunc: SocketResolveFunc | null = null;
+    if (existsSync(socketFilePath)) {
+      resolveFunc = await loadLogicFile<SocketResolveFunc>(socketFilePath, { noLogPrint: true });
+      !isRestart && Printer.log(Colors.success('Load socket logic file success!'), Colors.gray(unixifyPath(relPathToCWD(socketFilePath))));
+    }
     wsController = new WsCtrl({
       address: host,
       port,
@@ -269,7 +275,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
         port,
         server,
       },
-      resolve,
+      resolve: resolveFunc,
     });
   }
 

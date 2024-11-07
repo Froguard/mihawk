@@ -208,11 +208,14 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
   // - useWss (useWebSocket)
   options.useWss = !!options.socketConfig;
   if (options.useWss) {
+    // - socketConfig
     if (typeof options.socketConfig !== 'object') {
       options.socketConfig = {
         stomp: false,
       };
     }
+    // - socketFilePath
+    options.socketFilePath = join(options.mockDirPath, `./socket.${logicFileExt}`);
   }
 
   //
