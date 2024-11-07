@@ -1,4 +1,5 @@
 'use strict';
+import { SocketResolveFunc } from './composites/websocket';
 import type { ParsedArgs } from 'minimist';
 
 /**
@@ -117,6 +118,33 @@ export interface HttpsConfig {
 }
 
 /**
+ * rc 文件中的 logConfig 字段配置
+ */
+export interface MhkRcLogConfig {
+  /**
+   * 指定路由对应日志忽略不打印
+   */
+  ignoreRoutes?: string[];
+}
+
+/**
+ * rc 文件中的 websocket 字段配置
+ */
+export interface MhkRCWsConfig {
+  /**
+   * 是否启用 stomp 协议
+   */
+  stomp?: boolean;
+  /**
+   * 自定义 socket 解析函数
+   * @param socket
+   * @param request
+   * @param clientId
+   */
+  resolve?: SocketResolveFunc;
+}
+
+/**
  * mihawk root-config 配置文件
  */
 export interface MihawkRC {
@@ -193,12 +221,12 @@ export interface MihawkRC {
   /**
    * 日志打印，配置项
    */
-  logConfig?: {
-    /**
-     * 指定路由对应日志忽略不打印
-     */
-    ignoreRoutes?: string[];
-  } | null;
+  logConfig?: MhkRcLogConfig | null;
+
+  /**
+   * 是否启用 websocket server
+   */
+  websocket?: MhkRCWsConfig | null | boolean;
 }
 
 /**
@@ -278,6 +306,12 @@ export type MihawkOptions = MihawkRC & {
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   middlewareFilePath: string; //
+
+  /**
+   * @extra
+   * 是否开启 websocket server
+   */
+  useWebSocket?: boolean;
 };
 
 /**

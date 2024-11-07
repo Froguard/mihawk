@@ -204,6 +204,17 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
 
   // - useHttps
   options.useHttps = !!options.https || isObjStrict(options.https); // https 为 true，或者为一个对象 { key,cert }
+
+  // - useWebSocket
+  options.useWebSocket = !!options.websocket;
+  if (options.useWebSocket) {
+    if (typeof options.websocket !== 'object') {
+      options.websocket = {
+        stomp: false,
+      };
+    }
+  }
+
   //
   //
   return options as MihawkOptions;

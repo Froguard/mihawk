@@ -2,6 +2,7 @@
 import path from 'path';
 import http from 'http';
 import https from 'https';
+import { promisify } from 'util';
 import Koa from 'koa';
 import Colors from 'color-cc';
 import mdwBodyParser from 'koa-bodyparser';
@@ -26,7 +27,8 @@ import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
-import type { AnyFunc, KoaMiddleware, Loosify, MihawkRC } from './com-types';
+import WsCtrl, { WsCtrlOptions } from './composites/websocket';
+import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
 const PKG_ROOT_PATH = getRootAbsPath();
@@ -68,6 +70,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     routesFilePath,
     //
     middlewareFilePath,
+    //
+    useWebSocket,
+    websocket,
   } = options;
   const loadLogicFile = isTypesctiptMode ? loadTS : loadJS;
   const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
@@ -250,17 +255,45 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   server.listen(port, host); // or 443(https) 80(http)
 
   /**
+   * 7.websocket server
+   */
+  let wsController: WsCtrl | null = null;
+  if (useWebSocket) {
+    const { stomp, resolve } = websocket as MhkRCWsConfig;
+    wsController = new WsCtrl({
+      address: host,
+      port,
+      stomp,
+      wssOptions: {
+        host,
+        port,
+        server,
+      },
+      resolve,
+    });
+  }
+
+  /**
    * return handle obj with "destory" & "close" method props
    */
-  const destoryServer = (server as EnhancedServer<http.Server | https.Server>).destory;
   return {
     /**
      * destory server
      * - use during error caught
      */
     destory: async () => {
+      // 1.destory websocket server
+      // TODO:
+      if (typeof wsController?.destory === 'function') {
+        await wsController?.destory();
+        wsController = null;
+        Printer.log('Websocket server has been destoryed.');
+      }
+      // 2.destory http/https server
+      const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory;
       if (typeof destoryServer === 'function') {
         await destoryServer();
+        server = null;
         Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
       }
     },
@@ -269,12 +302,23 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
      * - use during restart
      */
     close: async () => {
+      // 1.close websocket server
+      if (typeof wsController?.close === 'function') {
+        await wsController.close();
+        wsController = null;
+        Printer.log(Colors.success('Close websocket server success!'));
+      }
+      // 2.close http/https Server
       typeof server.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
       typeof server.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
-      await new Promise((res, rej) => {
-        server.close(err => (err ? rej(err) : res(null)));
-      }).catch(err => Printer.error(`Close Server Failed!\n`, err));
-      Printer.log(Colors.success('Close Mock-Server success!'));
+      const closeServerAsync = promisify(server.close).bind(server);
+      try {
+        await closeServerAsync();
+        server = null;
+        Printer.log(Colors.success('Close Mock-Server success!'));
+      } catch (error) {
+        Printer.error(`Close Server Failed!\n`, error);
+      }
     },
   };
 }

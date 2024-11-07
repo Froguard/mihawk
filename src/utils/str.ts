@@ -74,3 +74,12 @@ export function formatPatterns(filters: any[]) {
 export function createRandId(len: number = 6) {
   return Math.random().toString(36).substring(2, 2 + len); // prettier-ignore
 }
+
+/**
+ * 删除地址的协议头
+ * @param address
+ * @returns {string} 删除了协议头（https:// 或 http://）的地址
+ */
+export function delAddrProtocol(address: string) {
+  return address?.replace(/^(https?:\/\/)/, '').replace(/\/+$/, '') || '';
+}
