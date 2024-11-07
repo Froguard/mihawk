@@ -289,18 +289,19 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
      */
     destory: async () => {
       // 1.destory websocket server
-      // TODO:
       if (typeof wsController?.destory === 'function') {
         await wsController.destory();
         wsController = null;
         Printer.log('Websocket server has been destoryed.');
       }
       // 2.destory http/https server
-      const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory;
-      if (typeof destoryServer === 'function') {
-        await destoryServer();
-        server = null;
-        Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
+      if (server) {
+        const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory;
+        if (typeof destoryServer === 'function') {
+          await destoryServer();
+          server = null;
+          Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
+        }
       }
     },
     /**
@@ -315,15 +316,17 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
         Printer.log(Colors.success('Close websocket server success!'));
       }
       // 2.close http/https Server
-      typeof server.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
-      typeof server.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
-      const closeServerAsync = promisify(server.close).bind(server);
-      try {
-        await closeServerAsync();
-        server = null;
-        Printer.log(Colors.success('Close Mock-Server success!'));
-      } catch (error) {
-        Printer.error(`Close Server Failed!\n`, error);
+      if (server) {
+        typeof server?.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
+        typeof server?.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
+        const closeServerAsync = promisify(server.close).bind(server);
+        try {
+          await closeServerAsync();
+          server = null;
+          Printer.log(Colors.success('Close Mock-Server success!'));
+        } catch (error) {
+          Printer.error(`Close Server Failed!\n`, error);
+        }
       }
     },
   };
