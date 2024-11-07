@@ -71,8 +71,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     middlewareFilePath,
     //
-    useWebSocket,
-    websocket,
+    useWss,
+    socketConfig,
   } = options;
   const loadLogicFile = isTypesctiptMode ? loadTS : loadJS;
   const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
@@ -258,8 +258,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    * 7.websocket server
    */
   let wsController: WsCtrl | null = null;
-  if (useWebSocket) {
-    const { stomp, resolve } = websocket as MhkRCWsConfig;
+  if (useWss) {
+    const { stomp, resolve } = socketConfig as MhkRCWsConfig;
     wsController = new WsCtrl({
       address: host,
       port,

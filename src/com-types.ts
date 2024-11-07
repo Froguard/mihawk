@@ -226,7 +226,7 @@ export interface MihawkRC {
   /**
    * 是否启用 websocket server
    */
-  websocket?: MhkRCWsConfig | null | boolean;
+  socketConfig?: MhkRCWsConfig | null | boolean;
 }
 
 /**
@@ -311,7 +311,7 @@ export type MihawkOptions = MihawkRC & {
    * @extra
    * 是否开启 websocket server
    */
-  useWebSocket?: boolean;
+  useWss?: boolean;
 };
 
 /**
