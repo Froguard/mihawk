@@ -291,7 +291,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       // 1.destory websocket server
       // TODO:
       if (typeof wsController?.destory === 'function') {
-        await wsController?.destory();
+        await wsController.destory();
         wsController = null;
         Printer.log('Websocket server has been destoryed.');
       }
