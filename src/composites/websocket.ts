@@ -85,7 +85,7 @@ export default class WsCtrl {
    * 构造器
    */
   constructor(options: WsCtrlOptions) {
-    const { stomp = false, resolve, wssOptions, address, port } = options;
+    const { stomp = false, address, port, wssOptions, resolve } = options;
     // useStompMsg
     this._useStompMsg = !!stomp;
     // wss instance
