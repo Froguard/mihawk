@@ -269,6 +269,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     wsController = new WsCtrl({
       // stomp,
       server,
+      host,
+      port,
+      secure: useHttps,
       resolve: resolveFunc,
     });
   }
