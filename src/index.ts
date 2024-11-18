@@ -267,14 +267,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       !isRestart && Printer.log(Colors.success('Load socket logic file success!'), Colors.gray(unixifyPath(relPathToCWD(socketFilePath))));
     }
     wsController = new WsCtrl({
-      address: host,
-      port,
-      stomp,
-      wssOptions: {
-        host,
-        port,
-        server,
-      },
+      // stomp,
+      server,
       resolve: resolveFunc,
     });
   }

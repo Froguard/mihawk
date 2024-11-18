@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WebSocket Test</title>
+  </head>
+  <body>
+    <script>
+      var socket = new WebSocket('ws://0.0.0.0:8080');
+
+      socket.onopen = function () {
+        console.log('[socket-client]: Connection established');
+        socket.send('Hello, server!');
+      };
+
+      socket.onmessage = function (event) {
+        console.log('[socket-client]: Recieve message from server', event.data);
+      };
+
+      socket.onclose = function () {
+        console.log('[socket-client]: Connection closed');
+      };
+
+      socket.onerror = function (error) {
+        console.error('[socket-client]: Error detected: ' + error);
+      };
+    </script>
+  </body>
+</html>
