@@ -155,7 +155,7 @@ export default class WsCtrl {
     this._wsSvr.on('connection', (socket: WS.WebSocket, request: IncomingMessage) => {
       const { remoteAddress, remotePort } = request?.socket || {};
       const clientId = remoteAddress ? `${remoteAddress}:${remotePort}__${getTimeNowStr()}` : this._autoCreateClientId();
-      Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId: ${clientId}`));
+      Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId="${clientId}"`));
       // socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
       resolveFunc(socket, request, clientId);
       //
@@ -241,41 +241,42 @@ export default class WsCtrl {
 function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, clientId?: string) {
   clientId = clientId || request.socket.remoteAddress;
   const clientName = `[${clientId}]`;
+  const logTail = Colors.gray(`from ${clientName}`);
   socket.send(`Hi, ${clientName}`);
   // open
   socket.on('open', () => {
-    Printer.log(LOGFLAG_WS, clientName, `Client ${Colors.gray(clientId)} open.`);
+    Printer.log(LOGFLAG_WS, `Client ${Colors.gray(clientId)} open.`, logTail);
   });
   // message
   socket.on('message', (message: any, isBinary: boolean) => {
-    Printer.log(LOGFLAG_WS, clientName, `Received message => ${message}`, isBinary ? Colors.gray('binary') : '');
+    Printer.log(LOGFLAG_WS, `Received message => ${message}`, isBinary ? Colors.gray('binary') : '', logTail, '\n');
     socket.send(`SocketServer: I have recived your message -> ${message}`); // send response
   });
   // upgrade
   socket.on('upgrade', (request: IncomingMessage) => {
     const clientAddr = request.socket.remoteAddress;
-    Printer.log(LOGFLAG_WS, clientName, `Client ${clientAddr} upgraded.`);
+    Printer.log(LOGFLAG_WS, `Client ${clientAddr} upgraded.`, logTail);
   });
   // ping
   socket.on('ping', (data: Buffer) => {
-    Printer.log(LOGFLAG_WS, clientName, `Received ping => ${data}`);
+    Printer.log(LOGFLAG_WS, `Received ping => ${data}`, logTail);
     socket.pong(`Pong: ${data?.toString()}`); // pong
   });
   // pong
   socket.on('pong', (data: Buffer) => {
-    Printer.log(LOGFLAG_WS, clientName, `Received pong => ${data?.toString()}`);
+    Printer.log(LOGFLAG_WS, `Received pong => ${data?.toString()}`, logTail);
   });
   // error
   socket.on('error', (err: Error) => {
-    Printer.error(LOGFLAG_WS, clientName, `CLient error: ${err.message}`);
+    Printer.error(LOGFLAG_WS, `CLient error: ${err.message}`, logTail);
   });
   // unexpected-response
   socket.on('unexpected-response', (request: IncomingMessage, response: IncomingMessage) => {
-    Printer.error(LOGFLAG_WS, clientName, `CLient unexpected-response: ${response.statusCode} ${response.statusMessage}`);
+    Printer.error(LOGFLAG_WS, `CLient unexpected-response: ${response.statusCode} ${response.statusMessage}`, logTail);
   });
   // close
   socket.on('close', (code: number, reason: Buffer) => {
-    Printer.log(LOGFLAG_WS, clientName, `Client close connection.(with code=${code},reason=${reason.toString()})`);
+    Printer.log(LOGFLAG_WS, `Client close connection.(with code=${code},reason=${reason.toString()})`, logTail);
   });
 }
 

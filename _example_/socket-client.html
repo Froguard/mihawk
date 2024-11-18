@@ -13,7 +13,7 @@
       };
 
       socket.onmessage = function (event) {
-        console.log('[socket-client]: Recieve message from server', event.data);
+        console.log('[socket-client]: Recieve message from server =>', '"', event.data, '"');
       };
 
       socket.onclose = function () {
@@ -21,7 +21,7 @@
       };
 
       socket.onerror = function (error) {
-        console.error('[socket-client]: Error detected: ' + error);
+        console.error('[socket-client]: Error detected => ' + error);
       };
     </script>
   </body>

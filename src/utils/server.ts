@@ -87,7 +87,7 @@ export function isServerAddressInfo(obj: unknown): obj is AddressInfo {
  */
 export function getAddrInfoByServer(server: HttpOrHttpsServer) {
   const addr = server.address();
-  console.log('addrinfo:', addr);
+  // console.log('addrinfo:', addr);
   if (isServerAddressInfo(addr)) {
     return addr;
   }
