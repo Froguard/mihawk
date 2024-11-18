@@ -5,6 +5,8 @@
   </head>
   <body>
     <script>
+      // 本文件可以直接浏览器打开方式进行测试，而无需使用 http 服务器，（只要 WebSocket 服务器正常运行着就行，对于 client 没要求）
+      // ts-node ./test-ws.ts 即可启动一个 WebSocket 服务器
       var socket = new WebSocket('ws://0.0.0.0:8080');
 
       socket.onopen = function () {
