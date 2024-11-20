@@ -90,15 +90,16 @@ export default class WsCtrl {
    */
   constructor(options: WsCtrlOptions) {
     const {
-      stomp = false, //
       host,
       port,
-      secure = false,
+      secure = false, //
       server,
-      resolve = _defaultResolveFunc,
+      stomp = false, //
+      resolve = _defaultResolveFunc, //
     } = options;
-    // // useStompMsg
+    // useStompMsg
     this._useStompMsg = !!stomp;
+    // host,port,secure (only for log print)
     this._host = host;
     this._port = port;
     this._secure = secure;
