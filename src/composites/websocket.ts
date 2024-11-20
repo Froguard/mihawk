@@ -271,7 +271,7 @@ function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, opt
 
   // ★ message
   socket.on('message', (message: any, isBinary: boolean) => {
-    const recived = Buffer.isBuffer(message) ? message?.toString() : typeof message === 'string' ? message : JSON.stringify(message);
+    const recived = typeof message === 'string' ? message : Buffer.isBuffer(message) ? message?.toString() : JSON.stringify(message);
     let recivedData: string | StompMsg = recived;
     if (stomp) {
       recivedData = parseStompMsg(recived);
