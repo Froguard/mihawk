@@ -306,7 +306,7 @@ export type MihawkOptions = MihawkRC & {
    * @extra
    * 是否开启 websocket server
    */
-  useWss?: boolean;
+  useWS?: boolean;
 
   /**
    * @extra

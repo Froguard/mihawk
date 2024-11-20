@@ -84,7 +84,7 @@ const defOpts: MihawkOptions = {
   routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
   // middleware file
   middlewareFilePath: null, // path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
-  useWss: false,
+  useWS: false,
   // socketFilePath
   socketFilePath: null,
 };

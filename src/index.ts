@@ -71,7 +71,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     middlewareFilePath,
     //
-    useWss,
+    useWS,
     socketConfig,
     socketFilePath,
   } = options;
@@ -259,7 +259,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    * 7.websocket server
    */
   let wsController: WsCtrl | null = null;
-  if (useWss) {
+  if (useWS) {
     const { stomp } = socketConfig as MhkRCWsConfig;
     let resolveFunc: SocketResolveFunc | null = null;
     if (existsSync(socketFilePath)) {
