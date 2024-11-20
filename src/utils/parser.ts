@@ -1,6 +1,6 @@
 'use strict';
 
-interface StompMsg {
+export interface StompMsg {
   command: string;
   headers: Record<string, string>;
   body?: string;

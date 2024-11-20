@@ -28,13 +28,14 @@
       var socket = new WebSocket('ws://127.0.0.1:8080/websocket');
 
       socket.onopen = function () {
-        console.log('[socket-client]: Connection established');
+        console.log('[socket-client]: Connection established, will send test msg "Hello, SocketServer!" to Server...');
         socket.send('Hello, SocketServer!');
         bindSendBtn(socket);
       };
 
       setTimeout(function () {
-        console.log('\nSend ping to server in 1s...');
+        console.log('\n');
+        console.log('Send ping to server in 1s...');
         socket.send('ping');
       }, 1000);
 
@@ -44,12 +45,15 @@
         console.log('[socket-client]: Recieve message from server => obj:', event);
       };
 
-      socket.onclose = function () {
-        console.log('[socket-client]: Connection closed');
+      socket.onclose = function (event) {
+        console.log('\n');
+        console.log('[socket-client]: Connection closed!', event.code, event.reason);
+        console.log('[socket-client]: CloseEvent:', event);
         unbindSendBtn();
       };
 
       socket.onerror = function (error) {
+        console.log('\n');
         console.error('[socket-client]: Error detected => ' + error);
         unbindSendBtn();
       };

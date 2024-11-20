@@ -6,7 +6,7 @@ import { isArrayBuffer } from 'util/types';
 import Colors from 'color-cc';
 import * as WS from 'ws';
 import { PKG_NAME } from '../consts';
-// import { parseStompMsg } from '../utils/parser';
+import { parseStompMsg, StompMsg } from '../utils/parser';
 import { Debugger, Printer } from '../utils/print';
 // import { delAddrProtocol } from '../utils/str';
 import { getTimeNowStr } from '../utils/date';
@@ -35,10 +35,15 @@ export type WsWebSocket = WS.WebSocket;
  */
 export type Socket = WS.WebSocket; // alias
 
+export interface SocketReslrFuncOptions {
+  stomp?: boolean;
+  clientId?: string;
+}
+
 /**
  * socket 逻辑处理函数
  */
-export type SocketResolveFunc = (socket: WS.WebSocket, request: IncomingMessage, clientId?: string) => void;
+export type SocketResolveFunc = (socket: WS.WebSocket, request: IncomingMessage, options?: SocketReslrFuncOptions) => void;
 
 /**
  * 构造器传参
@@ -54,10 +59,10 @@ export interface WsCtrlOptions {
   port: number;
   secure: boolean;
 
-  // /**
-  //  * 消息体数据，是否使用 stomp 协议，默认为 false
-  //  */
-  // stomp?: boolean; // TODO: 还没想好怎么暴露给用户使用
+  /**
+   * 消息体数据，是否使用 stomp 协议，默认为 false
+   */
+  stomp?: boolean;
 
   /**
    * 自定义 socket 逻辑处理函数
@@ -72,7 +77,7 @@ export interface WsCtrlOptions {
  * websocket 服务端相关操作的二次封装，class 类
  */
 export default class WsCtrl {
-  // private _useStompMsg: boolean;
+  private _useStompMsg: boolean;
   private _host: string; // 主机名，仅为了打印输出
   private _port: number; // 端口，仅为了打印输出
   private _secure: boolean; // 协议安全，仅为了打印输出
@@ -85,15 +90,15 @@ export default class WsCtrl {
    */
   constructor(options: WsCtrlOptions) {
     const {
-      // stomp = false,
+      stomp = false, //
       host,
       port,
-      secure,
+      secure = false,
       server,
-      resolve,
+      resolve = _defaultResolveFunc,
     } = options;
     // // useStompMsg
-    // this._useStompMsg = !!stomp;
+    this._useStompMsg = !!stomp;
     this._host = host;
     this._port = port;
     this._secure = secure;
@@ -103,10 +108,10 @@ export default class WsCtrl {
     this._baseServer = server;
     // logic resolve function
     const _resolve = typeof resolve === 'function' ? resolve : _defaultResolveFunc;
-    this._resolveFunc = function (socket: WS.WebSocket, request: IncomingMessage, clientId?: string) {
+    this._resolveFunc = function (socket: WS.WebSocket, request: IncomingMessage, options?: SocketReslrFuncOptions) {
       try {
         const funcCtx = socket; // 函数执行上下文 context
-        _resolve.call(funcCtx, socket, request, clientId);
+        _resolve.call(funcCtx, socket, request, options);
       } catch (error) {
         Printer.error(LOGFLAG_WS, 'Failed to exec socket logic resolveFunc:\n', error);
       }
@@ -130,6 +135,7 @@ export default class WsCtrl {
       return;
     }
     const resolveFunc = this._resolveFunc;
+    const stomp = this._useStompMsg;
     //
     if (server && _isHttpOrHttpsServer(server)) {
       this._baseServer = server; // 传入的 server 参数如果存在，则直接覆盖老的 server 参数
@@ -164,8 +170,11 @@ export default class WsCtrl {
       const { remoteAddress, remotePort } = request?.socket || {};
       const clientId = remoteAddress ? `${remoteAddress}:${remotePort || ++this._clientIndex}` : this._autoCreateClientId();
       Printer.log(LOGFLAG_WS, logPrefix, 'Socket client connected!', Colors.gray(`clientId=[${clientId}]`), Colors.gray(`time=${getTimeNowStr()}`));
-      // socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
-      resolveFunc(socket, request, clientId);
+      /**
+       * 调用自定义函数
+       * socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
+       */
+      resolveFunc(socket, request, { clientId, stomp });
       //
     });
 
@@ -176,7 +185,7 @@ export default class WsCtrl {
 
     // 2.5.监听 close 关闭事件
     this._wsSvr.on('close', function close() {
-      Printer.log(LOGFLAG_WS, logPrefix, Colors.gray(getTimeNowStr()), 'WebSocket server closed!');
+      Printer.log(LOGFLAG_WS, logPrefix, 'WebSocket server was closed!');
     });
     //
   }
@@ -249,26 +258,35 @@ export default class WsCtrl {
  * @param {WS.WebSocket} socket
  * @param {IncomingMessage} request
  */
-function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, clientId?: string) {
-  clientId = clientId || request.socket.remoteAddress;
+function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, options?: SocketReslrFuncOptions) {
+  const { clientId: cid, stomp } = options || {};
+  const clientId = cid || request.socket.remoteAddress;
   const clientName = `[${clientId}]`;
   const logTail = Colors.gray(`from ${clientName}`);
   const logName = Colors.gray('socket:');
 
   // ★ send a test msg
-  socket.send(`Hello, client! ${clientName}`);
+  socket.send(JSON.stringify({ success: true, data: `WsServer: Connection established! Hello, client! ${clientName}` }));
 
   // ★ message
   socket.on('message', (message: any, isBinary: boolean) => {
     const recived = Buffer.isBuffer(message) ? message?.toString() : message;
-    Printer.log(LOGFLAG_WS, logName, `Received message <= "${Colors.green(recived)}"`, isBinary ? Colors.gray('binary') : '', logTail);
+    let recivedData: any | StompMsg = recived;
+    if (stomp) {
+      recivedData = parseStompMsg(recived);
+      Printer.log(LOGFLAG_WS, logName, 'Received stomp message', logTail);
+      Printer.log(LOGFLAG_WS, logName, '<= stompData:', recivedData);
+    } else {
+      Printer.log(LOGFLAG_WS, logName, `Received message <= "${Colors.green(recived)}"`, isBinary ? Colors.gray('binary') : '', logTail);
+    }
     const msgData = {
       success: true,
-      data: `SocketServer: I have recived your message("${message?.toString()}")`,
+      data: `WsServer: I've recived your message(${JSON.stringify(recivedData)})`,
     };
     Printer.log(LOGFLAG_WS, logName, `Send response to ${Colors.gray(clientName)} =>`, msgData);
     // send response
     socket.send(JSON.stringify(msgData));
+    console.log('\n');
   });
 
   // open

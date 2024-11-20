@@ -134,6 +134,9 @@ export interface MhkRCWsConfig {
    * 是否启用 stomp 协议
    */
   stomp?: boolean;
+
+  // others
+  [k: string]: any;
 }
 
 /**
