@@ -2,6 +2,7 @@
 import https from 'https';
 import http, { IncomingMessage } from 'http';
 import { promisify } from 'util';
+import { isArrayBuffer } from 'util/types';
 import Colors from 'color-cc';
 import * as WS from 'ws';
 import { PKG_NAME } from '../consts';
@@ -135,44 +136,54 @@ export default class WsCtrl {
     }
     const { isSecure = this._secure, host = this._host, port = this._port } = _getBaseServerInfo(this._baseServer);
     const protocol = isSecure ? 'wss' : 'ws';
-    //
-    // 1.创建对应的 WebsocketServer 实例
-    // 这里允许两种方案二选一（port+host 和 server）因为是冲突的，所以传 server 就不传 host/port
+
+    /**
+     * 1.创建对应的 WebsocketServer 实例
+     * 这里允许两种方案二选一（port+host 和 server）因为是冲突的，所以传 server 就不传 host/port
+     */
     this._wsSvr = new WS.WebSocketServer({ server: this._baseServer });
-    //
-    // 2.注册 wss 上的基础事件 (listerning,headers,connection,error,close)
+
+    const logPrefix = Colors.gray('WsServer:');
+
+    /**
+     * 2.注册 wss 上的基础事件 (listerning,headers,connection,error,close)
+     */
     // 2.1.监听 WebSocket 服务器开始监听连接
     this._wsSvr.on('listening', function listening() {
-      Printer.log(LOGFLAG_WS, 'WebSocket server is listening', `${protocol}://${host}:${port}`);
+      Printer.log(LOGFLAG_WS, logPrefix, '🚀 WebSocket server is listening', Colors.cyan(`${protocol}://${host}:${port}`));
     });
+
     // 2.2.监听 headers 事件
     this._wsSvr.on('headers', function headers(headers, req) {
-      Debugger.log('Headers:', headers);
-      // 添加或修改响应头
-      headers.push(`X-Powered-By: ${PKG_NAME}`);
+      Debugger.log(LOGFLAG_WS, logPrefix, 'Headers:', headers);
+      headers.push(`X-Powered-By: ${PKG_NAME}`); // 添加或修改响应头
     });
+
     // 2.3.监听 connection 事件：当有新的客户端连接时的处理
     this._wsSvr.on('connection', (socket: WS.WebSocket, request: IncomingMessage) => {
       const { remoteAddress, remotePort } = request?.socket || {};
-      const clientId = remoteAddress ? `${remoteAddress}:${remotePort}__${getTimeNowStr()}` : this._autoCreateClientId();
-      Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId="${clientId}"`));
+      const clientId = remoteAddress ? `${remoteAddress}:${remotePort || ++this._clientIndex}` : this._autoCreateClientId();
+      Printer.log(LOGFLAG_WS, logPrefix, 'Socket client connected!', Colors.gray(`clientId=[${clientId}]`), Colors.gray(`time=${getTimeNowStr()}`));
       // socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
       resolveFunc(socket, request, clientId);
       //
     });
+
     // 2.4.监听 error 错误事件
     this._wsSvr.on('error', function error(err) {
-      Printer.error(LOGFLAG_WS, 'WebSocket server error:', err);
+      Printer.error(LOGFLAG_WS, logPrefix, 'WebSocket server error:', err);
     });
+
     // 2.5.监听 close 关闭事件
     this._wsSvr.on('close', function close() {
-      Printer.log(LOGFLAG_WS, 'WebSocket server closed');
+      Printer.log(LOGFLAG_WS, logPrefix, Colors.gray(getTimeNowStr()), 'WebSocket server closed!');
     });
     //
   }
 
   /**
    * 关闭/强行关闭 WebSocket 服务器
+   * - 注意：这里并不会对其 baseServer 进行关闭，只是关闭了 WebSocket 服务器（baseServer的关闭和销毁操作放到另外的地方）
    * @param {boolean} forceClose 是否强制关闭
    */
   private async _close(forceClose = false) {
@@ -198,7 +209,7 @@ export default class WsCtrl {
     const closeAsync = promisify(this._wsSvr.close).bind(this._wsSvr);
     try {
       await closeAsync();
-      this._wsSvr = null;
+      this._wsSvr = null; // 成功销毁之后需要进行置空处理
       Printer.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
     } catch (error) {
       Printer.error(LOGFLAG_WS, `${forceClose ? 'Destory' : 'Close'} WebSocket server failed!\n`, error);
@@ -220,8 +231,8 @@ export default class WsCtrl {
    * 强行/强制的关闭一个打开的套接字，并释放所有相关资源，且不考虑进行正常的关闭握手过程
    * - 立即关闭连接，不等待未发送的数据被发送或接收
    * - 释放所有与套接字关联的资源
-   * - 关闭连接后，会触发 close 事件
-   * - 如果有未处理的错误，可能会触发 error 事件
+   * - 关闭连接后，会触发 wsSvr 的 close 事件
+   * - 如果有未处理的错误，可能会触发 wsSvr 的 error 事件
    */
   public async destory() {
     return await this._close(true);
@@ -242,42 +253,65 @@ function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, cli
   clientId = clientId || request.socket.remoteAddress;
   const clientName = `[${clientId}]`;
   const logTail = Colors.gray(`from ${clientName}`);
-  socket.send(`Hi, ${clientName}`);
+  const logName = Colors.gray('socket:');
+
+  // ★ send a test msg
+  socket.send(`Hello, client! ${clientName}`);
+
+  // ★ message
+  socket.on('message', (message: any, isBinary: boolean) => {
+    const recived = Buffer.isBuffer(message) ? message?.toString() : message;
+    Printer.log(LOGFLAG_WS, logName, `Received message <= "${Colors.green(recived)}"`, isBinary ? Colors.gray('binary') : '', logTail);
+    const msgData = {
+      success: true,
+      data: `SocketServer: I have recived your message("${message?.toString()}")`,
+    };
+    Printer.log(LOGFLAG_WS, logName, `Send response to ${Colors.gray(clientName)} =>`, msgData);
+    // send response
+    socket.send(JSON.stringify(msgData));
+  });
+
   // open
   socket.on('open', () => {
-    Printer.log(LOGFLAG_WS, `Client ${Colors.gray(clientId)} open.`, logTail);
+    Printer.log(LOGFLAG_WS, logName, `Client ${Colors.gray(clientId)} open.`, logTail);
   });
-  // message
-  socket.on('message', (message: any, isBinary: boolean) => {
-    Printer.log(LOGFLAG_WS, `Received message => ${message}`, isBinary ? Colors.gray('binary') : '', logTail, '\n');
-    socket.send(`SocketServer: I have recived your message -> ${message}`); // send response
-  });
+
   // upgrade
   socket.on('upgrade', (request: IncomingMessage) => {
     const clientAddr = request.socket.remoteAddress;
-    Printer.log(LOGFLAG_WS, `Client ${clientAddr} upgraded.`, logTail);
+    Printer.log(LOGFLAG_WS, logName, `Client ${clientAddr} upgraded.`, logTail);
   });
+
   // ping
   socket.on('ping', (data: Buffer) => {
-    Printer.log(LOGFLAG_WS, `Received ping => ${data}`, logTail);
+    Printer.log(LOGFLAG_WS, logName, `Received ping => ${data?.toString() || ''}`, logTail);
     socket.pong(`Pong: ${data?.toString()}`); // pong
   });
+
   // pong
   socket.on('pong', (data: Buffer) => {
-    Printer.log(LOGFLAG_WS, `Received pong => ${data?.toString()}`, logTail);
+    Printer.log(LOGFLAG_WS, logName, `Received pong => ${data?.toString() || ''}`, logTail);
   });
+
   // error
   socket.on('error', (err: Error) => {
-    Printer.error(LOGFLAG_WS, `CLient error: ${err.message}`, logTail);
+    const errMsg = err?.message || err?.toString() || 'unknow error';
+    Printer.error(LOGFLAG_WS, logName, `CLient error: ${Colors.red(errMsg)}`, logTail);
+    Printer.error(LOGFLAG_WS, err, '\n');
   });
+
   // unexpected-response
   socket.on('unexpected-response', (request: IncomingMessage, response: IncomingMessage) => {
-    Printer.error(LOGFLAG_WS, `CLient unexpected-response: ${response.statusCode} ${response.statusMessage}`, logTail);
+    const exceptDetail = `${response.statusCode} ${response.statusMessage}`;
+    Printer.error(LOGFLAG_WS, logName, `CLient unexpected-response: ${Colors.red(exceptDetail)}`, logTail, '\n');
   });
+
   // close
   socket.on('close', (code: number, reason: Buffer) => {
-    Printer.log(LOGFLAG_WS, `Client close connection.(with code=${code},reason=${reason.toString()})`, logTail);
+    const closeDetail = `code=${code},reason=${reason.toString() || 'none'}`;
+    Printer.log(LOGFLAG_WS, logName, `Client close connection.(${Colors.yellow(closeDetail)})`, logTail, '\n');
   });
+  //
 }
 
 /**

@@ -4,26 +4,54 @@
     <title>WebSocket Test</title>
   </head>
   <body>
+    <p>WebSocket Test</p>
+    <div>
+      <button id="j-btn-send">sendMsg</button>
+    </div>
     <script>
+      // 按钮点击发送消息
+      let sendFunc = null;
+      function bindSendBtn(soeket) {
+        var btn = document.getElementById('j-btn-send');
+        sendFunc = function () {
+          socket.send(`RandNum:${Math.random() * 100}`);
+        };
+        btn.addEventListener('click', sendFunc);
+      }
+      function unbindSendBtn() {
+        var btn = document.getElementById('j-btn-send');
+        btn.removeEventListener('click', sendFunc);
+      }
+
       // 本文件可以直接浏览器打开方式进行测试，而无需使用 http 服务器，（只要 WebSocket 服务器正常运行着就行，对于 client 没要求）
       // ts-node ./test-ws.ts 即可启动一个 WebSocket 服务器
-      var socket = new WebSocket('ws://0.0.0.0:8080');
+      var socket = new WebSocket('ws://127.0.0.1:8080/websocket');
 
       socket.onopen = function () {
         console.log('[socket-client]: Connection established');
-        socket.send('Hello, server!');
+        socket.send('Hello, SocketServer!');
+        bindSendBtn(socket);
       };
 
+      setTimeout(function () {
+        console.log('\nSend ping to server in 1s...');
+        socket.send('ping');
+      }, 1000);
+
       socket.onmessage = function (event) {
-        console.log('[socket-client]: Recieve message from server =>', '"', event.data, '"');
+        console.log('\n');
+        console.log('[socket-client]: Recieve message from server => msg:', event.data);
+        console.log('[socket-client]: Recieve message from server => obj:', event);
       };
 
       socket.onclose = function () {
         console.log('[socket-client]: Connection closed');
+        unbindSendBtn();
       };
 
       socket.onerror = function (error) {
         console.error('[socket-client]: Error detected => ' + error);
+        unbindSendBtn();
       };
     </script>
   </body>

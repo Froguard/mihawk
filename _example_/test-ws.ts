@@ -22,3 +22,16 @@ const ws = new WsCtrl({
   // },
 });
 ws.start();
+
+// 6s 后关闭
+setTimeout(async () => {
+  //
+  // close ws server
+  await ws.close();
+  // close http server
+  server.close();
+  //
+  //
+  // force quit process
+  // process.exit(0);
+}, 6000);
