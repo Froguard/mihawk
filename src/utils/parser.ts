@@ -39,6 +39,14 @@ export interface StompMsg {
  * }
  */
 export function parseStompMsg(stmopDataRaw: string) {
+  if (!stmopDataRaw || typeof stmopDataRaw !== 'string') {
+    return {
+      command: 'UnkonwnCommand',
+      headers: null,
+      body: 'Exception: Empty or invalid stomp message, check it plz!',
+    };
+  }
+  //
   const msg: StompMsg = {
     command: '',
     headers: {},

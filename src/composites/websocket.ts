@@ -271,8 +271,8 @@ function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, opt
 
   // ★ message
   socket.on('message', (message: any, isBinary: boolean) => {
-    const recived = Buffer.isBuffer(message) ? message?.toString() : message;
-    let recivedData: any | StompMsg = recived;
+    const recived = Buffer.isBuffer(message) ? message?.toString() : typeof message === 'string' ? message : JSON.stringify(message);
+    let recivedData: string | StompMsg = recived;
     if (stomp) {
       recivedData = parseStompMsg(recived);
       Printer.log(LOGFLAG_WS, logName, 'Received stomp message', logTail);
@@ -280,12 +280,14 @@ function _defaultResolveFunc(socket: WS.WebSocket, request: IncomingMessage, opt
     } else {
       Printer.log(LOGFLAG_WS, logName, `Received message <= "${Colors.green(recived)}"`, isBinary ? Colors.gray('binary') : '', logTail);
     }
+    // struct response data
+    const recivedDataStr = typeof recivedData === 'string' ? recivedData : JSON.stringify(recivedData);
     const msgData = {
       success: true,
-      data: `WsServer: I've recived your message(${JSON.stringify(recivedData)})`,
+      data: `WsServer: I've recived your message(${recivedDataStr})`,
     };
-    Printer.log(LOGFLAG_WS, logName, `Send response to ${Colors.gray(clientName)} =>`, msgData);
     // send response
+    Printer.log(LOGFLAG_WS, logName, `Send response to ${Colors.gray(clientName)} =>`, msgData);
     socket.send(JSON.stringify(msgData));
     console.log('\n');
   });
