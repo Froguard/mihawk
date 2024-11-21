@@ -27,7 +27,12 @@ test.ts
 *.spec.ts
 *.spec.js
 
-# demo directories
+# demo & demo directories
+demo.js
+demo.cjs
+demo.json
+demo.json5
+demo.ts
 example/
 _example_/
 __example__/

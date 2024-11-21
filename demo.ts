@@ -2,7 +2,7 @@
  * 临时测试代码
  * 命令行中执行 yarn dev 即可
  */
-// import { singleSelectInCli } from '../src/utils/cli';
+// import { singleSelectInCli } from './src/utils/cli';
 // import deepMerge from 'deepmerge';
 
 // async function main() {

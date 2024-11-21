@@ -18,8 +18,7 @@
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
   "scripts": {
-    "dev": "ts-node ./_example_/demo.ts",
-    "dev2": "nodemon --config './.nodemonrc.json' ./_example_/demo.ts",
+    "dev": "ts-node ./demo.ts",
     "dev:bin": "ts-node ./bin/index.ts",
     "dev:bin:init": "ts-node ./bin/index.ts init",
     "-------------------build-------------------": "echo '------------------- build -------------------'",
