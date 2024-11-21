@@ -342,7 +342,7 @@ export type WsWebSocket = WS.WebSocket;
 
 /**
  * ws 实例
- * alias for WS.WebSocket
+ * alias for WS.WebSocket (Same equals to WsWebSocket)
  * - 便于理解，推荐直接使用 Scoket 这个类型
  */
 export type Socket = WS.WebSocket; // alias
