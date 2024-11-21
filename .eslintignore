@@ -2,6 +2,7 @@ tests/
 __tests__/
 coverage/
 __coverage__/
+_example_/mocks
 .*rc.js
 *.config.js
 node_modules

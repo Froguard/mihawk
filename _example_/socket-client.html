@@ -26,6 +26,7 @@
       // 本文件可以直接浏览器打开方式进行测试，而无需使用 http 服务器，（只要 WebSocket 服务器正常运行着就行，对于 client 没要求）
       // ts-node ./test-ws.ts 即可启动一个 WebSocket 服务器
       var socket = new WebSocket('ws://127.0.0.1:9527/websocket');
+      // var socket = new WebSocket('ws://192.168.0.223:9527/websocket');
 
       socket.onopen = function () {
         console.log('[socket-client]: Connection established, will send test msg "Hello, SocketServer!" to Server...');
