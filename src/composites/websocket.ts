@@ -11,6 +11,7 @@ import { Debugger, Printer } from '../utils/print';
 // import { delAddrProtocol } from '../utils/str';
 import { getTimeNowStr } from '../utils/date';
 import { /*getAddressByServer, getPortByServer, */ getAddrInfoByServer } from '../utils/server';
+import { getMyIp, isLocalHost, supportLocalHost } from '../utils/net';
 
 const LOGFLAG_WS = `${Colors.cyan('[WS]')}${Colors.gray(':')}`;
 
@@ -130,7 +131,7 @@ export default class WsCtrl {
   /**
    * start 函数
    */
-  public async start(server?: WS.ServerOptions['server']) {
+  public async start(server?: WS.ServerOptions['server'], isRestart?: boolean) {
     if (this._wsSvr) {
       Printer.log(LOGFLAG_WS, 'WS server is already running.');
       return;
@@ -143,26 +144,32 @@ export default class WsCtrl {
     }
     const { isSecure = this._secure, host = this._host, port = this._port } = _getBaseServerInfo(this._baseServer);
     const protocol = isSecure ? 'wss' : 'ws';
-
+    const hostFix = host === '0.0.0.0' ? '127.0.0.1' : host;
     /**
      * 1.创建对应的 WebsocketServer 实例
      * 这里允许两种方案二选一（port+host 和 server）因为是冲突的，所以传 server 就不传 host/port
      */
     this._wsSvr = new WS.WebSocketServer({ server: this._baseServer });
-
-    const logPrefix = Colors.gray('WsServer:');
+    // const logPrefix = Colors.gray('WsServer:');
 
     /**
      * 2.注册 wss 上的基础事件 (listerning,headers,connection,error,close)
      */
     // 2.1.监听 WebSocket 服务器开始监听连接
     this._wsSvr.on('listening', function listening() {
-      Printer.log(LOGFLAG_WS, logPrefix, '🚀 WebSocket server is listening', Colors.cyan(`${protocol}://${host}:${port}`));
+      Printer.log(/*LOGFLAG_WS, */ `🚀 ${Colors.green(`${isRestart ? 'Restart' : 'Start'} mock-socket-server success!`)}`);
+      !isRestart && Printer.log(`Mock Socket Server address:`);
+      Printer.log(/*LOGFLAG_WS, */ `${Colors.gray('-')} ${Colors.cyan(`${protocol}://${hostFix}:${port}`)}`);
+      if (supportLocalHost(host)) {
+        const addr2 = `${protocol}://${getMyIp()}:${port}`;
+        Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
+      }
+      console.log();
     });
 
     // 2.2.监听 headers 事件
     this._wsSvr.on('headers', function headers(headers, req) {
-      Debugger.log(LOGFLAG_WS, logPrefix, 'Headers:', headers);
+      Debugger.log(LOGFLAG_WS, 'Headers:', headers);
       headers.push(`X-Powered-By: ${PKG_NAME}`); // 添加或修改响应头
     });
 
@@ -170,7 +177,7 @@ export default class WsCtrl {
     this._wsSvr.on('connection', (socket: WS.WebSocket, request: IncomingMessage) => {
       const { remoteAddress, remotePort } = request?.socket || {};
       const clientId = remoteAddress ? `${remoteAddress}:${remotePort || ++this._clientIndex}` : this._autoCreateClientId();
-      Printer.log(LOGFLAG_WS, logPrefix, 'Socket client connected!', Colors.gray(`clientId=[${clientId}]`), Colors.gray(`time=${getTimeNowStr()}`));
+      Printer.log(LOGFLAG_WS, 'Socket client connected!', Colors.gray(`clientId=[${clientId}]`), Colors.gray(`time=${getTimeNowStr()}`));
       /**
        * 调用自定义函数
        * socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
@@ -181,12 +188,12 @@ export default class WsCtrl {
 
     // 2.4.监听 error 错误事件
     this._wsSvr.on('error', function error(err) {
-      Printer.error(LOGFLAG_WS, logPrefix, 'WebSocket server error:', err);
+      Printer.error(LOGFLAG_WS, 'WebSocket server error:', err);
     });
 
     // 2.5.监听 close 关闭事件
     this._wsSvr.on('close', function close() {
-      Printer.log(LOGFLAG_WS, logPrefix, 'WebSocket server was closed!');
+      Debugger.log(LOGFLAG_WS, 'WebSocket server was closed!');
     });
     //
   }
@@ -196,7 +203,7 @@ export default class WsCtrl {
    * - 注意：这里并不会对其 baseServer 进行关闭，只是关闭了 WebSocket 服务器（baseServer的关闭和销毁操作放到另外的地方）
    * @param {boolean} forceClose 是否强制关闭
    */
-  private async _close(forceClose = false) {
+  async _close(forceClose = false) {
     if (!this._wsSvr) {
       Printer.log(LOGFLAG_WS, 'WebSocket server is not running.');
       return;
@@ -206,9 +213,9 @@ export default class WsCtrl {
     try {
       if (clients?.size) {
         if (forceClose) {
-          clients?.forEach(client => client.terminate()); // destory
+          clients?.forEach(client => client?.terminate()); // destory
         } else {
-          clients?.forEach(client => client.close()); // close
+          clients?.forEach(client => client?.close()); // close
         }
       }
     } catch (error) {
@@ -220,7 +227,7 @@ export default class WsCtrl {
     try {
       await closeAsync();
       this._wsSvr = null; // 成功销毁之后需要进行置空处理
-      Printer.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
+      Debugger.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
     } catch (error) {
       Printer.error(LOGFLAG_WS, `${forceClose ? 'Destory' : 'Close'} WebSocket server failed!\n`, error);
     }
@@ -347,6 +354,7 @@ function _getBaseServerInfo(server: http.Server | https.Server) {
   const { port, address } = getAddrInfoByServer(server) || {};
   return { isSecure, protocol, host: address, port };
 }
+
 /**
  * 判断 server 是否为 http/https 服务器实例之一
  * @param {unknown} server

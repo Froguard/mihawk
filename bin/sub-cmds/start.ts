@@ -119,13 +119,13 @@ async function _start(ctrl: Controller, config: Loosify<MihawkRC>, isRestart?: b
 async function _restart(ctrl: Controller, config: Loosify<MihawkRC>) {
   if (typeof ctrl.serverHandle?.close === 'function') {
     console.log();
-    Printer.log(`🔄 ${Colors.magenta('Will restart the Mock-Server...')}`);
+    Printer.log(`🔄 ${Colors.magenta('Will restart the Mock-Tool...')}`);
     // close current one
     await ctrl.serverHandle?.close();
     // wait a while, mak sure server is closed!
     await sleep(0);
     // start main again
-    Printer.log(Colors.gray('🔜 The Mock-Server is ready to lanuch...'));
+    Printer.log(Colors.gray('🔜 The Mock-Tool is ready to lanuch...'));
     await _start(ctrl, config, true);
     //
   }

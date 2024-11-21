@@ -211,6 +211,9 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
     // - socketConfig
     if (typeof options.socketConfig !== 'object') {
       options.socketConfig = {
+        host: options.host,
+        port: options.port,
+        secure: options.useHttps,
         stomp: false,
       };
     }

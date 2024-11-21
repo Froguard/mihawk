@@ -22,12 +22,13 @@ import mdwHdCache from './middlewares/cache';
 import mdw404 from './middlewares/404';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
-import { isPortInUse, getMyIp } from './utils/net';
+import { isPortInUse, getMyIp, isLocalHost, supportLocalHost } from './utils/net';
 import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
 import WsCtrl, { SocketResolveFunc } from './composites/websocket';
+import { sleep } from './utils/async';
 import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
@@ -242,11 +243,13 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     const existedCount = existedRoutePaths.length;
     !isRestart && Printer.log(`Detected-Routes(${Colors.green(existedCount)}):`, existedCount ? existedRoutePaths : Colors.grey('empty'));
     //
-    const addr2 = `${protocol}://${getMyIp()}:${port}`;
     !isRestart && Printer.log(`Mock Server address:`);
     Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr1)}`);
-    Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
-    console.log();
+    if (supportLocalHost(host)) {
+      const addr2 = `${protocol}://${getMyIp()}:${port}`;
+      Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
+    }
+    !wsController && console.log();
   });
 
   // enhance server: add server.destory() method
@@ -260,12 +263,13 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   let wsController: WsCtrl | null = null;
   if (useWS) {
-    const { stomp } = socketConfig as MhkRCWsConfig;
+    const { stomp } = (socketConfig as MhkRCWsConfig) || {};
     let resolveFunc: SocketResolveFunc | null = null;
     if (existsSync(socketFilePath)) {
       resolveFunc = await loadLogicFile<SocketResolveFunc>(socketFilePath, { noLogPrint: true });
       !isRestart && Printer.log(Colors.success('Load socket logic file success!'), Colors.gray(unixifyPath(relPathToCWD(socketFilePath))));
     }
+    // create
     wsController = new WsCtrl({
       stomp,
       server,
@@ -274,6 +278,8 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       secure: useHttps,
       resolve: resolveFunc,
     });
+    // start
+    wsController.start(null, isRestart); // 不加 await
   }
 
   /**
@@ -286,18 +292,35 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
      */
     destory: async () => {
       // 1.destory websocket server
-      if (typeof wsController?.destory === 'function') {
-        await wsController.destory();
-        wsController = null;
-        Printer.log('Websocket server has been destoryed.');
+      if (wsController) {
+        //
+        Debugger.log('Detected websocket server existed, will destory it...');
+        const destoryWsSvr = (wsController as WsCtrl)?.destory?.bind(wsController);
+        if (typeof destoryWsSvr === 'function') {
+          try {
+            await destoryWsSvr();
+            wsController = null; // set null
+            Printer.log('Websocket server has been destoryed.');
+          } catch (error) {
+            Printer.error(`Destory websocket server failed!\n`, error);
+          }
+        }
       }
+      //
+      await sleep(0);
+      //
       // 2.destory http/https server
       if (server) {
-        const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory;
+        Debugger.log('Detected http/https server existed, will destory it...');
+        const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory?.bind(server);
         if (typeof destoryServer === 'function') {
-          await destoryServer();
-          server = null;
-          Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
+          try {
+            await destoryServer();
+            server = null; // set null
+            Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
+          } catch (error) {
+            Printer.error(`Destory Server Failed!\n`, error);
+          }
         }
       }
     },
@@ -307,19 +330,31 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
      */
     close: async () => {
       // 1.close websocket server
-      if (typeof wsController?.close === 'function') {
-        await wsController.close();
-        wsController = null;
-        Printer.log(Colors.success('Close websocket server success!'));
+      if (wsController) {
+        Debugger.log('Detected websocket server existed, will close it...');
+        const closeWsSvr = wsController?.close?.bind(wsController);
+        if (typeof closeWsSvr === 'function') {
+          try {
+            await closeWsSvr();
+            wsController = null; // set null
+            Printer.log(Colors.success('Close websocket server success!'));
+          } catch (error) {
+            Printer.error(`Close websocket server failed!\n`, error);
+          }
+        }
       }
+      //
+      await sleep(0);
+      //
       // 2.close http/https Server
       if (server) {
+        Debugger.log('Detected http/https server existed, will destory it...');
         typeof server?.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
         typeof server?.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
         const closeServerAsync = promisify(server.close).bind(server);
         try {
           await closeServerAsync();
-          server = null;
+          server = null; // set null
           Printer.log(Colors.success('Close Mock-Server success!'));
         } catch (error) {
           Printer.error(`Close Server Failed!\n`, error);

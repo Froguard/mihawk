@@ -91,3 +91,21 @@ export function getMyIp(ipv6: boolean = false) {
   }
   return LOCAL_HOST;
 }
+
+/**
+ * 判断地址是否为 localhost
+ * @param {string} host
+ * @returns {boolean}
+ */
+export function isLocalHost(host: string) {
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+}
+
+/**
+ * 是否等于 或者包含 localhost
+ * @param {string} host
+ * @returns {boolean}
+ */
+export function supportLocalHost(host: string) {
+  return isLocalHost(host) || '0.0.0.0' === host;
+}
