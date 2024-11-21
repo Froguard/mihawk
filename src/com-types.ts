@@ -332,6 +332,7 @@ export type SubCmdCallback<T = any> = (cliArg?: CliArgs<T>) => Promise<void>;
  * - 【注意】
  */
 export type WsWebScketServer = WS.WebSocketServer;
+export type SocketServer = WS.WebSocketServer; // alias
 
 /**
  * ws 实例（webSocket）
@@ -339,12 +340,6 @@ export type WsWebScketServer = WS.WebSocketServer;
  * - 【注意】这里和 WebsocketServer 的实例，有区别，两者不是一个东西
  */
 export type WsWebSocket = WS.WebSocket;
-
-/**
- * ws 实例
- * alias for WS.WebSocket (Same equals to WsWebSocket)
- * - 便于理解，推荐直接使用 Scoket 这个类型
- */
 export type Socket = WS.WebSocket; // alias
 
 /**
