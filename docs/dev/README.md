@@ -130,7 +130,7 @@ Greek:
 - [x] phi (Φ, φ)
 - [x] chi (Χ, χ)
 - [x] psi (Ψ, ψ)
-- [ ] omega (Ω, ω)
+- [x] omega (Ω, ω)
 
 Others:
 

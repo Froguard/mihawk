@@ -2,49 +2,17 @@
 import https from 'https';
 import http, { IncomingMessage } from 'http';
 import { promisify } from 'util';
-import { isArrayBuffer } from 'util/types';
 import Colors from 'color-cc';
 import * as WS from 'ws';
 import { PKG_NAME } from '../consts';
 import { parseStompMsg, StompMsg } from '../utils/parser';
 import { Debugger, Printer } from '../utils/print';
-// import { delAddrProtocol } from '../utils/str';
 import { getTimeNowStr } from '../utils/date';
-import { /*getAddressByServer, getPortByServer, */ getAddrInfoByServer } from '../utils/server';
-import { getMyIp, isLocalHost, supportLocalHost } from '../utils/net';
+import { getAddrInfoByServer } from '../utils/server';
+import { getMyIp, supportLocalHost } from '../utils/net';
+import type { SocketResolveFunc, SocketReslrFuncOptions } from '../com-types';
 
 const LOGFLAG_WS = `${Colors.cyan('[WS]')}${Colors.gray(':')}`;
-
-/**
- * wss 实例（web-sokcet-server）
- * WebSocketServer 实例，指的是 server 实例
- * - 【注意】
- */
-export type WsWebScketServer = WS.WebSocketServer;
-
-/**
- * ws 实例（webSocket）
- * WebSocket 实例
- * - 【注意】这里和 WebsocketServer 的实例，有区别，两者不是一个东西
- */
-export type WsWebSocket = WS.WebSocket;
-
-/**
- * ws 实例
- * alias for WS.WebSocket
- * - 便于理解，推荐直接使用 Scoket 这个类型
- */
-export type Socket = WS.WebSocket; // alias
-
-export interface SocketReslrFuncOptions {
-  stomp?: boolean;
-  clientId?: string;
-}
-
-/**
- * socket 逻辑处理函数
- */
-export type SocketResolveFunc = (socket: WS.WebSocket, request: IncomingMessage, options?: SocketReslrFuncOptions) => void;
 
 /**
  * 构造器传参

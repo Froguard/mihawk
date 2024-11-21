@@ -1,4 +1,6 @@
 'use strict';
+import * as WS from 'ws';
+import type { IncomingMessage } from 'http';
 import type { ParsedArgs } from 'minimist';
 
 /**
@@ -324,6 +326,38 @@ export type CliArgs<T extends Record<string, any> = any> = Loosify<ParsedArgs & 
  * subCmd 主逻辑对应的回调函数
  */
 export type SubCmdCallback<T = any> = (cliArg?: CliArgs<T>) => Promise<void>;
+/**
+ * wss 实例（web-sokcet-server）
+ * WebSocketServer 实例，指的是 server 实例
+ * - 【注意】
+ */
+export type WsWebScketServer = WS.WebSocketServer;
+
+/**
+ * ws 实例（webSocket）
+ * WebSocket 实例
+ * - 【注意】这里和 WebsocketServer 的实例，有区别，两者不是一个东西
+ */
+export type WsWebSocket = WS.WebSocket;
+
+/**
+ * ws 实例
+ * alias for WS.WebSocket
+ * - 便于理解，推荐直接使用 Scoket 这个类型
+ */
+export type Socket = WS.WebSocket; // alias
+
+/**
+ * SocketResolveFunc 逻辑处理函数的 options 参数
+ */
+export interface SocketReslrFuncOptions {
+  stomp?: boolean;
+  clientId?: string;
+}
+/**
+ * socket 逻辑处理函数
+ */
+export type SocketResolveFunc = (socket: WS.WebSocket, request: IncomingMessage, options?: SocketReslrFuncOptions) => void;
 
 //
 //

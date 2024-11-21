@@ -22,14 +22,14 @@ import mdwHdCache from './middlewares/cache';
 import mdw404 from './middlewares/404';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
-import { isPortInUse, getMyIp, isLocalHost, supportLocalHost } from './utils/net';
+import { isPortInUse, getMyIp, supportLocalHost } from './utils/net';
 import { EnhancedServer, enhanceServer } from './utils/server';
 import { isObjStrict } from './utils/is';
 import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
-import WsCtrl, { SocketResolveFunc } from './composites/websocket';
+import WsCtrl from './composites/websocket';
 import { sleep } from './utils/async';
-import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC } from './com-types';
+import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC, SocketResolveFunc } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
 const PKG_ROOT_PATH = getRootAbsPath();

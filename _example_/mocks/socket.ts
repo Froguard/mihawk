@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http';
 import Colors from 'color-cc';
-import { WsWebSocket, SocketReslrFuncOptions } from '../src/composites/websocket';
+import { WsWebSocket, SocketReslrFuncOptions } from 'mihawk/com-types';
 
 /**
  * 默认的 resolve 函数
