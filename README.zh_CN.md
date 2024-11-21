@@ -59,7 +59,7 @@ mihawk --port=8888
 > 路由与文件的映射关系
 
 ```sh
-request    ： GET http://local:8888/a/b/c/d
+request    ： GET http://localhost:8888/a/b/c/d
 JSON-file  ： data/get/a/b/c/d.json
 mock-file  :  data/get/a/b/c/d.js
 ```
