@@ -24,8 +24,19 @@ export interface WsCtrlOptions {
    */
   server: https.Server | http.Server;
 
+  /**
+   * 监听地址
+   */
   host: string;
+
+  /**
+   * 监听端口
+   */
   port: number;
+
+  /**
+   * 是否使用 https 协议
+   */
   secure: boolean;
 
   /**
@@ -52,10 +63,11 @@ export default class WsCtrl {
   private _secure: boolean; // 协议安全，仅为了打印输出
   private _baseServer?: https.Server | http.Server;
   private _wsSvr?: WS.WebSocketServer | null; // 是一个 web socket sever 实例
-  private _resolveFunc: SocketResolveFunc; // 自定义处理逻辑对应的函数
   private _clientIndex: number = 0; // 客户端连接的索引
+  private _resolveFunc: SocketResolveFunc; // 自定义处理逻辑对应的函数
+
   /**
-   * 构造器
+   * new 操作构造器
    */
   constructor(options: WsCtrlOptions) {
     const {
@@ -205,7 +217,7 @@ export default class WsCtrl {
    * 关闭一个已经打开的套接字连接。它会尝试优雅地关闭连接，确保所有已发送的数据都被接收方接收
    * - 发送一个 FIN 包给对方，表示本端不再发送数据。
    * - 允许接收来自对端的数据，直到对端也关闭连接。
-   * - 关闭连接后，会触发 close 事件
+   * - 关闭连接后，会触发 wsSvr 的 close 事件
    */
   public async close() {
     return await this._close();
