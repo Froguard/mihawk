@@ -240,6 +240,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     !isRestart && Printer.log('Mock directory: ', Colors.gray(unixifyPath(mockDir)));
     const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
     Debugger.log('Existed routes by scann:', existedRoutes);
+    //
     let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
     existedRoutePaths.push(...Object.keys(routes));
     existedRoutePaths = dedupe(existedRoutePaths);
@@ -253,9 +254,11 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       const addr2 = `${protocol}://${getMyIp()}:${port}`;
       Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
     }
+    //
     if (useHttps && !isRestart) {
       Printer.log('🗝', Colors.gray(`You can download CA file for https dev, from url -> https://${getMyIp()}:${port}/.cert/ca.crt`));
     }
+    //
     !wsController && console.log();
   });
 
