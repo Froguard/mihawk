@@ -8,7 +8,7 @@ const port = 9527;
 export default {
   host,
   port,
-  https: false,
+  https: true,
   cors: true,
   cache: false,
   watch: true,

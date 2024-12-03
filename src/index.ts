@@ -15,6 +15,7 @@ import { formatOptionsByConfig } from './composites/rc';
 import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/loader';
 import { relPathToCWD, getRootAbsPath, unixifyPath, absifyPath } from './utils/path';
 import mdwFavicon from './middlewares/favicon';
+import mdwCertFileDown from './middlewares/cert-file';
 import mdwCommon from './middlewares/common';
 import mdwError from './middlewares/error';
 import mdwCors from './middlewares/cors';
@@ -143,6 +144,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   // middleware: https base ssl
   useHttps && app.use(mdwSSL({ hostname: host, port }));
 
+  // middleware: certificate authority file download
+  useHttps && app.use(mdwCertFileDown());
+
   // middleware: favicon
   app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
 
@@ -248,6 +252,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     if (supportLocalHost(host)) {
       const addr2 = `${protocol}://${getMyIp()}:${port}`;
       Printer.log(`${Colors.gray('-')} ${Colors.cyan(addr2)}`);
+    }
+    if (useHttps && !isRestart) {
+      Printer.log('🗝', Colors.gray(`You can download CA file for https dev, from url -> https://${getMyIp()}:${port}/.cert/ca.crt`));
     }
     !wsController && console.log();
   });

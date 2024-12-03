@@ -45,6 +45,11 @@ export default function favicon(faviconPath: string, options?: FaviconOptions) {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { path, method } = ctx || {};
+    /**
+     * /favicon.ico
+     * /favicon.png
+     * /favicon.svg
+     */
     if (['/favicon.ico', '/favicon.png', '/favicon.svg'].some(p => p === path)) {
       ctx.skipDefaultMock = true;
       if (!['GET', 'HEAD'].includes(method)) {

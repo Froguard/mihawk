@@ -23,7 +23,7 @@ export default function notFound() {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { disableLogPrint, routePath, mockRelPath, request, url } = ctx || {};
+    const { /*disableLogPrint,*/ routePath, mockRelPath, request, url } = ctx || {};
     Debugger.log('mdw-404: >>', routePath);
 
     // ================================================
@@ -39,7 +39,7 @@ export default function notFound() {
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
         // html
         ctx.set('Content-Type', 'text/html');
-        ctx.body = html.replace("'<%= mockRelPath %>'", mockRelPath);
+        ctx.body = html.replace('<%= detailMsg %>', `The Mock-data(&nbsp;<i></i>&nbsp;&nbsp;)${mockRelPath} is not found!!!`);
         // ctx.body = `<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>Target request: ${url}</p></body></html>`;
       } else if (accept.includes('application/json')) {
         // json
