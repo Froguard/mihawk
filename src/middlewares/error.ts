@@ -7,6 +7,7 @@ import { getRootAbsPath } from '../utils/path';
 import type { KoaContext, KoaNext } from '../com-types';
 
 const ERR_HTML_PATH = resolve(getRootAbsPath(), './assets/50x.html');
+const NOT_FOUND_HTML_PATH = resolve(getRootAbsPath(), './assets/404.html');
 
 /**
  * 中间件生成器
@@ -16,31 +17,42 @@ const ERR_HTML_PATH = resolve(getRootAbsPath(), './assets/50x.html');
 export default function error() {
   Debugger.log('mdw-err: init...');
   const errHtml = readFileSync(ERR_HTML_PATH, 'utf-8');
+  const notFoundHtml = readFileSync(NOT_FOUND_HTML_PATH, 'utf-8');
 
   /**
-   * koa 中间件：
+   * koa 中间件：为方便能够监控到所有的中间件，建议将本中间件放置在第一个位置进行 app.use(error())
    * @param {KoaContext} ctx
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { disableLogPrint, routePath } = ctx;
-    Debugger.log('mdw-err: >>', routePath);
-    // !disableLogPrint && Printer.log('mdw-err:', routePath);
+    const { /*disableLogPrint, */ path, method } = ctx;
+    const logPath = `${method} ${path}`;
+    Debugger.log('mdw-err: >>');
+    // !disableLogPrint && Printer.log('mdw-err:', logPath);
     // ================================================
     try {
       //
-      await next();
+      //
+      await next(); // process next middlewares
+      //
       //
     } catch (err) {
       // ctx.throw(500, err);
       const { message, stack } = (err || {}) as Error;
       const errMsg = message || err?.toString() || 'Something wrong...';
-      Printer.error('mdw-err:', Colors.red(`Occurs error: ${errMsg}\n`), err);
-      ctx.status = 500;
+      Printer.error('MDW-err:', ctx.status, Colors.red(`Occurs error: ${errMsg}\n`), err);
+      console.log();
       ctx.set('Content-Type', 'text/html');
-      ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');
+      if (ctx.status === 404) {
+        // 404
+        ctx.body = notFoundHtml.replace('<%= detailMsg %>', `${errMsg}(<em>${logPath}</em> is not found!)`);
+      } else {
+        // others
+        ctx.status = 500;
+        ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');
+      }
     }
     // ================================================
-    Debugger.log('mdw-err: <<', routePath);
+    Debugger.log('mdw-err: <<', logPath);
   };
 }

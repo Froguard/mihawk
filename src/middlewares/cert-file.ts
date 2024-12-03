@@ -56,6 +56,7 @@ export default function certAuthFileDownload() {
           '<%= detailMsg %>',
           `The uri(${path}) is not found! Do u mean <a href="/.cert/ca.crt">/.cert/ca.crt</a> or <a href="/.cert/localhost.crt">/.cert/localhost.crt</a> ?`,
         );
+        // ctx.throw(404);
       }
     } else {
       // ================================================

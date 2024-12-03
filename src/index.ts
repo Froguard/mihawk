@@ -141,6 +141,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    */
   const app = new Koa();
 
+  // middleware: error resolve
+  app.use(mdwError());
+
   // middleware: https base ssl
   useHttps && app.use(mdwSSL({ hostname: host, port }));
 
@@ -152,9 +155,6 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
 
   // middleware: common middleware
   app.use(mdwCommon(options));
-
-  // middleware: error resolve
-  app.use(mdwError());
 
   // middleware: cors setting(ACAO,ACAM,ACAH)
   cors && app.use(mdwCors());
