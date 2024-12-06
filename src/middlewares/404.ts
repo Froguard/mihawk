@@ -1,21 +1,16 @@
 'use strict';
-import path from 'path';
-import Colors from 'color-cc';
+// import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
-import { Printer, Debugger } from '../utils/print';
-import { getRootAbsPath } from '../utils/path';
+import { /*Printer, */ Debugger } from '../utils/print';
+import { ASSET_TPL_HTML_404_PATH } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
-
-const HTML_FILE_PATH = path.resolve(getRootAbsPath(), './assets/404.html');
 
 /**
  * 中间件生成器
- * @param options
- * @returns
  */
 export default function notFound() {
   Debugger.log('mdw-404: init...');
-  const html = readFileSync(HTML_FILE_PATH, 'utf-8');
+  const html = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
   /**
    * koa 中间件：
@@ -40,7 +35,6 @@ export default function notFound() {
         // html
         ctx.set('Content-Type', 'text/html');
         ctx.body = html.replace('<%= detailMsg %>', `The Mock-data(&nbsp;<i></i>&nbsp;&nbsp;)${mockRelPath} is not found!!!`);
-        // ctx.body = `<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>Target request: ${url}</p></body></html>`;
       } else if (accept.includes('application/json')) {
         // json
         ctx.set('Content-Type', 'application/json');

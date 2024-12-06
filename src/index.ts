@@ -30,6 +30,7 @@ import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
 import WsCtrl from './composites/websocket';
 import { sleep } from './utils/async';
+import { ASSET_CERT_CA_CRT_PATH, ASSET_CERT_LOCAL_CRT_PATH, ASSET_CERT_LOCAL_KEY_PATH, ASSET_FAVICON_PATH } from './consts';
 import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC, SocketResolveFunc } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk
@@ -151,7 +152,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   useHttps && app.use(mdwCertFileDown());
 
   // middleware: favicon
-  app.use(mdwFavicon(path.resolve(PKG_ROOT_PATH, './assets/favicon.ico')));
+  app.use(mdwFavicon(ASSET_FAVICON_PATH)); // './assets/favicon.ico'
 
   // middleware: common middleware
   app.use(mdwCommon(options));
@@ -187,24 +188,30 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   let server: http.Server | https.Server | null = null;
   // create http|https server
   if (useHttps) {
-    const httpsOptions: Record<'key' | 'cert', any> | null = { key: null, cert: null };
-    let key = '', cert = ''; // prettier-ignore
+    const httpsOptions: Record<'key' | 'cert' | 'ca', any> | null = { key: null, cert: null, ca: null };
+    let key = '', cert = '', ca = ''; // prettier-ignore
     if (isObjStrict(httpsConfig)) {
       key = httpsConfig.key;
       cert = httpsConfig.cert;
+      ca = httpsConfig.ca;
     }
     const keyFilePath = absifyPath(key);
     const certFilePath = absifyPath(cert);
+    const caFilePath = absifyPath(ca);
     if (!key || !cert || !existsSync(keyFilePath) || !existsSync(certFilePath)) {
       // use built-in https cert files
-      httpsOptions.key = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.key'));
-      httpsOptions.cert = readFileSync(path.resolve(PKG_ROOT_PATH, './assets/.cert/localhost.crt'));
+      httpsOptions.key = readFileSync(ASSET_CERT_LOCAL_KEY_PATH); // './assets/.cert/localhost.key'
+      httpsOptions.cert = readFileSync(ASSET_CERT_LOCAL_CRT_PATH); // './assets/.cert/localhost.crt'
+      httpsOptions.ca = readFileSync(ASSET_CERT_CA_CRT_PATH); // './assets/.cert/ca.crt'
       !isRestart && Printer.log(Colors.gray(`Custom https cert files ware not found, use default build-in https cert files`));
     } else {
       // load custom https cert files
       httpsOptions.key = readFileSync(keyFilePath);
       httpsOptions.cert = readFileSync(certFilePath);
-      !isRestart && Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`${key} ${cert}`));
+      if (ca && existsSync(caFilePath)) {
+        httpsOptions.ca = readFileSync(caFilePath); // ca file is optional
+      }
+      !isRestart && Printer.log(Colors.success('Load https cert files success!'), Colors.gray(`key=${key}, cert=${cert}, ca=${ca || ''}`));
     }
     // create https server (SSL)
     server = https.createServer(httpsOptions, app.callback());

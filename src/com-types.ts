@@ -116,6 +116,10 @@ export interface HttpsConfig {
    * cert 文件路径
    */
   cert: string;
+  /**
+   * ca 文件路径
+   */
+  ca?: string;
 }
 
 /**
@@ -238,6 +242,7 @@ export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
 
 /**
  * Mihawk 启动参数, 在 MihawkRC 之上封装一些额外的参数，方便后续逻辑处理
+ * - 和 MihawkRC 区别是，包含一些二次加工过的属性，主要是为了方便程序内部使用
  */
 export type MihawkOptions = MihawkRC & {
   /**
@@ -345,10 +350,10 @@ export type Socket = WS.WebSocket; // alias
 /**
  * SocketResolveFunc 逻辑处理函数的 options 参数
  */
-export interface SocketReslrFuncOptions {
+export type SocketReslrFuncOptions = Unfixedify<{
   stomp?: boolean;
   clientId?: string;
-}
+}>;
 /**
  * socket 逻辑处理函数
  */
@@ -379,7 +384,7 @@ export type JSONObject = Record<string | number, JSONValue>;
  * 深度递归式让复杂类型的所有子属性都变成可选的。此泛型声明式为了弥补 Partial<T> 的不足
  */
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends AnyFunc ? T[P] : DeepPartial<T[P]>;
+  [P in keyof T]?: T[P] extends Record<any, any> ? (T[P] extends AnyFunc ? T[P] : DeepPartial<T[P]>) : T[P];
 };
 
 /**
@@ -387,11 +392,11 @@ export type DeepPartial<T> = {
  * - 兼容子属性为函数类型
  */
 export type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends AnyFunc ? T[P] : DeepReadonly<T[P]>;
+  readonly [P in keyof T]: T[P] extends Record<any, any> ? (T[P] extends AnyFunc ? T[P] : DeepReadonly<T[P]>) : T[P];
 };
 
 /**
- * 让对象 T 中的子属性变成“松散”(可自定义)
+ * 让对象 T 中的子属性变成“松散”(任意未定义的子属性都可能存在)
  */
 export type Unfixedify<T> = T & {
   [k: string | number | symbol]: any;
@@ -399,14 +404,9 @@ export type Unfixedify<T> = T & {
 
 /**
  * 让对象 T 中的子属性变成“宽松”(可选&可自定义)
- * - 1.子属性可选的
- * - 2.子属性可自定义，即 { [k: string | number | symbol]: any }
+ * - 1.子属性可选的，即 “子属性不一定存在”
+ * - 2.子属性可自定义，即 “任意未定义的子属性都可能存在” { [k: string | number | symbol]: any }
  *
  * 可用于“一些对象可能长得像某个类型时，但子属性又不局限于这个类型定义”的场景
  */
 export type Loosify<T> = Unfixedify<DeepPartial<T>>;
-// export type Loosify<T extends Record<string | number | symbol, any>> = {
-//   [k: string | number | symbol]: any;
-// } & {
-//   [k in keyof T]?: T[k];
-// };

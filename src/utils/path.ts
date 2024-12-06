@@ -51,7 +51,7 @@ export function isExistedSync(targetPath: string, rootPath: string = CWD) {
   return existsSync(targetPath);
 }
 
-let _pkgRootAbsPath: string = '';
+let _pkgRootAbsPath: string = ''; // @private, cache
 /**
  * 获取本工程（mihawk）的根目录
  * - 作用：用于读取本工程根目录下的文件，如 package.json 文件

@@ -2,74 +2,39 @@
   "description": "mihawk root-config 配置文件",
   "type": "object",
   "properties": {
-    "host": {
-      "description": "监听地址，默认 `0.0.0.0`",
-      "type": "string",
-      "default": "0.0.0.0"
-    },
-    "port": {
-      "description": "监听端口, 默认 8888",
-      "type": "number",
-      "default": 8888
-    },
+    "host": { "type": "string", "default": "0.0.0.0", "description": "监听地址，默认 `0.0.0.0`" },
+    "port": { "type": "number", "default": 8888, "description": "监听端口, 默认 8888" },
     "https": {
       "description": "是否开启 https，默认 false",
       "anyOf": [
+        { "type": "boolean" },
         {
           "type": "object",
           "properties": {
-            "key": {
-              "description": "key 文件路径",
-              "type": "string"
-            },
-            "cert": {
-              "description": "cert 文件路径",
-              "type": "string"
-            }
+            "key": { "type": "string", "description": "key 文件路径" },
+            "cert": {"type": "string", "description": "cert 文件路径"},
+            "ca": { "type": "string", "description": "ca 文件路径" }
           }
-        },
-        {
-          "type": "boolean"
         }
       ]
     },
-    "cors": {
-      "description": "是否开启 cors，默认 true",
-      "type": "boolean",
-      "default": true
+    "cors": { "type": "boolean", "default": true, "description": "是否开启 cors，默认 true" },
+    "watch": { "type": "boolean", "default": true, "description": "是否开启 watch（mock 文件变化的时候，进行刷新），默认 true" },
+    "cache": { "type": "boolean", "default": false, "description": "对 mock 文件进行缓存，默认 false" },
+    "mockDir": { "type": "string", "default": "mocks", "description": "mock 目录，默认为 `./mocks`" },
+    "mockDataFileType": { 
+      "type": "string", 
+      "enum": ["json", "json5"], 
+      "default": "json", 
+      "description": "mock 数据文件类型，默认 json" 
     },
-    "watch": {
-      "description": "是否开启 watch（mock 文件变化的时候，进行刷新），默认 true",
-      "type": "boolean",
-      "default": true
+    "mockLogicFileType": { 
+      "type": "string", 
+      "enum": ["cjs", "javascript", "js", "none", "ts", "typescript"], 
+      "default": "none", 
+      "description": "mock 逻辑文件类型，默认 none" 
     },
-    "cache": {
-      "description": "对 mock 文件进行缓存，默认 false",
-      "type": "boolean",
-      "default": false
-    },
-    "mockDir": {
-      "description": "mock 目录，默认为 `./mocks`",
-      "type": "string",
-      "default": "mocks"
-    },
-    "mockDataFileType": {
-      "description": "mock 数据文件类型，默认 json",
-      "enum": ["json", "json5"],
-      "type": "string",
-      "default": "json"
-    },
-    "mockLogicFileType": {
-      "description": "mock 逻辑文件类型，默认 none",
-      "enum": ["cjs", "javascript", "js", "none", "ts", "typescript"],
-      "type": "string",
-      "default": "none"
-    },
-    "autoCreateMockLogicFile": {
-      "description": "是否自动创建 mock 文件，默认 false",
-      "type": "boolean",
-      "default": false
-    },
+    "autoCreateMockLogicFile": { "description": "是否自动创建 mock 文件，默认 false", "type": "boolean", "default": false },
     "tsconfigPath": {
       "description": "tsconfig.json 的路径\n- 当且仅当 mockLogicFileType 为 ts|typescript 时有效\n- 默认不写则为空字符串，即采用内置的 ts 配置\n  - 可以写为 `./mocks/tsconfig.json`(建议和工程中的 tsconfig.json 区分开来，因为 mockTs 并不需要进行打包输出)",
       "type": "string"
@@ -81,11 +46,21 @@
         "ignoreRoutes": {
           "description": "指定路由对应日志忽略不打印",
           "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         }
       }
+    },
+    "socketConfig": {
+      "description": "是否开启 websocket，默认 false",
+      "anyOf": [
+        { "type": "boolean" },
+        {
+          "type": "object",
+          "properties": {
+            "stomp": { "type": "boolean", "description": "是否开启 stomp 消息解析（本字段暂时无用）" }
+          }
+        }
+      ]
     }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"

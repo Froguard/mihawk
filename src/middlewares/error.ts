@@ -1,23 +1,17 @@
 'use strict';
-import { resolve } from 'path';
 import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
 import { Printer, Debugger } from '../utils/print';
-import { getRootAbsPath } from '../utils/path';
+import { ASSET_TPL_HTML_404_PATH, ASSET_TPL_HTML_50X_PATH } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
-const ERR_HTML_PATH = resolve(getRootAbsPath(), './assets/50x.html');
-const NOT_FOUND_HTML_PATH = resolve(getRootAbsPath(), './assets/404.html');
-
 /**
- * 中间件生成器
- * @param options
- * @returns
+ * error 中间件生成器
  */
 export default function error() {
   Debugger.log('mdw-err: init...');
-  const errHtml = readFileSync(ERR_HTML_PATH, 'utf-8');
-  const notFoundHtml = readFileSync(NOT_FOUND_HTML_PATH, 'utf-8');
+  const errHtml = readFileSync(ASSET_TPL_HTML_50X_PATH, 'utf-8');
+  const notFoundHtml = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
   /**
    * koa 中间件：为方便能够监控到所有的中间件，建议将本中间件放置在第一个位置进行 app.use(error())

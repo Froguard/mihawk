@@ -1,14 +1,11 @@
 'use strict';
 import { resolve } from 'path';
 import { createReadStream, readFileSync } from 'fs-extra';
-import { getRootAbsPath } from '../utils/path';
 import { Debugger } from '../utils/print';
-import { PKG_NAME } from '../consts';
+import { PKG_NAME, ASSET_TPL_HTML_404_PATH, ASSET_DIR_PATH } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
-const PKG_ROOT_PATH = getRootAbsPath();
-const CA_ROOT_PATH = resolve(PKG_ROOT_PATH, './assets/.cert/');
-const HTML_FILE_PATH = resolve(PKG_ROOT_PATH, './assets/404.html');
+const CA_ROOT_PATH = resolve(ASSET_DIR_PATH, './.cert/');
 
 /**
  * koa certificate Authority 文件的下载路由，中间件生成器：
@@ -16,7 +13,7 @@ const HTML_FILE_PATH = resolve(PKG_ROOT_PATH, './assets/404.html');
  */
 export default function certAuthFileDownload() {
   Debugger.log('mdw-certificateAuthority: init...');
-  const html = readFileSync(HTML_FILE_PATH, 'utf-8');
+  const html = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
   /**
    * koa 中间件函数：
@@ -25,7 +22,7 @@ export default function certAuthFileDownload() {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { path, method } = ctx || {};
-    if (path.startsWith('/.cert/')) {
+    if (path.startsWith('/.cert/') || path === '/.cert') {
       ctx.skipDefaultMock = true;
       if (['/.cert/ca.crt', '/.cert/localhost.crt'].some(p => p === path)) {
         /**
@@ -52,11 +49,7 @@ export default function certAuthFileDownload() {
          */
         ctx.set('Content-Type', 'text/html');
         ctx.status = 404;
-        ctx.body = html.replace(
-          '<%= detailMsg %>',
-          `The uri(${path}) is not found! Do u mean <a href="/.cert/ca.crt">/.cert/ca.crt</a> or <a href="/.cert/localhost.crt">/.cert/localhost.crt</a> ?`,
-        );
-        // ctx.throw(404);
+        ctx.body = html.replace('<%= detailMsg %>', `The uri(${path}) is not found! Do you mean &nbsp;<a href="/.cert/ca.crt">/.cert/ca.crt</a>&nbsp;?`);
       }
     } else {
       // ================================================
