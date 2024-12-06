@@ -30,7 +30,7 @@ import { scanExistedRoutes } from './composites/scanner';
 import { delNillProps } from './utils/obj';
 import WsCtrl from './composites/websocket';
 import { sleep } from './utils/async';
-import { ASSET_CERT_CA_CRT_PATH, ASSET_CERT_LOCAL_CRT_PATH, ASSET_CERT_LOCAL_KEY_PATH, ASSET_FAVICON_PATH } from './consts';
+import { ASSET_CERT_CA_CRT_PATH, ASSET_CERT_LOCAL_CRT_PATH, ASSET_CERT_LOCAL_KEY_PATH, ASSET_FAVICON_PATH } from './root';
 import type { AnyFunc, KoaMiddleware, Loosify, MhkRCWsConfig, MihawkRC, SocketResolveFunc } from './com-types';
 
 // npm pkg absolute root path, eg: xxx_project_path/node_modules/mihawk

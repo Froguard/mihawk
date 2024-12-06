@@ -2,7 +2,7 @@
 import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
 import { Printer, Debugger } from '../utils/print';
-import { ASSET_TPL_HTML_404_PATH, ASSET_TPL_HTML_50X_PATH } from '../consts';
+import { ASSET_TPL_HTML_404_PATH, ASSET_TPL_HTML_50X_PATH } from '../root';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**

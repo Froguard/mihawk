@@ -2,7 +2,9 @@
 import { resolve } from 'path';
 import { createReadStream, readFileSync } from 'fs-extra';
 import { Debugger } from '../utils/print';
-import { PKG_NAME, ASSET_TPL_HTML_404_PATH, ASSET_DIR_PATH } from '../consts';
+import { PKG_NAME } from '../consts';
+import { ASSET_TPL_HTML_404_PATH, ASSET_DIR_PATH } from '../root';
+
 import type { KoaContext, KoaNext } from '../com-types';
 
 const CA_ROOT_PATH = resolve(ASSET_DIR_PATH, './.cert/');

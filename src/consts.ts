@@ -7,7 +7,6 @@
 import path from 'path';
 import Colors from 'color-cc';
 import { MihawkOptions, MihawkRC } from './com-types';
-import { getRootAbsPath } from './utils/path';
 
 /**
  * 本工程的 npm 包名
@@ -23,11 +22,6 @@ export const LOG_FLAG = `${Colors.magenta(`[${PKG_NAME}]`)}${Colors.gray(':')}`;
  * 日志字符，右箭头
  */
 export const LOG_ARROW = Colors.gray('->');
-
-/**
- * Mihawk 包所在的根目录（绝对路径）
- */
-export const PKG_ROOT_PATH = getRootAbsPath();
 
 /**
  * 当前的执行目录
@@ -95,42 +89,3 @@ const defOpts: MihawkOptions = {
   socketFilePath: null,
 };
 export const DEFAULT_OPTIONS = Object.freeze(defOpts);
-
-/**
- * assets 路径(相对于工程根目录，短路径)
- */
-const assetDir = './assets';
-const assetFavicon = `${assetDir}/favicon.ico`; // favicon.ico 文件，相对路径(相对于工程根目录)
-const assetCertLocalKey = `${assetDir}/.cert/localhost.key`; // 本地证书 key 文件，相对路径(相对于工程根目录)
-const assetCertLocalCrt = `${assetDir}/.cert/localhost.crt`; // 本地证书 crt 文件，相对路径(相对于工程根目录)
-const assetCertCaCrt = `${assetDir}/.cert/ca.crt`; // CA 证书 crt 文件，相对路径(相对于工程根目录)
-const assetTplHtml404 = `${assetDir}/tpl/404.html`; // 404 页面模板文件相对路径(相对于工程根目录)
-const assetTplHtml50X = `${assetDir}/tpl/50x.html`; // 500 页面模板文件相对路径(相对于工程根目录)
-/**
- * assets 目录的绝对路径
- */
-export const ASSET_DIR_PATH = path.resolve(PKG_ROOT_PATH, assetDir);
-/**
- * favicon 文件，绝对路径
- */
-export const ASSET_FAVICON_PATH = path.resolve(PKG_ROOT_PATH, assetFavicon);
-/**
- * 本地证书 key 文件，绝对路径
- */
-export const ASSET_CERT_LOCAL_KEY_PATH = path.resolve(PKG_ROOT_PATH, assetCertLocalKey);
-/**
- * 本地证书 crt 文件，绝对路径
- */
-export const ASSET_CERT_LOCAL_CRT_PATH = path.resolve(PKG_ROOT_PATH, assetCertLocalCrt);
-/**
- * CA 证书 crt 文件，绝对路径
- */
-export const ASSET_CERT_CA_CRT_PATH = path.resolve(PKG_ROOT_PATH, assetCertCaCrt);
-/**
- * 404 页面模板文件绝对路径
- */
-export const ASSET_TPL_HTML_404_PATH = path.resolve(PKG_ROOT_PATH, assetTplHtml404);
-/**
- * 500 页面模板文件绝对路径
- */
-export const ASSET_TPL_HTML_50X_PATH = path.resolve(PKG_ROOT_PATH, assetTplHtml50X);
