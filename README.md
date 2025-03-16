@@ -109,7 +109,7 @@ About root config props:
 - `mockDir`: string, default `mocks`, the directory of mock data
 - `mockDataFileType`: string `json` | `json5`, default `json`, the file type of mock data
 - `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic
-- `fallbackRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
+- `initJsonByRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
   - Default: `undefined`
   - When local mock file not found:
     1. If set to proxy object with `{enable:true, target:'xxx' }` to fetch from remote proxy

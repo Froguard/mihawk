@@ -34,7 +34,7 @@ export function createDataResolver(options: MihawkOptions) {
     dataFileExt: JSON_EXT,
     logicFileExt: LOGIC_EXT,
     autoCreateMockLogicFile = false,
-    fallbackRemote,
+    initJsonByRemote,
   } = options || {};
   // load convert-function logic file
   const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
@@ -75,7 +75,7 @@ export function createDataResolver(options: MihawkOptions) {
       let finalInitType = 'default';
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
-      if (typeof fallbackRemote === 'object' && fallbackRemote?.enable) {
+      if (typeof initJsonByRemote === 'object' && initJsonByRemote?.enable) {
         const { method, headers, request } = ctx || {};
         const body = request?.body as BodyInit;
         remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
@@ -149,22 +149,22 @@ export function createDataResolver(options: MihawkOptions) {
  * @returns {Promise<JSONObject | null>}s
  */
 async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOptions: MihawkOptions) {
-  const { fallbackRemote } = mhkOptions;
-  if (typeof fallbackRemote !== 'object') {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote isnot a object, will skip remote data fetch!');
+  const { initJsonByRemote } = mhkOptions;
+  if (typeof initJsonByRemote !== 'object') {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote isnot a object, will skip remote data fetch!');
     return null;
   }
-  if (!fallbackRemote?.enable) {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote.enable != true, will skip remote data fetch!');
+  if (!initJsonByRemote?.enable) {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote.enable != true, will skip remote data fetch!');
     return null;
   }
-  if (!fallbackRemote?.target) {
-    Printer.warn(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote.target is not defined, will skip remote data fetch!');
+  if (!initJsonByRemote?.target) {
+    Printer.warn(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote.target is not defined, will skip remote data fetch!');
     return null;
   }
 
   try {
-    const { target, timeout = 5000, rewrite } = fallbackRemote;
+    const { target, timeout = 5000, rewrite } = initJsonByRemote;
     if (typeof rewrite === 'function') {
       reqPath = rewrite(reqPath);
     }

@@ -109,7 +109,7 @@ mihawk init
 - `mockDir`: string, 默认值为 `mocks`，表示 mock 数据的目录
 - `mockDataFileType`: string 可选值为 `json` | `json5` 之一, 默认值为 `json`，表示 mock 数据的文件格式
 - `mockLogicFileType`: string 可选值为 `js` | `cjs` | `ts` | `none` 之一, 默认值为 `none`，表示 mock 数据的处理逻辑文件
-- `fallbackRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
+- `initJsonByRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
   - 默认值: `undefined`
   - 当本地 mock 文件不存在时:
     1. 设置为包含 `{enable:true, target:'xxx' }` 的代理对象时，将从远程代理获取数据

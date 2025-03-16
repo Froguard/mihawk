@@ -1,10 +1,10 @@
-# Fallback Remote Proxy
+# init json data file by remote
 
 ## 1. Function Triggers
 
 - When no local mock rule matches
-- `fallbackRemote.enable` is true in config
-- `fallbackRemote.target` was setted in config, by a valid url
+- `initJsonByRemote.enable` is true in config
+- `initJsonByRemote.target` was setted in config, by a valid url
 
 ## 2. Configuration Parameters
 
@@ -26,7 +26,7 @@ interface {
 // .mihawkrc.ts
 export default {
   // ...
-  fallbackRemote: {
+  initJsonByRemote: {
     enable: true,
     target: 'https://api.example.com',
     timeout: 5000,
