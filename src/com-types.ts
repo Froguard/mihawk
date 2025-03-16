@@ -150,6 +150,19 @@ export interface MhkRCWsConfig {
  */
 export interface MihawkRC {
   /**
+   * 当本地mock文件不存在时，从远端代理获取初始化数据
+   * - 配置格式：{ target: string; rewrite?: (path: string) => string }
+   * - 设置为false/null/undefined时禁用该功能
+   */
+  fallbackRemote?: {
+    enable: boolean;
+    target: string;
+    timeout?: number;
+    // changeOrigin?: boolean;
+    rewrite?: (path: string) => string;
+  } | null;
+
+  /**
    * 监听地址，默认 `0.0.0.0`
    */
   host?: string;

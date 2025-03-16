@@ -109,6 +109,15 @@ About root config props:
 - `mockDir`: string, default `mocks`, the directory of mock data
 - `mockDataFileType`: string `json` | `json5`, default `json`, the file type of mock data
 - `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic
+- `fallbackRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
+  - Default: `undefined`
+  - When local mock file not found:
+    1. If set to proxy object with `{enable:true, target:'xxx' }` to fetch from remote proxy
+    2. If set to `null`/`undefined` to disable
+  - Proxy config requires:
+    - `target`(required): remote server URL, **required**
+    - `rewrite`: optional path rewrite function
+    - `timeout`: request timeout in milliseconds
 
 > More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
 

@@ -109,6 +109,15 @@ mihawk init
 - `mockDir`: string, 默认值为 `mocks`，表示 mock 数据的目录
 - `mockDataFileType`: string 可选值为 `json` | `json5` 之一, 默认值为 `json`，表示 mock 数据的文件格式
 - `mockLogicFileType`: string 可选值为 `js` | `cjs` | `ts` | `none` 之一, 默认值为 `none`，表示 mock 数据的处理逻辑文件
+- `fallbackRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
+  - 默认值: `undefined`
+  - 当本地 mock 文件不存在时:
+    1. 设置为包含 `{enable:true, target:'xxx' }` 的代理对象时，将从远程代理获取数据
+    2. 设置为 `null`/`undefined` 时禁用该功能
+  - 代理配置要求:
+    - `target`(必填): 远端服务器URL，该值为必须值
+    - `rewrite`: 可选路径重写函数
+    - `timeout`: 请求超时时间（毫秒）
 
 > 更多说明，详见 ts 定义文件 → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
 

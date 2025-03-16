@@ -10,7 +10,9 @@ import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME, LOG_FLAG } from '../consts';
 import { createReadonlyProxy } from '../utils/obj';
+import { jsonRequest } from '../utils/request';
 import { initMockLogicFile } from './init-file';
+import type { RequestInit, BodyInit } from 'node-fetch'; // @^2.6.11
 import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
@@ -18,7 +20,7 @@ const RESOLVER_NAME = '[resolver]';
 const LOGFLAG_RESOLVER = `${Colors.cyan(RESOLVER_NAME)}${Colors.gray(':')}`;
 
 /**
- *
+ * 创建数据解析器
  * @param {MihawkOptions} options
  * @returns
  */
@@ -32,6 +34,7 @@ export function createDataResolver(options: MihawkOptions) {
     dataFileExt: JSON_EXT,
     logicFileExt: LOGIC_EXT,
     autoCreateMockLogicFile = false,
+    fallbackRemote,
   } = options || {};
   // load convert-function logic file
   const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
@@ -68,9 +71,23 @@ export function createDataResolver(options: MihawkOptions) {
       // 采用备份形式
       mockJson = jsonData || initData;
     } else {
-      Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it...`, jsonPath4log);
-      // ★ Auto create json file
-      writeJSONSafeSync(mockJsonAbsPath, initData);
+      let finalInitData: Record<string, any> = initData;
+      let finalInitType = 'default';
+      // Try fetch from remote if enabled
+      let remoteData: Record<string, any> | null = null;
+      if (typeof fallbackRemote === 'object' && fallbackRemote?.enable) {
+        const { method, headers, request } = ctx || {};
+        const body = request?.body as BodyInit;
+        remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
+      }
+      // Use remote data if available, otherwise use default
+      if (remoteData) {
+        finalInitData = remoteData;
+        finalInitType = 'fallbackRemoteData';
+      }
+      Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
+      // Auto create json file
+      writeJSONSafeSync(mockJsonAbsPath, finalInitData);
       //
     }
     ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
@@ -122,4 +139,56 @@ export function createDataResolver(options: MihawkOptions) {
     //
     return mockJson;
   };
+}
+
+/**
+ * 从远端获取 json 数据内容（该内容会用于初始化 mock 时候所需要的 json 文件）
+ * @param {string} reqPath
+ * @param {RequestInit} reqOptions
+ * @param {MihawkOptions} mhkOptions
+ * @returns {Promise<JSONObject | null>}s
+ */
+async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOptions: MihawkOptions) {
+  const { fallbackRemote } = mhkOptions;
+  if (typeof fallbackRemote !== 'object') {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote isnot a object, will skip remote data fetch!');
+    return null;
+  }
+  if (!fallbackRemote?.enable) {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote.enable != true, will skip remote data fetch!');
+    return null;
+  }
+  if (!fallbackRemote?.target) {
+    Printer.warn(LOGFLAG_RESOLVER, 'FetchRemoteData: fallbackRemote.target is not defined, will skip remote data fetch!');
+    return null;
+  }
+
+  try {
+    const { target, timeout = 5000, rewrite } = fallbackRemote;
+    if (typeof rewrite === 'function') {
+      reqPath = rewrite(reqPath);
+    }
+    const requestPath = `${target}/${reqPath}`;
+    Printer.log(LOGFLAG_RESOLVER, `FetchRemoteData: Fetching remote data from ${Colors.cyan(requestPath)}`);
+    const { method = 'GET', headers: originalHeaders = {}, body } = reqOptions || {};
+    // 构造透传 headers
+    const headers: Record<string, any> = {
+      ...originalHeaders,
+      'Cache-Control': 'no-cache',
+      Accept: 'application/json',
+    };
+    // delete headers['content-length'];
+    // delete headers['authorization'];
+    // 执行请求
+    const data = await jsonRequest(requestPath, { method, timeout, headers, body });
+    if (!isObjStrict(data)) {
+      Printer.error(LOGFLAG_RESOLVER, 'FetchRemoteData: Invalid response data format', data);
+      return null;
+    }
+    data.mihawkMessage = `Auto init json data from remote: ${requestPath}`;
+    return data;
+  } catch (error: any) {
+    Printer?.error(LOGFLAG_RESOLVER, 'FetchRemoteData: Remote data fetch failed:', error);
+    return null;
+  }
 }
