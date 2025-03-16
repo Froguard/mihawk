@@ -160,6 +160,8 @@ export interface MihawkRC {
     timeout?: number;
     // changeOrigin?: boolean;
     rewrite?: (path: string) => string;
+    // 是否修改（覆盖）已存在的 json 文件
+    coverExistedJson?: boolean; // TODO: 待实现，当文件存在的时候，通过远端拉取到的数据会强制更新掉本地的 json 文件
   } | null;
 
   /**

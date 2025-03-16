@@ -8,11 +8,12 @@ import nodeFetch, { type RequestInit } from 'node-fetch'; // @^2.6.11
  */
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: RequestInit) {
   const apiRes = await nodeFetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
     method: 'GET',
     ...options, // overwrite
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
   });
   if (!apiRes.ok || apiRes.status !== 200) {
     throw new Error(`HTTP Error: ${apiRes.status}`);
