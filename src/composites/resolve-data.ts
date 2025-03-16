@@ -34,7 +34,7 @@ export function createDataResolver(options: MihawkOptions) {
     dataFileExt: JSON_EXT,
     logicFileExt: LOGIC_EXT,
     autoCreateMockLogicFile = false,
-    initJsonByRemote,
+    setJsonByRemote,
   } = options || {};
   // load convert-function logic file
   const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
@@ -75,7 +75,7 @@ export function createDataResolver(options: MihawkOptions) {
       let finalInitType = 'default';
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
-      if (typeof initJsonByRemote === 'object' && initJsonByRemote?.enable) {
+      if (typeof setJsonByRemote === 'object' && setJsonByRemote?.enable) {
         const { method, headers, request } = ctx || {};
         const body = request?.body as BodyInit;
         remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
@@ -149,22 +149,22 @@ export function createDataResolver(options: MihawkOptions) {
  * @returns {Promise<JSONObject | null>}s
  */
 async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOptions: MihawkOptions) {
-  const { initJsonByRemote } = mhkOptions;
-  if (typeof initJsonByRemote !== 'object') {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote isnot a object, will skip remote data fetch!');
+  const { setJsonByRemote } = mhkOptions;
+  if (typeof setJsonByRemote !== 'object') {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
     return null;
   }
-  if (!initJsonByRemote?.enable) {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote.enable != true, will skip remote data fetch!');
+  if (!setJsonByRemote?.enable) {
+    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote.enable != true, will skip remote data fetch!');
     return null;
   }
-  if (!initJsonByRemote?.target) {
-    Printer.warn(LOGFLAG_RESOLVER, 'FetchRemoteData: initJsonByRemote.target is not defined, will skip remote data fetch!');
+  if (!setJsonByRemote?.target) {
+    Printer.warn(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote.target is not defined, will skip remote data fetch!');
     return null;
   }
 
   try {
-    const { target, timeout = 5000, rewrite } = initJsonByRemote;
+    const { target, timeout = 5000, rewrite } = setJsonByRemote;
     if (typeof rewrite === 'function') {
       reqPath = rewrite(reqPath);
     }

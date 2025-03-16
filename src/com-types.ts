@@ -154,7 +154,7 @@ export interface MihawkRC {
    * - 配置格式：{ target: string; rewrite?: (path: string) => string }
    * - 设置为false/null/undefined时禁用该功能
    */
-  initJsonByRemote?: {
+  setJsonByRemote?: {
     enable: boolean;
     target: string;
     timeout?: number;

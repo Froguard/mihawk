@@ -3,8 +3,8 @@
 ## 1. 功能触发条件
 
 - 当本地未匹配到mock规则时
-- 配置文件中开启`initJsonByRemote.enable`选项
-- 配置文件中正确配置了 `initJsonByRemote.target` 选项（url字符串形式）
+- 配置文件中开启`setJsonByRemote.enable`选项
+- 配置文件中正确配置了 `setJsonByRemote.target` 选项（url字符串形式）
 
 ## 2. 配置参数类型
 
@@ -26,7 +26,7 @@ interface {
 // .mihawkrc.ts
 export default {
   // ...
-  initJsonByRemote: {
+  setJsonByRemote: {
     enable: true,
     target: 'https://api.example.com',
     timeout: 5000,

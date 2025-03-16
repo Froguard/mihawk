@@ -3,8 +3,8 @@
 ## 1. Function Triggers
 
 - When no local mock rule matches
-- `initJsonByRemote.enable` is true in config
-- `initJsonByRemote.target` was setted in config, by a valid url
+- `setJsonByRemote.enable` is true in config
+- `setJsonByRemote.target` was setted in config, by a valid url
 
 ## 2. Configuration Parameters
 
@@ -26,7 +26,7 @@ interface {
 // .mihawkrc.ts
 export default {
   // ...
-  initJsonByRemote: {
+  setJsonByRemote: {
     enable: true,
     target: 'https://api.example.com',
     timeout: 5000,
