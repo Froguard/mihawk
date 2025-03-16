@@ -11,8 +11,8 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
     method: 'GET',
     ...options, // overwrite
     headers: {
-      'Content-Type': 'application/json',
       ...options?.headers,
+      'Content-Type': 'application/json', // force set json type
     },
   });
   if (!apiRes.ok || apiRes.status !== 200) {
