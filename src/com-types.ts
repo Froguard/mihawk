@@ -229,9 +229,12 @@ export interface MihawkRC {
    */
   socketConfig?: MhkRCWsConfig | null | boolean;
   /**
-   * 当本地mock文件不存在时，从远端代理获取初始化数据
+   * 从远端接口拉取数据之后，更新本地 json 文件
+   * - 情况1：当本地mock文件不存在时，从远端代理获取初始化数据
+   * - 情况2：当本地mock文件存在时, 如果设置了 coverExistedJson=true，会强制更新本地的mock文件，否则直接不会发起请求，直接走本地 mock
+   * 配置：
    * - 配置格式：{ target: string; rewrite?: (path: string) => string }
-   * - 设置为false/null/undefined时禁用该功能
+   * - 设置为 null/undefined 时禁用该功能
    */
   setJsonByRemote?: {
     enable: boolean; // required
