@@ -150,21 +150,6 @@ export interface MhkRCWsConfig {
  */
 export interface MihawkRC {
   /**
-   * 当本地mock文件不存在时，从远端代理获取初始化数据
-   * - 配置格式：{ target: string; rewrite?: (path: string) => string }
-   * - 设置为false/null/undefined时禁用该功能
-   */
-  setJsonByRemote?: {
-    enable: boolean;
-    target: string;
-    timeout?: number;
-    // changeOrigin?: boolean;
-    rewrite?: (path: string) => string;
-    // 是否修改（覆盖）已存在的 json 文件
-    coverExistedJson?: boolean; // TODO: 待实现，当文件存在的时候，通过远端拉取到的数据会强制更新掉本地的 json 文件
-  } | null;
-
-  /**
    * 监听地址，默认 `0.0.0.0`
    */
   host?: string;
@@ -243,6 +228,20 @@ export interface MihawkRC {
    * 是否启用 websocket server
    */
   socketConfig?: MhkRCWsConfig | null | boolean;
+  /**
+   * 当本地mock文件不存在时，从远端代理获取初始化数据
+   * - 配置格式：{ target: string; rewrite?: (path: string) => string }
+   * - 设置为false/null/undefined时禁用该功能
+   */
+  setJsonByRemote?: {
+    enable: boolean; // required
+    target: string; // required
+    timeout?: number;
+    changeOrigin?: boolean; // 转发请求到远端时，是否修改请求头中的 origin 保持与远端一致？
+    rewrite?: (path: string) => string;
+    // 是否修改（覆盖）已存在的 json 文件
+    coverExistedJson?: boolean; // 待实现，当文件存在的时候，通过远端拉取到的数据会强制更新掉本地的 json 文件
+  } | null;
 }
 
 /**
@@ -335,6 +334,12 @@ export type MihawkOptions = MihawkRC & {
    * websocket 相关 diy 处理路径
    */
   socketFilePath?: string;
+
+  /**
+   * @extra
+   * 是否启用远端拉取数据能力
+   */
+  useRemoteData?: boolean;
 };
 
 /**

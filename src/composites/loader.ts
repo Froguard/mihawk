@@ -210,7 +210,7 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     } else {
       cacheData = fileContent;
     }
-    cacheData && cacheObj.set(filePath, cacheData);
+    cacheData && cacheObj.set(filePath, cacheData); // TODO: 当文件内容过大的时候，如果超过限制，则不缓存
   }
   return cacheData as Data;
 }

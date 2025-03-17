@@ -22,7 +22,7 @@ const LOGFLAG_RESOLVER = `${Colors.cyan(RESOLVER_NAME)}${Colors.gray(':')}`;
 /**
  * 创建数据解析器
  * @param {MihawkOptions} options
- * @returns
+ * @returns {asyncFunction}
  */
 export function createDataResolver(options: MihawkOptions) {
   const {
@@ -35,6 +35,7 @@ export function createDataResolver(options: MihawkOptions) {
     logicFileExt: LOGIC_EXT,
     autoCreateMockLogicFile = false,
     setJsonByRemote,
+    useRemoteData,
   } = options || {};
   // load convert-function logic file
   const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
@@ -61,8 +62,26 @@ export function createDataResolver(options: MihawkOptions) {
     const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
-      let jsonData = await loadJson(mockJsonAbsPath, { noCache: !cache });
-      if (jsonData && typeof jsonData === 'object') {
+      let jsonData: Record<string, any> | null = null;
+      // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
+      if (useRemoteData && setJsonByRemote?.coverExistedJson) {
+        const { method, headers, request } = ctx || {};
+        const body = request?.body as BodyInit;
+        const remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
+        if (isObjStrict(remoteData)) {
+          // 只有当拉取到的远端数据是正常数据时，才会更新到文件
+          writeJSONSafeSync(mockJsonAbsPath, remoteData);
+          jsonData = remoteData;
+        } else {
+          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow(`RemoteData isn't a normal json response!`), Colors.yellow('Unexception value='), remoteData);
+          jsonData = null;
+        }
+      }
+      if (!jsonData) {
+        // 如果上述拉取远端数据，没有成功：如拉取失败、或者未执行拉取（即：未开启远端覆盖）；则执行本地文件读取
+        jsonData = await loadJson(mockJsonAbsPath, { noCache: !cache });
+      }
+      if (isObjStrict(jsonData)) {
         // 不开启缓存时，每次都会保证返回的时 json 里边的数据（这里使用 deepMerge 做一次通过拷贝创建副本的操作，防止老 json 数据被修改）
         jsonData = cache ? jsonData : deepMerge({}, jsonData);
       } else {
@@ -75,7 +94,7 @@ export function createDataResolver(options: MihawkOptions) {
       let finalInitType = 'default';
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
-      if (typeof setJsonByRemote === 'object' && setJsonByRemote?.enable) {
+      if (useRemoteData) {
         const { method, headers, request } = ctx || {};
         const body = request?.body as BodyInit;
         remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
@@ -164,12 +183,12 @@ async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOpti
   }
 
   try {
-    const { target, timeout = 5000, rewrite } = setJsonByRemote;
+    const { target, timeout = 10000, changeOrigin, rewrite } = setJsonByRemote;
+    // 重置 reqPath 接口地址
     if (typeof rewrite === 'function') {
       reqPath = rewrite(reqPath);
     }
     const requestPath = `${target}/${reqPath}`;
-    Printer.log(LOGFLAG_RESOLVER, `FetchRemoteData: Fetching remote data from ${Colors.cyan(requestPath)}`);
     const { method = 'GET', headers: originalHeaders = {}, body } = reqOptions || {};
     // 构造透传 headers
     const headers: Record<string, any> = {
@@ -177,16 +196,25 @@ async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOpti
       'Cache-Control': 'no-cache',
       Accept: 'application/json',
     };
+    // 重置 headers['host'] 字段，如果有必要
+    const targetUrl = new URL(target);
+    const targetHost = targetUrl.host;
+    if (changeOrigin && targetHost) {
+      headers.Host = targetHost;
+      Debugger.log(LOGFLAG_RESOLVER, `Apply changeOrigin: ${Colors.cyan(headers.Host)}`);
+    }
     // delete headers['content-length'];
     // delete headers['authorization'];
     // 执行请求
+    Printer.log(LOGFLAG_RESOLVER, `FetchRemoteData: Fetching remote data from ${Colors.cyan(requestPath)}`);
     const data = await jsonRequest(requestPath, { method, timeout, headers, body });
-    if (!isObjStrict(data)) {
+    if (isObjStrict(data)) {
+      data.mihawkMessage = `Auto init json data from remote: ${requestPath}`;
+      return data;
+    } else {
       Printer.error(LOGFLAG_RESOLVER, 'FetchRemoteData: Invalid response data format', data);
       return null;
     }
-    data.mihawkMessage = `Auto init json data from remote: ${requestPath}`;
-    return data;
   } catch (error: any) {
     Printer?.error(LOGFLAG_RESOLVER, 'FetchRemoteData: Remote data fetch failed:', error);
     return null;

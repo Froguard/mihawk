@@ -221,6 +221,8 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
     options.socketFilePath = join(options.mockDirPath, `./socket.${logicFileExt}`);
   }
 
+  // - useRemoteData
+  options.useRemoteData = typeof options.setJsonByRemote === 'object' && options.setJsonByRemote?.enable;
   //
   //
   return options as MihawkOptions;
