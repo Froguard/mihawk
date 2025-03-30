@@ -119,7 +119,9 @@
     "express",
     "mock-server",
     "http-mock",
-    "api-mock"
+    "api-mock",
+    "socket-mock",
+    "socket"
   ],
   "repository": {
     "type": "git",
