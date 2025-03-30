@@ -1,6 +1,6 @@
 # Mihawk (简单小巧的 MockServer 工具)
 
-> English → [README.md](./README.md)
+> English → [README.md](https://github.com/Froguard/mihawk/blob/master/README.md)
 
 > 推荐使用版本 `v1.0.0`+
 

@@ -1,6 +1,6 @@
 # Mihawk (simple tiny mock-server)
 
-> 中文版说明 → [README.zh-CN.md](./README.zh_CN.md)
+> 中文版说明 → [README.zh-CN.md](https://github.com/Froguard/mihawk/blob/master/README.zh_CN.md)
 
 > Recommend: use version@`v1.0.0`+
 
