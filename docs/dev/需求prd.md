@@ -46,8 +46,8 @@
   - [x] 方案2：自己实现（轻量化办法）：√
     - 使用 chokidar 监控文件变化，当文件变化时，刷新 require.cache, 并重新启动整个 server（先 close 再 start，以便于加载 mock 相关文件，并重新执行新逻辑）
     - 使用 lru-cache 算法，缓存 mock 文件的内容，避免重复加载
-- [ ] 支持 websocket 链接的 mock 能力
-  - [ ] 自定义 socket 实例上的几个常见 listener 的处理函数
+- [x] 支持 websocket 链接的 mock 能力
+  - [x] 自定义 socket 实例上的几个常见 listener 的处理函数
 
 ## mocks 目录说明
 
