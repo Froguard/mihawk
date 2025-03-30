@@ -20,6 +20,7 @@ export default function cache() {
     ctx.set('Pragma', 'No-cache');
     ctx.set('Cache-Control', 'No-cache');
     ctx.set('Expires', '0');
+    ctx.set('Vary', 'Origin'); // Access-Control-Allow-Origin 不是固定的 * 时，这个字段需要设置
 
     // ================================================
     //
