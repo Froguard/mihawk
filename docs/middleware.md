@@ -52,7 +52,7 @@ function expressMiddlware(req, res, next) {
 }
 
 // 🚀 The explicit definition here is necessary, to identify it as an express middleware, so mihawk can resolve in right way!
-expressMiddlware.isExpress = true;
+expressMiddlware.isExpress = true; // set before export
 
 // exports a default middleware
 export default expressMiddlware;

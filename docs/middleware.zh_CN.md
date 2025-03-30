@@ -52,7 +52,7 @@ function expressMiddlware(req, res, next) {
 }
 
 // 🚀 此处必须显式声明中间件类型，以便 mihawk 能正确识别为 Express 中间件！
-expressMiddlware.isExpress = true;
+expressMiddlware.isExpress = true; // 在 export 导出之前进行设置！
 
 // 导出默认中间件
 export default expressMiddlware;
