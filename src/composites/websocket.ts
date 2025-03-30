@@ -163,6 +163,10 @@ export default class WsCtrl {
        * socket 实例上的一系列事件（通过外部提供的函数，进行自定义实现）
        */
       resolveFunc(socket, request, { clientId, stomp });
+      // 🔥 主动触发一下 open 事件，以便于如果 resolveFunc 函数中，如果针对 socket 对象进行了监听 open 事件能够执行
+      socket.emit('open', () => {
+        Printer.log(LOGFLAG_WS, 'Socket client opened!', Colors.gray(`clientId=[${clientId}]`), Colors.gray(`time=${getTimeNowStr()}`));
+      });
       //
     });
 
