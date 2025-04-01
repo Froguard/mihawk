@@ -38,6 +38,8 @@ export function deepFreeze(obj: any) {
 }
 
 /**
+ * 【暂时废弃】有问题
+ * @deprecated
  * 获取一个代理对象，该对象允许读取目标对象上所有属性（包括深层子属性），但不允许修改
  * @param {T} obj
  * @returns {Readonly<T>} new proxy obj

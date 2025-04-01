@@ -9,11 +9,11 @@ import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME, LOG_FLAG } from '../consts';
-import { createReadonlyProxy } from '../utils/obj';
+import { createReadonlyProxy, deepFreeze } from '../utils/obj';
 import { jsonRequest } from '../utils/request';
 import { initMockLogicFile } from './init-file';
 import type { RequestInit, BodyInit } from 'node-fetch'; // @^2.6.11
-import type { BaseRequestEx, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { BaseRequestEx, MhkCvtrExtra, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
 const RESOLVER_NAME = '[resolver]';
@@ -123,11 +123,11 @@ export function createDataResolver(options: MihawkOptions) {
         const dataConvertor = await loadConvertLogicFile(mockLogicAbsPath, { noCache: !cache });
         if (typeof dataConvertor === 'function') {
           const { request } = ctx || {};
-          // 定义 extra 方式1: 防止被篡改，进行深度冻结
-          // const extra: MhkCvtrExtra = { ...request };
-          // deepFreeze(extra);
-          // 定义 extra 方式2: 防止被篡改，进行深度代理
-          const extra = createReadonlyProxy(request as BaseRequestEx, `${LOG_FLAG} ${Colors.gray('[extra]:')}`);
+          // 定义 extra 方式1: 直接访问
+          const extra = request as MhkCvtrExtra;
+          // deepFreeze(extra); // 不可以改变 request 的对象属性，这里暂时不加
+          // 定义 extra 方式2: 防止被篡改，进行深度代理 // TODO: 目前这种方式会报错，比如使用 extra.query（即 ctx.request.query） 的时候会报错
+          // const extra = createReadonlyProxy(request as BaseRequestEx, `${LOG_FLAG} ${Colors.gray('[extra]:')}`);
           try {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);

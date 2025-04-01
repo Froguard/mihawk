@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-a",
+  "version": "0.1.0-b",
   "description": "A tiny & simple mock server tool, support json,js,cjs,ts(typescript).",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
