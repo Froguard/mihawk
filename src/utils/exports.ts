@@ -28,7 +28,7 @@ export { fuzzyIncludes, shallowEqual, isMatchPatterns, formatPatterns, createRan
 
 /** number */
 export { getSafeNum } from './num';
-/** ts-type-define for date */
+/** ts-type-define for num */
 export type { LooseNum, NumberRange } from './num';
 
 /** async */
