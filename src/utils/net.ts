@@ -2,7 +2,7 @@
 import net from 'net';
 import os from 'os';
 import Colors from 'color-cc';
-import { Printer, Debugger } from './print';
+import { Printer } from './print';
 
 interface PortDetecInfo {
   isInUse?: boolean;

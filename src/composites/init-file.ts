@@ -247,7 +247,7 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
         useTypeDefine
           ? 'export default async function convertData(originData: Record<string, any>, extra: MhkCvtrExtra) {'
           : 'export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {',
-        '  // write your logic here', //
+        '  // 👇🏻 write your logic here...', //
         '  return originData;',
         '}',
       ].join('\n');

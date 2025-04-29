@@ -3,6 +3,7 @@
 /**
  * 获取对象类型
  * - 缺陷：Object.prototype.toString.call(NaN) 的时候，返回的是 number，即其无法准确判断 number
+ * - 关于 NaN 的判断，推荐使用 isNaNStrict 函数
  * @param {unknown} obj
  * @returns {string} typeName
  */
@@ -28,6 +29,10 @@ export function isType(obj: unknown, typeName: string) {
 export function isNil(value: unknown): value is null | undefined {
   return value === null || value === undefined;
 }
+/** alias for isNil */
+export const isNullOrUndefined = isNil;
+/** alias for isNil */
+export const isUndefinedOrNull = isNil;
 
 // 七个 js 官方认定的基础类型（没有 array）
 export type PrimitiveType = null | undefined | string | number | boolean | symbol | bigint;

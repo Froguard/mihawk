@@ -52,6 +52,11 @@
       "require": "./dist/cjs/src/com-types.js",
       "import": "./dist/esm/src/com-types.js",
       "types": "./dist/types/src/com-types.d.ts"
+    },
+    "./utils/exports": {
+      "require": "./dist/cjs/src/utils/exports.js",
+      "import": "./dist/esm/src/utils/exports.js",
+      "types": "./dist/types/src/utils/exports.d.ts"
     }
   },
   "dependencies": {
