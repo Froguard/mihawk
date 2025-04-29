@@ -222,7 +222,7 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
   // generate init-content
   let initContent: string = '';
   const commentCode = [
-    '"use strict;"',
+    "'use strict;'",
     '/**', //
     ` * ${routePath}`, //
     ' * This file isn‘t mandatory. If it is not needed (such as when there is no need to modify response data), it can be deleted directly',
@@ -261,7 +261,7 @@ export function initMockLogicFile(mockLogicFilePath: string, options: MockLogicF
         '',
         ...methodCommentCode,
         'module.exports = async function convertData(originData, extra) {',
-        '  // write your logic here', //
+        '  // 👇🏻 write your logic here...', //
         '  return originData;',
         '};',
       ].join('\n');

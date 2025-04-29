@@ -1,7 +1,7 @@
 'use strict';
 import { join } from 'path';
 import dedupe from 'free-dedupe';
-import { Printer, Debugger } from '../utils/print';
+import { Debugger } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { PKG_NAME } from '../consts';
 import { unixifyPath } from '../utils/path';

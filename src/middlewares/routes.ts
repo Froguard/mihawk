@@ -22,7 +22,7 @@ export default function (routes: Record<string, string>) {
    * @param {KoaNext} next
    */
   return async function (ctx: KoaContext, next: KoaNext) {
-    const { disableLogPrint, skipDefaultMock, mockRelPath, routePath, path } = ctx;
+    const { /*disableLogPrint,*/ skipDefaultMock, mockRelPath, routePath, path } = ctx;
     Debugger.log('mdw-routes: >>', routePath);
     // !disableLogPrint && Printer.log('mdw-routes:', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     //

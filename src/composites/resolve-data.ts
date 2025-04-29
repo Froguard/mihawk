@@ -8,12 +8,11 @@ import { Printer, Debugger } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
-import { LOG_ARROW, MOCK_DATA_DIR_NAME, LOG_FLAG } from '../consts';
-import { createReadonlyProxy, deepFreeze } from '../utils/obj';
+import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
 import { jsonRequest } from '../utils/request';
 import { initMockLogicFile } from './init-file';
 import type { RequestInit, BodyInit } from 'node-fetch'; // @^2.6.11
-import type { BaseRequestEx, MhkCvtrExtra, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
+import type { MhkCvtrExtra, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
 const RESOLVER_NAME = '[resolver]';
