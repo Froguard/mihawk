@@ -137,7 +137,7 @@ export function createDataResolver(options: MihawkOptions) {
             Printer.log(Colors.yellow(`Will return json (${jsonPath4log}) instead.`));
           }
           if (!isObjStrict(mockJson)) {
-            // TODO: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是严格判断 object
+            // MARK: mockJson 的检查待优化，这里应该是 isPureObj/isJson 的判断，而不是“判断严格object”,暂时用这个方案，能满足要求，限制小
             Printer.warn(LOGFLAG_RESOLVER, Colors.yellow("Convert-function of MockLogicFile, isn't return an json-object!"), Colors.gray(logicPath4log));
           }
         } else {

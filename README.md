@@ -1,5 +1,12 @@
 # Mihawk (simple tiny mock-server)
 
+[![version](https://img.shields.io/npm/v/mihawk.svg 'version')](https://www.npmjs.com/package/mihawk)
+[![download](https://img.shields.io/npm/dt/mihawk.svg 'download')](https://www.npmjs.com/package/mihawk)
+[![GitHub issues](https://img.shields.io/github/issues/Froguard/mihawk.svg)](https://github.com/Froguard/mihawk/issues?q=is%3Aopen+is%3Aissue)
+[![Github licences](https://img.shields.io/github/license/Froguard/mihawk.svg)](https://github.com/Froguard/mihawk/blob/master/LICENSE)
+
+<!-- [![nodei](https://nodei.co/npm/mihawk.png?downloads=true)](https://www.npmjs.com/package/mihawk) -->
+
 > 🇨🇳 中文版说明 → [README.zh-CN.md](https://github.com/Froguard/mihawk/blob/master/README.zh_CN.md)
 
 > Recommend: use version@`v1.0.0`+
