@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-e",
+  "version": "0.1.0-f",
   "description": "A tiny & simple mock server tool, support json,js,cjs,ts(typescript).",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
@@ -36,7 +36,7 @@
     "-------------------publish-----------------": "echo '------------------- publish -----------------'",
     "prerelease": "npm rum build",
     "release": "npm publish --regitry=https://registry.npmjs.org",
-    "postinstall": "husky install",
+    "_postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
   },
