@@ -5,15 +5,44 @@ import Colors from 'color-cc';
  * 日期格式化,格式为 yyyy-mm-dd_hh:mm:ss.ms
  * @param {Date} date
  * @returns {string}
+ * @example
+ *   const now = new Date();
+ *   console.log(dateFormat(now)); // 默认格式: yyyy-MM-dd hh:mm:ss, eg: 2025-05-03 04:25:41
+ *   console.log(dateFormat(now, 'yyyy年MM月dd日 HH:mm:ss')); // 24小时制, eg: 2025年05月03日 04:25:41
+ *   console.log(dateFormat(now, 'yy-M-d h:m:s a')); // 12小时制带AM/PM, eg: 25-5-3 4:25:41 AM
+ *   console.log(dateFormat(now, 'yyyy-MM-dd HH:mm:ss.SSS')); // 带毫秒, eg: 2025-05-03 04:25:41.661
  */
-export function dateFormat(date: Date) {
-  return [
-    [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-'), // yyyy-mm-dd
-    '_', //
-    [date.getHours(), date.getMinutes(), date.getSeconds()].join(':'), // hh:mm:ss
-    '.', //
-    date.getMilliseconds(), // SSS
-  ].join('');
+export function dateFormat(date: Date, fmt = 'yyyy-MM-dd hh:mm:ss') {
+  const leftPadZero = (num: number, len: number = 2) => `${num}`.padStart(len, '0');
+  //
+  const fullYear = date.getFullYear();
+  const hours12 = date.getHours() % 12 || 12;
+  const hours24 = date.getHours();
+  const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+  //
+  const tokens: Record<string, any> = {
+    yyyy: fullYear,
+    yy: String(fullYear).slice(-2),
+    MM: leftPadZero(date.getMonth() + 1, 2),
+    M: date.getMonth() + 1,
+    dd: leftPadZero(date.getDate(), 2),
+    d: date.getDate(),
+    HH: leftPadZero(hours24, 2),
+    H: hours24,
+    hh: leftPadZero(hours12, 2),
+    h: hours12,
+    mm: leftPadZero(date.getMinutes(), 2),
+    m: date.getMinutes(),
+    ss: leftPadZero(date.getSeconds(), 2),
+    s: date.getSeconds(),
+    SSS: leftPadZero(date.getMilliseconds(), 3),
+    a: ampm,
+    A: ampm.toUpperCase(),
+  };
+  //
+  return fmt.replace(/(yyyy|yy|MM|M|dd|d|HH|H|hh|h|mm|m|ss|s|SSS|a|A)/g, match => {
+    return tokens[match] !== undefined ? tokens[match] : match;
+  });
 }
 
 /**
@@ -21,7 +50,24 @@ export function dateFormat(date: Date) {
  * @returns {string}
  */
 export function getTimeNowStr() {
-  return dateFormat(new Date());
+  return dateFormat(new Date(), 'yyyy-MM-dd_hh:mm:ss.SSS');
+}
+
+/**
+ * 获取一个随机日期
+ * @returns {Date}
+ */
+export function createRandDate() {
+  return new Date(+new Date() + Math.floor(Math.random() * 1000000000));
+}
+
+/**
+ * 获取一个随机日期字符串
+ * @param {string} fmt = 'yyyy-MM-dd hh:mm:ss'
+ * @returns {string}
+ */
+export function createRandDateStr(fmt?: string) {
+  return dateFormat(createRandDate(), fmt || 'yyyy-MM-dd hh:mm:ss');
 }
 
 /**

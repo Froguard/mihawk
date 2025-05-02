@@ -16,7 +16,7 @@ export { isNullOrUndefined, isUndefinedOrNull, isEmptyList } from './is';
 export type { EmptyObj, EmptyArr, SimpleJsonPropType, PrimitiveType } from './is';
 
 /** date */
-export { dateFormat, getTimeNowStr, ensureDate } from './date';
+export { dateFormat, ensureDate, getTimeNowStr, createRandDate, createRandDateStr } from './date';
 /** ts-type-define for date */
 export type { LooseDate } from './date';
 
@@ -24,10 +24,23 @@ export type { LooseDate } from './date';
 export { delNillProps, deepFreeze } from './obj';
 
 /** str */
-export { fuzzyIncludes, shallowEqual, isMatchPatterns, formatPatterns, createRandId, delAddrProtocol } from './str';
+export {
+  fuzzyIncludes,
+  shallowEqual,
+  isMatchPatterns,
+  formatPatterns,
+  delAddrProtocol,
+  createRandId,
+  createRandChar,
+  createRandStr,
+  createRandPhone,
+  createRandEmail,
+  createRandColor,
+  createRandImage,
+} from './str';
 
 /** number */
-export { getSafeNum } from './num';
+export { getSafeNum, createRandNum } from './num';
 /** ts-type-define for num */
 export type { LooseNum, NumberRange } from './num';
 
@@ -52,7 +65,7 @@ export { parseStompMsg } from './parser';
 export { Printer } from './print';
 
 /** net */
-export { supportLocalHost, isPortInUse, isLocalHost, getMyIp, detectPort } from './net';
+export { supportLocalHost, isPortInUse, isLocalHost, getMyIp, detectPort, createRandIp } from './net';
 
 /** server */
 export { getPortByServer, getAddressByServer, getAddrInfoByServer } from './server';
@@ -63,5 +76,5 @@ export { default as dedupe } from 'free-dedupe';
 /** 3rd-deepmerge */
 export { default as deepmerge } from 'deepmerge';
 
-/** 3rd-Colors */
+/** 3rd-Colors(Terminal Color) */
 export { default as Colors } from 'color-cc';
