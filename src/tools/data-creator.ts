@@ -1,6 +1,6 @@
 'use strict';
 import { dateFormat } from '../utils/date';
-import { isNaNStrict, isNil } from '../utils/is';
+import { isNumStrict } from '../utils/is';
 import { randPick } from '../utils/list';
 
 /**
@@ -150,14 +150,14 @@ export function createRandStr(minLen: number, maxLen: number, onlyLetters: boole
  * @returns {string}
  */
 export function createRandStr(p1: number, p2?: number | boolean, p3?: boolean) {
-  if (!isNaNStrict(p1) || p1 <= 0) {
+  if (!isNumStrict(p1) || p1 <= 0) {
     return '';
   }
   let len = p1;
   let onlyLetters = false;
   if (typeof p2 === 'boolean') {
     onlyLetters = p2;
-  } else if (isNaNStrict(p2)) {
+  } else if (isNumStrict(p2)) {
     if (p2 > 0 && p2 > p1) {
       len = Math.floor(Math.random() * (p2 - p1 + 1)) + p1;
     }

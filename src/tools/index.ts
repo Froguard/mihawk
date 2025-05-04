@@ -27,7 +27,7 @@ export {
 } from './data-creator';
 
 /** mock data convertor */
-export { shuffleList, shuffleString, pickRand, dedupe, deepmerge } from './data-resolver';
+export { pickRand, dedupe, deepmerge, getListByPagination, shuffleList, shuffleString } from './data-resolver';
 
 /** var type detect */
 export { getType, isType, isNil, isPrimitvieType, isSimpleJsonPropType, isJsonStr, isNumStrict, isNaNStrict, isObjStrict, isEmptyObj, isEmptyArr } from '../utils/is';
@@ -76,7 +76,7 @@ export { Printer } from '../utils/print';
 export { supportLocalHost, isPortInUse, isLocalHost, getMyIp, detectPort } from '../utils/net';
 
 /** server */
-export { getPortByServer, getAddressByServer, getAddrInfoByServer } from '../utils/server';
+export { getPortByServer as getPort, getAddressByServer as getAddress, getAddrInfoByServer as getAddrInfo } from '../utils/server';
 
 /** 3rd-Colors(Terminal Colorful Text) */
 export { default as Colors } from 'color-cc';

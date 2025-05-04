@@ -1,4 +1,5 @@
 'use strict';
+import { isNumStrict } from '../utils/is';
 import { shuffle, randPick } from '../utils/list';
 
 /**
@@ -28,4 +29,23 @@ export const shuffleList = shuffle;
  */
 export function shuffleString(str: string) {
   return shuffleList<string>(str.split('')).join('');
+}
+
+/**
+ * 获取分页数据
+ * @param {T[]} list
+ * @param {object} options
+ * @param {number} options.index 页码
+ * @param {number} options.size 每页数量
+ * @returns {T[]} 分页后的数据（新数组）
+ */
+export function getListByPagination<T = any>(list: T[], options: { index: number; size: number }) {
+  let { index, size } = options || {};
+  index = isNumStrict(index) && index > 0 ? index : 1;
+  size = isNumStrict(size) && size >= 2 ? size : 10;
+  //
+  const start = (index - 1) * size;
+  const end = index * size;
+  //
+  return list.slice(start, end);
 }
