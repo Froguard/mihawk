@@ -79,7 +79,7 @@
     "free-dedupe": "^0.0.7",
     "fs-extra": "^11.1.1",
     "json5": "^2.2.3",
-    "koa": "^2.15.3",
+    "koa": "^2.16.1",
     "koa-bodyparser": "^4.4.1",
     "koa-connect": "^2.1.0",
     "koa-sslify": "^5.0.1",
