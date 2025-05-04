@@ -20,6 +20,7 @@ Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b
 - Support custom special routes mapping in `routes.json`, mapping multiple request to same resolve file。 routes key align `glob` expression
 - Support mock logic file type: `js` | `cjs` | `ts`
 - Slightly support for `socket` simulations
+- Support the generation of some simple simulation data, in `mihawk/tools`, eg: `createRandPhone`、`createRandEmail`
 
 ## Install
 

@@ -12,7 +12,13 @@ export {
   creataRandBool,
   createRandNum,
   createRandChar,
+  /**
+   * 获取一个随机字符串
+   * - createRandStr(len, onlyLetter?)
+   * - createRandStr(minLen, maxLen, onlyLetter?)
+   */
   createRandStr,
+  createRandStrByLimit,
   createRandDate,
   createRandDateStr,
   //
@@ -24,6 +30,8 @@ export {
   createRandColor,
   createRandImage,
   createRandIp,
+  createRandName,
+  createRandCname,
 } from './data-creator';
 
 /** mock data convertor */

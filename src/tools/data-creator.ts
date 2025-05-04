@@ -83,13 +83,14 @@ export const RAW_CHARS = `_0123456789${RAW_LETTERS}`; //[_0-9A-Za-z]
 
 /**
  * 获取随机内容的字符串，范围限定在 charsLimit 中
+ * - 如无定制需求，推荐优先使用 createRandStr 函数
  * @param {number} len 长度
  * @param {string} charsLimit 范围，即由字符组成的字符串，如 'abc'
  * @returns
  */
-function _createRandStrByLimit(len: number, charsLimit: string) {
-  len = len || 1;
-  charsLimit = charsLimit?.length ? charsLimit : RAW_CHARS;
+export function createRandStrByLimit(len: number, charsLimit: string) {
+  len = isNumStrict(len) && len > 0 ? len : 1;
+  charsLimit = typeof charsLimit === 'string' && charsLimit?.length ? charsLimit : RAW_CHARS;
   const res: string[] = [];
   let i = 0, n = 0; // prettier-ignore
   for (i = 0; i < len; ++i) {
@@ -144,7 +145,7 @@ export function createRandStr(minLen: number, maxLen: number, onlyLetters: boole
  * - createRandStr(len)
  * - createRandStr(len, true)
  * - createRandStr(minLen, maxLen)
- * - createRandStr(minLen, maxLen, true) *
+ * - createRandStr(minLen, maxLen, true)
  * @param {number} p1
  * @param {number} p2
  * @returns {string}
@@ -166,7 +167,7 @@ export function createRandStr(p1: number, p2?: number | boolean, p3?: boolean) {
     len = p1;
     onlyLetters = false;
   }
-  return _createRandStrByLimit(len, onlyLetters ? RAW_LETTERS : RAW_CHARS);
+  return createRandStrByLimit(len, onlyLetters ? RAW_LETTERS : RAW_CHARS);
 }
 
 /**
@@ -174,7 +175,7 @@ export function createRandStr(p1: number, p2?: number | boolean, p3?: boolean) {
  * @returns {char}
  */
 export function createRandChar(onlyLetters?: boolean) {
-  return _createRandStrByLimit(1, onlyLetters ? RAW_LETTERS : RAW_CHARS);
+  return createRandStrByLimit(1, onlyLetters ? RAW_LETTERS : RAW_CHARS);
 }
 
 /**
@@ -308,4 +309,325 @@ export function createRandUrl(options?: { includeHash?: boolean; includeQuery?: 
   }
   //
   return `${protocol}://${domain}/${pathname}${queryString}${hash}`;
+}
+
+/**
+ * 生成随机姓名（英文）
+ * - 只是简单的 mock 姓和名都不全面
+ * @param {string} part
+ * @returns {string}
+ */
+export function createRandName(part: 'full' | 'first' | 'last' = 'full') {
+  // firse names range:
+  const FIRST_NAMES: string[] = [
+    'Herry',
+    'Tom',
+    'Jerry',
+    'Sky',
+    'Emma',
+    'Liam',
+    'Olivia',
+    'Noah',
+    'Ava',
+    'Isabella',
+    'Sophia',
+    'Jackson',
+    'Mason',
+    'Lucas',
+    'Ethan',
+    'James',
+    'Alexander',
+    'Michael',
+    'Benjamin',
+    'Emily',
+    'Abigail',
+    'Charlotte',
+    'Harper',
+    'Megan',
+    'Jessica',
+    'Robert',
+    'William',
+    'David',
+    'Joseph',
+    'Daniel',
+    'Matthew',
+    'Anthony',
+    'Mark',
+  ];
+  // last names range:
+  const LAST_NAMES: string[] = [
+    'Smith',
+    'Johnson',
+    'Williams',
+    'Brown',
+    'Jones',
+    'Garcia',
+    'Miller',
+    'Davis',
+    'Rodriguez',
+    'Martinez',
+    'Hernandez',
+    'Lopez',
+    'Wilson',
+    'Anderson',
+    'Thomas',
+    'Taylor',
+    'Moore',
+    'Jackson',
+    'Martin',
+    'Lee',
+    'Perez',
+    'Thompson',
+    'White',
+    'Harris',
+    'Sanchez',
+    'Clark',
+    'Ramirez',
+    'Lewis',
+    'Robinson',
+    'Walker',
+  ];
+  //
+  const firstName = randPick(FIRST_NAMES);
+  const lastName = randPick(LAST_NAMES);
+  switch (part) {
+    case 'first':
+      return firstName;
+    case 'last':
+      return lastName;
+    default:
+      return `${firstName} ${lastName}`;
+  }
+}
+
+/**
+ * 生成随机姓名（中文）
+ * - 只是简单的 mock, 姓氏并非完整百家姓
+ * @returns {string}
+ */
+export function createRandCname() {
+  // 常见姓氏
+  const SUR_NAMES = [
+    '赵',
+    '钱',
+    '孙',
+    '李',
+    '周',
+    '吴',
+    '郑',
+    '王',
+    '冯',
+    '陈',
+    '褚',
+    '卫',
+    '蒋',
+    '沈',
+    '韩',
+    '杨',
+    '朱',
+    '秦',
+    '尤',
+    '许',
+    '阎',
+    '颜',
+    '马',
+    '张',
+    '梁',
+    '段',
+    '唐',
+    '徐',
+    '庄',
+    '吕',
+    '冯',
+    '俞',
+    '沈',
+    '苗',
+    '林',
+    '叶',
+    '葛',
+    '程',
+    '陈',
+    '丁',
+    '刘',
+    '汤',
+    '谢',
+    '胡',
+    '何',
+    '诸葛',
+    '纳兰',
+    '欧阳',
+    '上官',
+    '南宫',
+    '东方',
+    '太史',
+    '端木',
+    '皇甫',
+    '呼延',
+    '独孤',
+    '司马',
+    '申屠',
+    '慕容',
+    '宇文',
+    '司徒',
+    '公孙',
+  ];
+  // 中间名字
+  const MID_NAMES = [
+    '明',
+    '刚',
+    '伟',
+    '金',
+    '木',
+    '水',
+    '火',
+    '土',
+    '石',
+    '永',
+    '国',
+    '宁',
+    '飞',
+    '东',
+    '西',
+    '南',
+    '北',
+    '子',
+    '梓',
+    '雨',
+    '露',
+    '语',
+    '宇',
+    '予',
+    '长',
+    '大',
+    '小',
+    '细',
+    '硕',
+    '建',
+    '美',
+    '帅',
+    '春',
+    '夏',
+    '秋',
+    '冬',
+    '梅',
+  ];
+  // 常见名字
+  const GIVEN_NAMES = [
+    '月',
+    '磊',
+    '犇',
+    '玥',
+    '蕊',
+    '瑞',
+    '昊',
+    '浩',
+    '明',
+    '博',
+    '伟',
+    '芳',
+    '娜',
+    '敏',
+    '静',
+    '丽',
+    '强',
+    '磊',
+    '洋',
+    '勇',
+    '娟',
+    '艳',
+    '杰',
+    '浩',
+    '明',
+    '波',
+    '平',
+    '轩',
+    '涵',
+    '欣',
+    '俊',
+    '宇',
+    '泽',
+    '葵',
+    '飞',
+    '佑',
+    '倩',
+    '茹',
+    '思',
+    '怿',
+    '乐',
+    '悦',
+    '峰',
+    '锋',
+    '东',
+    '冬',
+    '卓',
+    '君',
+    '军',
+    '敏',
+    '魁',
+  ];
+  // 常见组合
+  const COMBS = [
+    '宇宁',
+    '建国',
+    '白樱',
+    '丽娟',
+    '丽君',
+    '宝瑞',
+    '宝强',
+    '宝国',
+    '宝亮',
+    '卫国',
+    '卫红',
+    '子轩',
+    '子涵',
+    '子强',
+    '子豪',
+    '梓轩',
+    '梓涵',
+    '梓豪',
+    '紫涵',
+    '雨欣',
+    '雨夕',
+    '明远',
+    '明轩',
+    '可馨',
+    '可心',
+    '可灵',
+    '诗涵',
+    '雨涵',
+    '舟虚',
+    '星驰',
+    '遇春',
+    '子龙',
+    '豪杰',
+    '香玉',
+    '龙凤',
+    '人风',
+    '火风',
+    '不悔',
+    '弃疾',
+    '病已',
+    '仲达',
+    '无忌',
+    '芷若',
+    '德华',
+    '文采',
+    '雪凝',
+    '宝华',
+    '晓龙',
+    '振兴',
+    '思聪',
+  ];
+  //
+  const surName = randPick(SUR_NAMES);
+  if (Math.random() >= 0.4) {
+    // 60%
+    const midName = Math.random() > 0.5 ? randPick(MID_NAMES) : '';
+    const givenName = randPick(GIVEN_NAMES);
+    return `${surName}${midName}${givenName}`;
+  } else {
+    // 40%
+    const comb = randPick(COMBS);
+    return `${surName}${comb}`;
+  }
 }
