@@ -13,14 +13,15 @@
 
 采用 `GET /a/b/c` → `./mocks/data/GET/a/b/c.json` 方式去做 api 请求的 mock server 工具
 
-- 支持 https 协议
-- 支持所有有请求方法，例如 `GET`, `POST`, `PUT`, `DELETE` 等，通过文件路径方式自动映射请求路径
-- 用以定义 mock 的数据文件，同时支持 `json` | `json5` 两种格式
-- 用以处理 mock 数据的逻辑文件，支持 `js` | `cjs` | `ts` 三种格式，可以对 json 请求进行二次修改，以便于支持一些动态逻辑处理
-- 在默认的文件映射功能之外，允许在 `middleware.{js|cjs|ts}` 文件中，通过暴露 koa2 middleware 函数的形式，完成自定义路由的复杂的处理逻辑 (express中间件也兼容，通过设置中间件函数func.isExpress=trye即可)
-- 允许自定义 `routes.json` 文件方式, 让多条路径映射到同一个文件，其中 key 允许 glob 表达式
-- 简单支持 `socket` 的模拟
-- 通过 `mihawk/tools` 提供一些简单的函数，便于模拟数据的生成，如: `createRandPhone`、`createRandEmail`
+- ✅ 对于项目的前端代码零侵入
+- ✅ 支持 https 协议
+- ✅ 支持所有有请求方法，例如 `GET`, `POST`, `PUT`, `DELETE` 等，通过文件路径方式自动映射请求路径
+- ✅ 用以定义 mock 的数据文件，同时支持 `json` | `json5` 两种格式
+- ✅ 用以处理 mock 数据的逻辑文件，支持 `js` | `cjs` | `ts` 三种格式，可以对 json 请求进行二次修改，以便于支持一些动态逻辑处理
+- ✅ 在默认的文件映射功能之外，允许在 `middleware.{js|cjs|ts}` 文件中，通过暴露 koa2 middleware 函数的形式，完成自定义路由的复杂的处理逻辑 (express中间件也兼容，通过设置中间件函数func.isExpress=trye即可)
+- ✅ 允许自定义 `routes.json` 文件方式, 让多条路径映射到同一个文件，其中 key 允许 glob 表达式
+- ✅ 简单支持 `socket` 的模拟
+- ✅ 通过 `mihawk/tools` 提供一些简单的函数，便于模拟数据的生成，如: `createRandPhone`、`createRandEmail`
 
 ## 安装
 
@@ -130,6 +131,48 @@ mihawk init
 
 > 更多说明，详见 ts 定义文件 → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
 
+## 在常见的打包工具中，配置 Mihawk
+
+> 本质上就是基于 `devServer` 的代理功能，将请求转发至 `mihawk` 服务器
+
+### vite
+
+配置 `vite.config.js` 文件:
+
+```js
+import { defineConfig } from 'vite';
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8888', // mihawk server address
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+});
+```
+
+### webpack
+
+配置 `webpack.config.js` 文件:
+
+```js
+// webpack.config.js
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8888', // mihawk server address
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' },
+      },
+    },
+  },
+};
+```
+
 ## 示例
 
 假设有一个请求 `GET /api/fetch_a_random_number`，返回一个随机数，那么可以这样写：
@@ -234,3 +277,24 @@ export default async function convertData(originData: Record<string, any>, extra
   return originData; // 需要进行显式 return
 }
 ```
+
+## 和 Mockjs 区别？
+
+### 1、定位不同
+
+- Mockjs 是一个前端的 mockjs 库，提供了强大的模拟数据生成功能
+- Mihawk 是一个 Node.js 的 mock 服务，可以和前端项目一起使用，也可以单独使用；提供了基于 Nodejs 的 httpServer|SocketServer 的 mock 能力
+
+### 2、实现方式不同
+
+- Mockjs 通过劫持 xhr/fetch 等，对于请求进行拦截并返回模拟数据，对于前端工程代码有一定改造，且请求与真实线上环境的收发过程有一定差异
+- Mihawk 通过 Koa2 中间件的形式，对请求进行拦截并返回模拟数据，对于前端工程代码无改造，且请求与真实线上环境的收发过程无差异
+
+### 3、常用使用场景
+
+- Mockjs 用于模拟数据的生产，通过其提供的特定语法，生成对应的假数据
+- Mihawk 用于基于 Nodejs 实现对于 BackendSenver 的模拟，比如 Socket, httpServer 等，搭配简单的数据生产函数，完成假数据的生成
+  - `mhiawk/tools`: 内置的一些工具函数 `creatRandXxx` 等生成假数据，这部分功能并没有 Mockjs 那么强大;
+    - 可以考虑同时使用 mockjs 的 `data generate` 和 mihawk 的 `server mock`，配合完成；两者并不冲突
+  - `mocks/middleware.ts`: 模拟后端服务，比如 httpServer
+  - `mocks/socket.ts`: 模拟后端服务，比如 socketServer

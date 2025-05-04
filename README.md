@@ -13,14 +13,15 @@
 
 Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b/c.json` mapping
 
-- Support https protocol
-- Support all methods, like `GET`, `POST`, `PUT`, `DELETE` etc.
-- Support mock data file type: `json` | `json5`
-- Support custom your middleware in `middleware.{js|cjs|ts}`, write as `koa2 middleware` (or `express-middleware` both ok with `func.isExpress=true`)
-- Support custom special routes mapping in `routes.json`, mapping multiple request to same resolve file。 routes key align `glob` expression
-- Support mock logic file type: `js` | `cjs` | `ts`
-- Slightly support for `socket` simulations
-- Support the generation of some simple simulation data, in `mihawk/tools`, eg: `createRandPhone`、`createRandEmail`
+- ✔️ Zero intrusion into front-end code
+- ✔️ Support https protocol
+- ✔️ Support all methods, like `GET`, `POST`, `PUT`, `DELETE` etc.
+- ✔️ Support mock data file type: `json` | `json5`
+- ✔️ Support custom your middleware in `middleware.{js|cjs|ts}`, write as `koa2 middleware` (or `express-middleware` both ok with `func.isExpress=true`)
+- ✔️ Support custom special routes mapping in `routes.json`, mapping multiple request to same resolve file。 routes key align `glob` expression
+- ✔️ Support mock logic file type: `js` | `cjs` | `ts`
+- ✔️ Slightly support for `socket` simulations
+- ✔️ Support the generation of some simple simulation data, in `mihawk/tools`, eg: `createRandPhone`、`createRandEmail`
 
 ## Install
 
@@ -79,7 +80,7 @@ mock-file  :  data/get/a/b/c/d.js
 
 Finally, the return data will be the data after processing mock-file (the `mock-file`) with origin data (the `JSON-file`)
 
-## Usage-Recommend
+## Usage-Recommend ✅
 
 > A more recommended way to use it is to write all config props into the `.mihawkrc.json` in the root directory
 >
@@ -129,6 +130,48 @@ About root config props:
     - `timeout`: request timeout in milliseconds
 
 > More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
+
+## Config with Build tools
+
+> Essentially, it is based on the proxy functionality of `devServer`, forwarding requests to the mihawk server.
+
+### vite
+
+in `vite.config.js` file:
+
+```js
+import { defineConfig } from 'vite';
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8888', // mihawk server address
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+});
+```
+
+### webpack
+
+in `webpack.config.js` file:
+
+```js
+// webpack.config.js
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8888', // mihawk server address
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' },
+      },
+    },
+  },
+};
+```
 
 ## Example
 
@@ -235,3 +278,24 @@ export default async function convertData(originData: Record<string, any>, extra
   return originData; // return data, it is required
 }
 ```
+
+## Differences from Mockjs?
+
+### 1. Different positioning
+
+- Mockjs is a front-end mockjs library that provides powerful simulated data generation capabilities
+- Mihawk is a Node.js mock service that can be used with front-end projects or standalone; it provides mock capabilities for httpServer/SocketServer based on Nodejs
+
+### 2. Different implementation methods
+
+- Mockjs intercepts requests and returns simulated data by hijacking xhr/fetch, etc., which requires certain modifications to front-end engineering code, and there are some differences in the request sending/receiving process compared to the real online environment
+- Mihawk intercepts requests and returns simulated data through Koa2 middleware format, without requiring any modifications to front-end engineering code, and the request sending/receiving process is identical to the real online environment
+
+### 3. Common usage scenarios
+
+- Mockjs is used for simulated data production, generating corresponding fake data through its specific syntax
+- Mihawk is used to simulate BackendServer based on Nodejs, such as Socket, httpServer, etc., combined with simple data generation functions to complete fake data generation
+  - `mhiawk/tools`: Built-in utility functions like `creatRandXxx` for generating fake data; this functionality is not as powerful as Mockjs
+    - Consider using both mockjs's `data generate` and mihawk's `server mock` together; they are not mutually exclusive
+  - `your_project/mocks/middleware.ts`: Simulate backend services, such as httpServer
+  - `your_project/mocks/socket.ts`: Simulate backend services, such as socketServer
