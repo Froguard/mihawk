@@ -53,10 +53,10 @@
       "import": "./dist/esm/src/com-types.js",
       "types": "./dist/types/src/com-types.d.ts"
     },
-    "./utils/exports": {
-      "require": "./dist/cjs/src/utils/exports.js",
-      "import": "./dist/esm/src/utils/exports.js",
-      "types": "./dist/types/src/utils/exports.d.ts"
+    "./tools": {
+      "require": "./dist/cjs/src/tools/index.js",
+      "import": "./dist/esm/src/tools/index.js",
+      "types": "./dist/types/src/tools/index.d.ts"
     }
   },
   "dependencies": {

@@ -109,25 +109,3 @@ export function isLocalHost(host: string) {
 export function supportLocalHost(host: string) {
   return isLocalHost(host) || '0.0.0.0' === host;
 }
-
-/**
- * 创建随机 IO
- * @param {boolean} isIPV6
- * @returns {string}
- * @example
- * console.log(createRandIp()); // 生成IPv4，例如：192.168.1.1
- * console.log(createRandIp(true)); // 生成IPv6，例如：2001:0db8:85a3:0000:0000:8a2e:0370:7334
- */
-export function createRandIp(isIPV6?: boolean) {
-  if (isIPV6) {
-    // 生成随机的IPv6地址
-    return Array.from({ length: 8 }, () =>
-      Math.floor(Math.random() * 0xffff)
-        .toString(16)
-        .padStart(4, '0'),
-    ).join(':');
-  } else {
-    // 默认生成随机的IPv4地址
-    return Array.from({ length: 4 }, () => Math.floor(Math.random() * 256)).join('.');
-  }
-}

@@ -48,6 +48,7 @@
     - 使用 lru-cache 算法，缓存 mock 文件的内容，避免重复加载
 - [x] 支持 websocket 链接的 mock 能力
   - [x] 自定义 socket 实例上的几个常见 listener 的处理函数
+- [x] 实现一些较为基础的工具函数，帮助用户生成随机的 mock 数据，放在 `tools` 目录下
 
 ## mocks 目录说明
 

@@ -1,4 +1,5 @@
 'use strict';
+import * as JSON5 from 'json5';
 
 /**
  * 获取对象类型
@@ -83,7 +84,7 @@ export function isNumStrict(n: unknown): n is number {
  * @param obj
  * @returns
  */
-export function isNaNStrict(obj: unknown): boolean {
+export function isNaNStrict(obj: unknown): obj is number {
   return obj !== obj;
 }
 
@@ -150,3 +151,21 @@ export function isEmptyArr(arr: unknown): arr is EmptyArr {
 }
 // alias
 export const isEmptyList = isEmptyArr;
+
+/**
+ * 判断 json 文本是否合理
+ * @param {string} jsonStr
+ * @returns {boolean} isValidJsonCnt
+ */
+export function isJsonStr(jsonStr: string, isJson5 = false): jsonStr is string {
+  let isValidJsonCnt = false;
+  try {
+    isValidJsonCnt = JSON.parse(jsonStr);
+    if (!isValidJsonCnt && isJson5) {
+      isValidJsonCnt = JSON5.parse(jsonStr);
+    }
+  } catch (e) {
+    isValidJsonCnt = false;
+  }
+  return isValidJsonCnt;
+}

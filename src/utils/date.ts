@@ -54,23 +54,6 @@ export function getTimeNowStr() {
 }
 
 /**
- * 获取一个随机日期
- * @returns {Date}
- */
-export function createRandDate() {
-  return new Date(+new Date() + Math.floor(Math.random() * 1000000000));
-}
-
-/**
- * 获取一个随机日期字符串
- * @param {string} fmt = 'yyyy-MM-dd hh:mm:ss'
- * @returns {string}
- */
-export function createRandDateStr(fmt?: string) {
-  return dateFormat(createRandDate(), fmt || 'yyyy-MM-dd hh:mm:ss');
-}
-
-/**
  * 宽松型日期数据表示
  */
 export type LooseDate = Date | string | number;
