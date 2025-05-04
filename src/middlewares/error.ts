@@ -43,7 +43,8 @@ export default function error() {
       } else {
         // others
         ctx.status = 500;
-        ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', stack || '');
+        Printer.error('MDW-err stack trace:', stack || 'No stack trace available');
+        ctx.body = errHtml.replace('<%= errMsg %>', errMsg).replace('<%= errStack %>', 'An internal server error occurred.');
       }
     }
     // ================================================
