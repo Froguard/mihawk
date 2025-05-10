@@ -3,7 +3,7 @@
 ```mermaid
 graph LR
     A[Request] --> B(devServer)
-    B --> C{mihawk}
+    B --> C[mihawk]
     C --> D{是否已初始化 JSON 数据？}
     D -- 已初始化 --> E[直接返回数据]
     D -- 未初始化 --> F[请求远端服务的数据]
