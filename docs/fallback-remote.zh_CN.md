@@ -1,5 +1,31 @@
 # 用远端接口初始化本地 mock 数据
 
+```mermaid
+graph LR
+    A[Request] --> B(devServer)
+    B --> C{mihawk}
+    C --> D{是否已初始化 JSON 数据？}
+    D -- 已初始化 --> E[直接返回数据]
+    D -- 未初始化 --> F[请求远端服务的数据]
+    F --> G[远端服务]
+    G --> H[初始化json文件并返回数据]
+
+    style A fill:#333,stroke:#fff,color:#fff
+    style B fill:#555,stroke:#fff,color:#fff
+    style C fill:#09c,stroke:#fff,color:#fff
+    style D fill:#777,stroke:#fff,color:#fff
+    style E fill:#888,stroke:#fff,color:#fff
+    style F fill:#999,stroke:#fff,color:#fff
+    style G fill:#7a6da2,stroke:#fff,color:#fff
+    style H fill:#bbb,stroke:#fff,color:#fff
+
+    classDef step fill:#555,stroke:#fff,color:#fff;
+    classDef decision fill:#777,stroke:#fff,color:#fff;
+
+    class A,F,G,H step
+    class D decision
+```
+
 ## 1. 功能触发条件
 
 - 当本地未匹配到mock规则时

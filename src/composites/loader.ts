@@ -23,7 +23,7 @@ interface BaseLoadOption {
 }
 
 /**
- * 加载&执行 json 文件，返回数据
+ * 加载 & 执行 json 文件，返回数据
  * @param {string} jsonFilePath
  * @param {BaseLoadOption} options load 配置项
  * @returns {object}
@@ -50,7 +50,7 @@ export async function loadJson(jsonFilePath: string, options?: BaseLoadOption) {
 }
 
 /**
- * 加载&执行 js 文件，返回执行结果
+ * 加载 & 执行 js 文件，返回执行结果
  * @param {string} jsFilePath
  * @param {BaseLoadOption} options load 配置项
  * @returns {Promise<T|null>}

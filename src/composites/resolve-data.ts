@@ -124,9 +124,14 @@ export function createDataResolver(options: MihawkOptions) {
           const { request } = ctx || {};
           // 定义 extra 方式1: 直接访问
           const extra = request as MhkCvtrExtra;
-          // deepFreeze(extra); // 不可以改变 request 的对象属性，这里暂时不加
-          // 定义 extra 方式2: 防止被篡改，进行深度代理 // TODO: 目前这种方式会报错，比如使用 extra.query（即 ctx.request.query） 的时候会报错
+
+          // MARK: ↓ 这里暂时不加，有点画蛇添足
+          // deepFreeze(extra); // 不可以改变 request 的对象属性
+
+          // MARK: ↓ 目前这种方式会报错，比如使用 extra.query（即 ctx.request.query） 的时候会报错
+          // 定义 extra 方式2: 防止被篡改，进行深度代理
           // const extra = createReadonlyProxy(request as BaseRequestEx, `${LOG_FLAG} ${Colors.gray('[extra]:')}`);
+
           try {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);
