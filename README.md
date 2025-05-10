@@ -23,36 +23,6 @@ Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b
 - ✔️ Slightly support for `socket` simulations
 - ✔️ Support the generation of some simple simulation data, in `mihawk/tools`, eg: `createRandPhone`、`createRandEmail`
 
-```mermaid
-graph LR
-    A[Dev Mode: Request] --> B(devServer)
-    B --> D1[Mode 1: mockServer → Local launched mockServer]
-    B --> D2[Mode 2: Proxy to backend → Change proxy to backend's address]
-    D1 --> C(Mihawk)
-    D2 --> E(BackendServer)
-
-    F[Production Mode: Request] --> G(BackendServer)
-
-    style A fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
-    style B fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style C fill:#09c,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style D1 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style D2 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style E fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style F fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
-    style G fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-
-    classDef devStyle fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee;
-    classDef serviceStyle fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
-    classDef backendStyle fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
-
-    class A,F devStyle
-    class B,D1,D2 serviceStyle
-    class C,E,G backendStyle
-```
-
-> In the above diagram, `devServer` is typically provided by bundling tools during local development, such as Vite or Webpack, which have corresponding configuration options.
-
 ## Install
 
 ```sh
@@ -162,6 +132,36 @@ About root config props:
 > More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
 
 ## Config with Build tools
+
+```mermaid
+graph LR
+    A[Dev Mode: Request] --> B(devServer)
+    B --> D1[Mode 1: mockServer → Local launched mockServer]
+    B --> D2[Mode 2: Proxy to backend → Change proxy to backend's address]
+    D1 --> C(Mihawk)
+    D2 --> E(BackendServer)
+
+    F[Production Mode: Request] --> G(BackendServer)
+
+    style A fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style B fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style C fill:#09c,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D1 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D2 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style E fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style F fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style G fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+
+    classDef devStyle fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee;
+    classDef serviceStyle fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
+    classDef backendStyle fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
+
+    class A,F devStyle
+    class B,D1,D2 serviceStyle
+    class C,E,G backendStyle
+```
+
+> In the above diagram, `devServer` is typically provided by bundling tools during local development, such as Vite or Webpack, which have corresponding configuration options.
 
 > Essentially, it is based on the proxy functionality of `devServer`, forwarding requests to the mihawk server.
 

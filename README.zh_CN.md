@@ -23,36 +23,6 @@
 - ✅ 简单支持 `socket` 的模拟
 - ✅ 通过 `mihawk/tools` 提供一些简单的函数，便于模拟数据的生成，如: `createRandPhone`、`createRandEmail`
 
-```mermaid
-graph LR
-    A[开发模式: 请求] --> B(devServer)
-    B --> D1[Mode 1: mockServer → 本地Mock服务器]
-    B --> D2[Mode 2: 代理至后端 → 某个后端服务地址]
-    D1 --> C(Mihawk)
-    D2 --> E(后端服务)
-
-    F[生产环境: 请求] --> G(后端服务)
-
-    style A fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
-    style B fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style C fill:#09c,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style D1 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style D2 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style E fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-    style F fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
-    style G fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
-
-    classDef devStyle fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee;
-    classDef serviceStyle fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
-    classDef backendStyle fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
-
-    class A,F devStyle
-    class B,D1,D2 serviceStyle
-    class C,E,G backendStyle
-```
-
-> 上图中 `devServer` 一般为本地开发时候的打包工具可提供，如 vite，webpack 等，均有对应配置
-
 ## 安装
 
 ```sh
@@ -162,6 +132,36 @@ mihawk init
 > 更多说明，详见 ts 定义文件 → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
 
 ## 在常见的打包工具中，配置 Mihawk
+
+```mermaid
+graph LR
+    A[开发模式: 请求] --> B(devServer)
+    B --> D1[Mode 1: mockServer → 本地Mock服务器]
+    B --> D2[Mode 2: 代理至后端 → 某个后端服务地址]
+    D1 --> C(Mihawk)
+    D2 --> E(后端服务)
+
+    F[生产环境: 请求] --> G(后端服务)
+
+    style A fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style B fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style C fill:#09c,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D1 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D2 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style E fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style F fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style G fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+
+    classDef devStyle fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee;
+    classDef serviceStyle fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
+    classDef backendStyle fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
+
+    class A,F devStyle
+    class B,D1,D2 serviceStyle
+    class C,E,G backendStyle
+```
+
+> 上图中 `devServer` 一般为本地开发时候的打包工具可提供，如 vite，webpack 等，均有对应配置
 
 > 本质上就是基于 `devServer` 的代理功能，将请求转发至 `mihawk` 服务器
 
