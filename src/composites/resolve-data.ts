@@ -65,6 +65,7 @@ export function createDataResolver(options: MihawkOptions) {
       msg: `Auto init file: ${jsonPath4log}`,
     };
     let mockJson: Record<string, any> = initData;
+    let loadRemote: boolean = false;
     if (existsSync(mockJsonAbsPath)) {
       let jsonData: Record<string, any> | null = null;
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
@@ -76,12 +77,14 @@ export function createDataResolver(options: MihawkOptions) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
           jsonData = remoteData;
+          loadRemote = true;
         } else {
           Printer.warn(LOGFLAG_RESOLVER, Colors.yellow(`RemoteData isn't a normal json response!`), Colors.yellow('Unexception value='), remoteData);
           jsonData = null;
         }
       }
       if (!jsonData) {
+        loadRemote = false;
         // 如果上述拉取远端数据，没有成功：如拉取失败、或者未执行拉取（即：未开启远端覆盖）；则执行本地文件读取
         jsonData = await loadJson(mockJsonAbsPath, { noCache: !cache });
       }
@@ -105,6 +108,7 @@ export function createDataResolver(options: MihawkOptions) {
       }
       // Use remote data if available, otherwise use default
       if (remoteData) {
+        loadRemote = true;
         finalInitData = remoteData;
         finalInitType = 'fallbackRemoteData';
       }
@@ -113,6 +117,7 @@ export function createDataResolver(options: MihawkOptions) {
       writeJSONSafeSync(mockJsonAbsPath, finalInitData);
       //
     }
+    ctx.set('X-Mock-Use-Remote', loadRemote ? '1' : '0');
     ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
 
     // 2.convert data by logic file, if it exists & exec correctly
@@ -129,14 +134,11 @@ export function createDataResolver(options: MihawkOptions) {
           const { request } = ctx || {};
           // 定义 extra 方式1: 直接访问
           const extra = request as MhkCvtrExtra;
-
           // MARK: ↓ 这里暂时不加，有点画蛇添足
           // deepFreeze(extra); // 不可以改变 request 的对象属性
-
           // MARK: ↓ 目前这种方式会报错，比如使用 extra.query（即 ctx.request.query） 的时候会报错
           // 定义 extra 方式2: 防止被篡改，进行深度代理
           // const extra = createReadonlyProxy(request as BaseRequestEx, `${LOG_FLAG} ${Colors.gray('[extra]:')}`);
-
           try {
             // 执行转换器，处理原始的 json 数据
             mockJson = await dataConvertor(mockJson, extra);
@@ -174,7 +176,7 @@ export function createDataResolver(options: MihawkOptions) {
  * @param {string} reqPath
  * @param {RequestInit} reqOptions
  * @param {MihawkOptions} mhkOptions
- * @returns {Promise<JSONObject | null>}s
+ * @returns {Promise<JSONObject | null>} json 数据内容 或者 null
  */
 async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOptions: MihawkOptions) {
   const { setJsonByRemote } = mhkOptions;
