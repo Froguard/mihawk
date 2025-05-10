@@ -285,6 +285,34 @@ export default async function convertData(originData: Record<string, any>, extra
 - Mockjs 是一个前端的 mockjs 库，提供了强大的模拟数据生成功能
 - Mihawk 是一个 Node.js 的 mock 服务，可以和前端项目一起使用，也可以单独使用；提供了基于 Nodejs 的 httpServer|SocketServer 的 mock 能力
 
+```mermaid
+graph LR
+    A[开发模式: 请求] --> B(devServer)
+    B --> D1[Mode 1: mockServer → 本地服务]
+    B --> D2[Mode 2: 代理带后端 → 某个后端服务地址]
+    D1 --> C(Mihawk)
+    D2 --> E(后端服务)
+
+    F[生产环境: 请求] --> G(后端服务)
+
+    style A fill:#333,stroke:#fff,fill-opacity:1,color:#fff
+    style B fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style C fill:#777,stroke:#000,fill-opacity:1,color:#000
+    style D1 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style D2 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style E fill:#444,stroke:#fff,fill-opacity:1,color:#fff
+    style F fill:#333,stroke:#fff,fill-opacity:1,color:#fff
+    style G fill:#444,stroke:#fff,fill-opacity:1,color:#fff
+
+    classDef devStyle fill:#333,stroke:#fff,fill-opacity:1,color:#fff;
+    classDef serviceStyle fill:#555,stroke:#fff,fill-opacity:1,color:#fff;
+    classDef backendStyle fill:#444,stroke:#fff,fill-opacity:1,color:#fff;
+
+    class A,F devStyle
+    class B,D1,D2 serviceStyle
+    class C,E,G backendStyle
+```
+
 ### 2、实现方式不同
 
 - Mockjs 通过劫持 xhr/fetch 等，对于请求进行拦截并返回模拟数据，对于前端工程代码有一定改造，且请求与真实线上环境的收发过程有一定差异

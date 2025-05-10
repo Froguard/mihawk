@@ -286,6 +286,34 @@ export default async function convertData(originData: Record<string, any>, extra
 - Mockjs is a front-end mockjs library that provides powerful simulated data generation capabilities
 - Mihawk is a Node.js mock service that can be used with front-end projects or standalone; it provides mock capabilities for httpServer/SocketServer based on Nodejs
 
+```mermaid
+graph LR
+    A[Dev Mode: Request] --> B(devServer)
+    B --> D1[Mode 1: mockServer → Local development]
+    B --> D2[Mode 2: Proxy to backend → Change proxy to backend's address]
+    D1 --> C(Mihawk)
+    D2 --> E(BackendServer)
+
+    F[Production Mode: Request] --> G(BackendServer)
+
+    style A fill:#333,stroke:#fff,fill-opacity:1,color:#fff
+    style B fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style C fill:#777,stroke:#000,fill-opacity:1,color:#000
+    style D1 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style D2 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
+    style E fill:#444,stroke:#fff,fill-opacity:1,color:#fff
+    style F fill:#333,stroke:#fff,fill-opacity:1,color:#fff
+    style G fill:#444,stroke:#fff,fill-opacity:1,color:#fff
+
+    classDef devStyle fill:#333,stroke:#fff,fill-opacity:1,color:#fff;
+    classDef serviceStyle fill:#555,stroke:#fff,fill-opacity:1,color:#fff;
+    classDef backendStyle fill:#444,stroke:#fff,fill-opacity:1,color:#fff;
+
+    class A,F devStyle
+    class B,D1,D2 serviceStyle
+    class C,E,G backendStyle
+```
+
 ### 2. Different implementation methods
 
 - Mockjs intercepts requests and returns simulated data by hijacking xhr/fetch, etc., which requires certain modifications to front-end engineering code, and there are some differences in the request sending/receiving process compared to the real online environment
