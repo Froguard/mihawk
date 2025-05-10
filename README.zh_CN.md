@@ -33,18 +33,18 @@ graph LR
 
     F[生产环境: 请求] --> G(后端服务)
 
-    style A fill:#333,stroke:#fff,fill-opacity:1,color:#fff
-    style B fill:#555,stroke:#fff,fill-opacity:1,color:#fff
-    style C fill:#777,stroke:#000,fill-opacity:1,color:#000
-    style D1 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
-    style D2 fill:#555,stroke:#fff,fill-opacity:1,color:#fff
-    style E fill:#444,stroke:#fff,fill-opacity:1,color:#fff
-    style F fill:#333,stroke:#fff,fill-opacity:1,color:#fff
-    style G fill:#444,stroke:#fff,fill-opacity:1,color:#fff
+    style A fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style B fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style C fill:#09c,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D1 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style D2 fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style E fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
+    style F fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee
+    style G fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0
 
-    classDef devStyle fill:#333,stroke:#fff,fill-opacity:1,color:#fff;
-    classDef serviceStyle fill:#555,stroke:#fff,fill-opacity:1,color:#fff;
-    classDef backendStyle fill:#444,stroke:#fff,fill-opacity:1,color:#fff;
+    classDef devStyle fill:#2c2c2c,stroke:#ccc,fill-opacity:1,color:#eee;
+    classDef serviceStyle fill:#5e6472,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
+    classDef backendStyle fill:#7a6da2,stroke:#f0f0f0,fill-opacity:1,color:#f0f0f0;
 
     class A,F devStyle
     class B,D1,D2 serviceStyle
