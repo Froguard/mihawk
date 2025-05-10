@@ -58,7 +58,12 @@ export function createDataResolver(options: MihawkOptions) {
     const jsonPath4log = `${DATA_BASE_PATH}/${jsonPath}`; // only for log
     const mockJsonAbsPath = absifyPath(join(MOCK_DATA_DIR_PATH, jsonPath));
     // 确保每次初始化的 initData 都是新声明定义并赋值的，方式多次访问时出现逻辑混乱
-    const initData = { code: 200, data: 'Empty data', msg: `Auto init file: ${jsonPath4log}` };
+    const initData = {
+      code: 200, // status: 200,
+      // success: true,
+      data: 'Empty data!',
+      msg: `Auto init file: ${jsonPath4log}`,
+    };
     let mockJson: Record<string, any> = initData;
     if (existsSync(mockJsonAbsPath)) {
       let jsonData: Record<string, any> | null = null;
