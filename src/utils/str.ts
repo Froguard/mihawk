@@ -81,3 +81,12 @@ export function delAddrProtocol(address: string) {
       .replace(/\/+$/, '') || ''
   );
 }
+
+/**
+ * 获取字符串内容的字节数
+ * @param {string} content
+ * @returns {number}
+ */
+export function getByteSize(content: string) {
+  return Buffer.byteLength(content || '', 'utf8');
+}

@@ -9,7 +9,8 @@ import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
 import { Debugger, Printer } from '../utils/print';
-import { isNil } from '../utils/is';
+import { isNil, isNumStrict } from '../utils/is';
+import { getByteSize } from '../utils/str';
 import type { IPackageJson } from 'package-json-type';
 
 const LOGFLAG_LOADER = Colors.cyan('[loader]') + Colors.gray(':');
@@ -35,6 +36,7 @@ export async function loadJson(jsonFilePath: string, options?: BaseLoadOption) {
     cacheObj: _cacheJson,
     forceRefresh: noCache,
     noLogPrint,
+    // maxSize: 2048, // 2MB(1024kb)
     resolveData: async JsonStr => {
       let jsonData: Record<string, any> = {};
       try {
@@ -176,6 +178,7 @@ interface LoadWithCacheOptions<Data = any> {
   resolveData?: (fileContent: string | null) => Promise<Data | null>;
   forceRefresh?: boolean;
   noLogPrint?: boolean;
+  maxSize?: number; // kb
 }
 /**
  * 加载数据，并缓存数据
@@ -190,7 +193,7 @@ interface LoadWithCacheOptions<Data = any> {
  * @returns {any}
  */
 async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWithCacheOptions<Data>) {
-  const { cacheObj, resolveData, forceRefresh = false, noLogPrint = false } = options;
+  const { cacheObj, resolveData, forceRefresh = false, noLogPrint = false, maxSize = 0 } = options;
   let cacheData: Data | string | null | undefined = null;
   if (!forceRefresh && cacheObj.has(filePath)) {
     cacheData = cacheObj.get(filePath);
@@ -210,7 +213,18 @@ async function _loadFileWithCache<Data = any>(filePath: string, options: LoadWit
     } else {
       cacheData = fileContent;
     }
-    cacheData && cacheObj.set(filePath, cacheData); // TODO: 当文件内容过大的时候，如果超过限制，则不缓存
+    if (cacheData) {
+      if (maxSize !== undefined && isNumStrict(maxSize) && maxSize > 0) {
+        // 当文件内容过大的时候，如果超过限制，则不缓存 (maxSize 单位 kb)
+        if (getByteSize(fileContent) > maxSize * 1024) {
+          Printer.warn(LOGFLAG_LOADER, 'File content is too large, skip cache it!', Colors.gray(filePath));
+        } else {
+          cacheObj.set(filePath, cacheData);
+        }
+      } else {
+        cacheObj.set(filePath, cacheData);
+      }
+    }
   }
   return cacheData as Data;
 }
