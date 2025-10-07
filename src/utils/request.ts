@@ -1,5 +1,5 @@
-import nodeFetch, { type RequestInit } from 'node-fetch'; // @^2.6.11
-import crossFetch, { Headers } from 'cross-fetch';
+import crossFetch from 'cross-fetch';
+
 /**
  * 接口的响应为 json 格式的请求
  * @param {string} url
@@ -8,8 +8,10 @@ import crossFetch, { Headers } from 'cross-fetch';
  * @description
  */
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
-  // const apiRes = await nodeFetch(url, {
-  const apiRes = await crossFetch(url, {
+  const nodeFetch = (await import('node-fetch')).default;
+  console.log('crossFetch: ', typeof crossFetch, ',nodeFetch:', typeof nodeFetch);
+  const apiRes = await nodeFetch(url, {
+    // const apiRes = await crossFetch(url, {
     method: 'GET',
     ...options, // overwrite
     headers: {
