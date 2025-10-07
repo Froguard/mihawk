@@ -72,7 +72,8 @@ export function createDataResolver(options: MihawkOptions) {
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
         const { method, path, headers, request } = ctx || {};
         const body = request?.body as BodyInit;
-        const remoteData = await fetchRemoteData(unixifyPath(path), { method, headers, body }, options);
+        const apiPath = unixifyPath(path);
+        const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
