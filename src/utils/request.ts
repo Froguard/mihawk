@@ -1,4 +1,5 @@
 import nodeFetch, { type RequestInit } from 'node-fetch'; // @^2.6.11
+import crossFetch, { Headers } from 'cross-fetch';
 /**
  * 接口的响应为 json 格式的请求
  * @param {string} url
@@ -6,12 +7,13 @@ import nodeFetch, { type RequestInit } from 'node-fetch'; // @^2.6.11
  * @returns {Promise<R>} res
  * @description
  */
-export async function jsonRequest<R = Record<string, any>>(url: string, options?: RequestInit) {
-  const apiRes = await nodeFetch(url, {
+export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
+  // const apiRes = await nodeFetch(url, {
+  const apiRes = await crossFetch(url, {
     method: 'GET',
     ...options, // overwrite
     headers: {
-      ...options?.headers,
+      ...options?.headers, // overwrite
       'Content-Type': 'application/json', // force set json type
     },
   });
