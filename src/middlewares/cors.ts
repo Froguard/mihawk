@@ -21,6 +21,10 @@ export default function cors() {
     ctx.set('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,HEAD,OPTIONS,TRACE'); // *
     ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Content-Range,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
     // ctx.set('Access-Control-Allow-Credentials', 'true'); // 当设置为 true 时，Access-Control-Allow-Origin 不能为 *
+    if (ctx.method === 'OPTIONS') {
+      ctx.status = 204; // no content body
+      return;
+    }
     // ================================================
     //
     await next();

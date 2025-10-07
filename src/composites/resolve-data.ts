@@ -5,7 +5,7 @@ import { existsSync } from 'fs-extra';
 import deepMerge from 'deepmerge';
 import { writeJSONSafeSync } from '../utils/file';
 import { Printer, Debugger } from '../utils/print';
-import { absifyPath, formatPath, formatMockPath } from '../utils/path';
+import { absifyPath, formatPath, formatMockPath, unixifyPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
@@ -70,9 +70,9 @@ export function createDataResolver(options: MihawkOptions) {
       let jsonData: Record<string, any> | null = null;
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
-        const { method, headers, request } = ctx || {};
+        const { method, path, headers, request } = ctx || {};
         const body = request?.body as BodyInit;
-        const remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
+        const remoteData = await fetchRemoteData(unixifyPath(path), { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
