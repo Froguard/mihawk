@@ -11,7 +11,6 @@ import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
 import { jsonRequest } from '../utils/request';
 import { initMockLogicFile } from './init-file';
-import type { RequestInit, BodyInit } from 'node-fetch'; // @^2.6.11
 import type { MhkCvtrExtra, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
 // only for log
@@ -71,7 +70,7 @@ export function createDataResolver(options: MihawkOptions) {
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
         const { method, path, headers, request } = ctx || {};
-        const body = request?.body as BodyInit;
+        const body = request?.body;
         const apiPath = unixifyPath(path);
         const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
@@ -175,11 +174,11 @@ export function createDataResolver(options: MihawkOptions) {
 /**
  * 从远端获取 json 数据内容（该内容会用于初始化 mock 时候所需要的 json 文件）
  * @param {string} reqPath
- * @param {RequestInit} reqOptions
+ * @param {Record<string, any>} reqOptions
  * @param {MihawkOptions} mhkOptions
  * @returns {Promise<JSONObject | null>} json 数据内容 或者 null
  */
-async function fetchRemoteData(reqPath: string, reqOptions: RequestInit, mhkOptions: MihawkOptions) {
+async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
   const { setJsonByRemote } = mhkOptions;
   if (typeof setJsonByRemote !== 'object') {
     Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
