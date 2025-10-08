@@ -21,6 +21,7 @@
     /**
      * common build config:
      */
+    // "types": ["node"],
     "lib": ["ES2022"], // 方便 ts 识别最新的 es 语法
     "moduleResolution": "node16", // 默认以 nodejs 模块的方式进行模块解析，需要同时设置 module=node16
     "esModuleInterop": true, // 确保在 CommonJS 环境中使用 ES Modules 导出时不会出现类型错误或导入问题
@@ -60,4 +61,4 @@
     // "./__tests__/**/*.ts",
   ],
   "exclude": ["node_modules", "__tests__", "__coverage__"],
-  }
+}

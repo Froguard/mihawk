@@ -1,9 +1,4 @@
-import https from 'https';
-
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-  minVersion: 'TLSv1.3',
-});
+// import { fetch } from 'undici';
 
 /**
  * 接口的响应为 json 格式的请求
@@ -13,14 +8,12 @@ const httpsAgent = new https.Agent({
  * @description
  */
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
-  const nodeFetch = (await import('node-fetch')).default;
-
   // format options
   const isHttps = url.startsWith('https://');
   options = formatOptions(options, isHttps);
 
   // send api
-  const apiRes = await nodeFetch(url, {
+  const apiRes = await fetch(url, {
     // const apiRes = await crossFetch(url, {
     ...options, // overwrite
     headers: {
@@ -30,11 +23,12 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
   });
 
   // resolve exceptions
-  if (!apiRes.ok || apiRes.status !== 200) {
+  if (!apiRes.ok) {
     throw new Error(`HTTP Error: ${apiRes.status}`);
   }
-  if (apiRes.headers.get('content-type') !== 'application/json') {
-    throw new Error('Invalid content-type');
+  const resContentType = apiRes.headers.get('content-type');
+  if (!resContentType.includes('application/json') && !resContentType.includes('json')) {
+    throw new Error(`Invalid content-type: ${resContentType}`);
   }
 
   // parse to json
@@ -42,17 +36,29 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
   return res as R;
 }
 
+/**
+ * format request options
+ * @param {object} options
+ * @param {boolean} isHttps
+ * @returns
+ */
 function formatOptions(options?: Record<string, any>, isHttps?: boolean) {
   options = options || {};
+
   // method
-  options.method = options.method || 'GET';
+  options.method = (options.method || 'GET') as string;
+
   // body
-  if (['HEAD', 'GET'].includes(options.method)) {
+  if (['HEAD', 'GET'].includes(options.method.toUpperCase())) {
     delete options.body;
   }
-  // agent
-  if (isHttps) {
-    options.agent = httpsAgent;
+
+  // content-length
+  if (options.headers?.['Content-Length']) {
+    delete options.headers['Content-Length'];
+  }
+  if (options.headers?.['content-length']) {
+    delete options.headers['content-length'];
   }
 
   return options;

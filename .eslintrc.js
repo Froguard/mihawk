@@ -66,6 +66,10 @@ module.exports = {
         alwaysTryTypes: true
       },
       node: true,
-    }
+    },
+    // "import/core-modules": ["undici"]
+  },
+  env: {
+    node: true
   }
 }
