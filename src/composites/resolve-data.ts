@@ -65,13 +65,15 @@ export function createDataResolver(options: MihawkOptions) {
     };
     let mockJson: Record<string, any> = initData;
     let loadRemote: boolean = false;
+    const { method, url, headers, request } = ctx || {};
+    const body = request?.body;
+    const apiPath = url; // url=/a/b/c?x=1&y=2&z=3 (相对于path，其包含querystring)
     if (existsSync(mockJsonAbsPath)) {
       let jsonData: Record<string, any> | null = null;
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
-        const { method, url, headers, request } = ctx || {};
-        const body = request?.body;
-        const remoteData = await fetchRemoteData(url, { method, headers, body }, options);
+        // 🚀 send remote api
+        const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
@@ -101,9 +103,8 @@ export function createDataResolver(options: MihawkOptions) {
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
-        const { method, url, headers, request } = ctx || {};
-        const body = request?.body;
-        remoteData = await fetchRemoteData(url, { method, headers, body }, options);
+        // 🚀 send remote api
+        remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
       }
       // Use remote data if available, otherwise use default
       if (remoteData) {
