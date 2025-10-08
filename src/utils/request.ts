@@ -1,7 +1,8 @@
 import https from 'https';
 
 const httpsAgent = new https.Agent({
-  minVersion: 'TLSv1.2',
+  rejectUnauthorized: false,
+  minVersion: 'TLSv1.3',
 });
 
 /**
