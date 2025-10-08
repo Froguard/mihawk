@@ -1,4 +1,8 @@
-import crossFetch from 'cross-fetch';
+import https from 'https';
+
+const httpsAgent = new https.Agent({
+  minVersion: 'TLSv1.2',
+});
 
 /**
  * 接口的响应为 json 格式的请求
@@ -9,10 +13,10 @@ import crossFetch from 'cross-fetch';
  */
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
   const nodeFetch = (await import('node-fetch')).default;
-  console.log('crossFetch: ', typeof crossFetch, ',nodeFetch:', typeof nodeFetch);
 
   // format options
-  options = formatOptions(options);
+  const isHttps = url.startsWith('https://');
+  options = formatOptions(options, isHttps);
 
   // send api
   const apiRes = await nodeFetch(url, {
@@ -37,13 +41,17 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
   return res as R;
 }
 
-function formatOptions(options?: Record<string, any>) {
+function formatOptions(options?: Record<string, any>, isHttps?: boolean) {
   options = options || {};
   // method
   options.method = options.method || 'GET';
   // body
   if (['HEAD', 'GET'].includes(options.method)) {
     delete options.body;
+  }
+  // agent
+  if (isHttps) {
+    options.agent = httpsAgent;
   }
 
   return options;

@@ -103,7 +103,7 @@ export function createDataResolver(options: MihawkOptions) {
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
         const { method, headers, request } = ctx || {};
-        const body = request?.body as BodyInit;
+        const body = request?.body;
         remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
       }
       // Use remote data if available, otherwise use default
