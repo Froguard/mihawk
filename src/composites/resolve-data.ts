@@ -199,7 +199,7 @@ async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>,
     if (typeof rewrite === 'function') {
       reqPath = rewrite(reqPath);
     }
-    const requestPath = `${target}/${reqPath}`;
+    const requestPath = `${target}/${reqPath.replace(/^[/]+/g, '')}`;
     const { method = 'GET', headers: originalHeaders = {}, body } = reqOptions || {};
     // 构造透传 headers
     const headers: Record<string, any> = {
