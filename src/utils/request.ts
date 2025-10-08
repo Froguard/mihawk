@@ -19,16 +19,17 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
     headers: {
       ...options?.headers, // overwrite
       'Content-Type': 'application/json', // force set json type
+      Cookie: options.headers.Cookie,
     },
   });
 
   // resolve exceptions
-  if (!apiRes.ok) {
-    throw new Error(`HTTP Error: ${apiRes.status}`);
-  }
-  const resContentType = apiRes.headers.get('content-type');
-  if (!resContentType.includes('application/json') && !resContentType.includes('json')) {
-    throw new Error(`Invalid content-type: ${resContentType}`);
+  // if (!apiRes.ok) {
+  //   throw new Error(`HTTP Error: ${apiRes.status}`);
+  // }
+  const resContentType = apiRes.headers.get('content-type') || apiRes.headers.get('Content-Type') || '';
+  if (!resContentType || (!resContentType.includes('application/json') && !resContentType.includes('json') && !resContentType.includes('text'))) {
+    throw new Error(`Invalid content-type: ${resContentType || 'unknown'}`);
   }
 
   // parse to json
@@ -40,7 +41,7 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
  * format request options
  * @param {object} options
  * @param {boolean} isHttps
- * @returns
+ * @returns {object} options
  */
 function formatOptions(options?: Record<string, any>, isHttps?: boolean) {
   options = options || {};

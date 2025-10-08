@@ -102,9 +102,10 @@ export function createDataResolver(options: MihawkOptions) {
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
-        const { method, headers, request } = ctx || {};
+        const { method, path, headers, request } = ctx || {};
         const body = request?.body;
-        remoteData = await fetchRemoteData(mockRelPath, { method, headers, body }, options);
+        const apiPath = unixifyPath(path);
+        remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
       }
       // Use remote data if available, otherwise use default
       if (remoteData) {
@@ -206,6 +207,8 @@ async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>,
       ...originalHeaders,
       'Cache-Control': 'no-cache',
       Accept: 'application/json',
+      Credentials: 'include',
+      Cookie: originalHeaders.cookie || originalHeaders.Cookie || originalHeaders.cookies || originalHeaders.Cookies,
     };
     // 重置 headers['host'] 字段，如果有必要
     const targetUrl = new URL(target);
