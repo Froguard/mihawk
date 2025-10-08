@@ -69,9 +69,9 @@ export function createDataResolver(options: MihawkOptions) {
       let jsonData: Record<string, any> | null = null;
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
-        const { method, path, headers, request } = ctx || {};
+        const { method, url, headers, request } = ctx || {};
         const body = request?.body;
-        const apiPath = unixifyPath(path);
+        const apiPath = unixifyPath(url);
         const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
@@ -102,9 +102,9 @@ export function createDataResolver(options: MihawkOptions) {
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
-        const { method, path, headers, request } = ctx || {};
+        const { method, url, headers, request } = ctx || {};
         const body = request?.body;
-        const apiPath = unixifyPath(path);
+        const apiPath = unixifyPath(url);
         remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
       }
       // Use remote data if available, otherwise use default
