@@ -12,7 +12,7 @@ import start from './sub-cmds/start';
 import type { SubCmdCallback } from '../src/com-types';
 
 //
-const { name, version } = readPackageJson() || {};
+const { name: pkgName, version: pkgVersion } = readPackageJson() || {};
 
 /**
  * main logic
@@ -32,7 +32,7 @@ const { name, version } = readPackageJson() || {};
     const isMainCmd = !subCmdName;
     if (isMainCmd) {
       // main cmd: mihawk -a -b -c -d ...
-      Printer.log(Colors.gray(`mihawk ${_.join(' ')}`));
+      Printer.log(Colors.gray(`mihawk ${_.length ? _.join(' ') : ''}`));
       try {
         await start(args);
       } catch (error) {
@@ -86,7 +86,7 @@ function errorHandler(error: any) {
  * 显示包信息
  */
 function showPkgInfo() {
-  Printer.log(`${name}@${version}\n`);
+  Printer.log(`${pkgName}@${pkgVersion}\n`);
 }
 
 /**
@@ -96,7 +96,7 @@ function showHelp() {
   console.log(
     [
       '',
-      `Usage: ${name} [options]`,
+      `Usage: ${pkgName} [options]`,
       'Options:',
       '  -v, -V, --ver --version   Show version information', //
       '  -h, -H, --help            Display help for command',
@@ -104,12 +104,12 @@ function showHelp() {
       `  -d, --mockDir ${Colors.gray('<string>')}    Specify the mock data directory(non-empty-string)`,
       `  -w, --watch ${Colors.gray('<boolean>')}     Enable watch mode`,
       'Examples:',
-      Colors.gray(`  > ${name} -p 8888 -d ./mocks`),
+      Colors.gray(`  > ${pkgName} -p 8888 -d ./mocks`),
       Colors.green('Recommended:'),
-      `  1. init a ${Colors.gray(`.${name}rc.json`)} file`,
-      Colors.gray(`  > ${name} init`),
+      `  1. init a ${Colors.gray(`.${pkgName}rc.json`)} file`,
+      Colors.gray(`  > ${pkgName} init`),
       `  2. then start mihawk server directly`,
-      Colors.gray(`  > ${name}`),
+      Colors.gray(`  > ${pkgName}`),
       '\n',
     ].join('\n'),
   );
@@ -119,5 +119,5 @@ function showHelp() {
  * 显示版本信息
  */
 function showVersion() {
-  console.log(`v${version}\n`);
+  console.log(`v${pkgVersion}\n`);
 }
