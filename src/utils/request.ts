@@ -10,21 +10,41 @@ import crossFetch from 'cross-fetch';
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
   const nodeFetch = (await import('node-fetch')).default;
   console.log('crossFetch: ', typeof crossFetch, ',nodeFetch:', typeof nodeFetch);
+
+  // format options
+  options = formatOptions(options);
+
+  // send api
   const apiRes = await nodeFetch(url, {
     // const apiRes = await crossFetch(url, {
-    method: 'GET',
     ...options, // overwrite
     headers: {
       ...options?.headers, // overwrite
       'Content-Type': 'application/json', // force set json type
     },
   });
+
+  // resolve exceptions
   if (!apiRes.ok || apiRes.status !== 200) {
     throw new Error(`HTTP Error: ${apiRes.status}`);
   }
   if (apiRes.headers.get('content-type') !== 'application/json') {
     throw new Error('Invalid content-type');
   }
+
+  // parse to json
   const res = await apiRes.json();
   return res as R;
+}
+
+function formatOptions(options?: Record<string, any>) {
+  options = options || {};
+  // method
+  options.method = options.method || 'GET';
+  // body
+  if (['HEAD', 'GET'].includes(options.method)) {
+    delete options.body;
+  }
+
+  return options;
 }
