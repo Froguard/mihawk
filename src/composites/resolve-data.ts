@@ -5,7 +5,7 @@ import { existsSync } from 'fs-extra';
 import deepMerge from 'deepmerge';
 import { writeJSONSafeSync } from '../utils/file';
 import { Printer, Debugger } from '../utils/print';
-import { absifyPath, formatPath, formatMockPath, unixifyPath } from '../utils/path';
+import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
@@ -69,10 +69,9 @@ export function createDataResolver(options: MihawkOptions) {
       let jsonData: Record<string, any> | null = null;
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
-        const { method, url, headers, request } = ctx || {};
+        const { method, url, headers, request, cookies } = ctx || {};
         const body = request?.body;
-        const apiPath = unixifyPath(url);
-        const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
+        const remoteData = await fetchRemoteData(url, { method, headers, body, cookies }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
@@ -102,10 +101,9 @@ export function createDataResolver(options: MihawkOptions) {
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
-        const { method, url, headers, request } = ctx || {};
+        const { method, url, headers, request, cookies } = ctx || {};
         const body = request?.body;
-        const apiPath = unixifyPath(url);
-        remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
+        remoteData = await fetchRemoteData(url, { method, headers, body, cookies }, options);
       }
       // Use remote data if available, otherwise use default
       if (remoteData) {
@@ -201,14 +199,16 @@ async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>,
       reqPath = rewrite(reqPath);
     }
     const requestPath = `${target}/${reqPath.replace(/^[/]+/g, '')}`;
-    const { method = 'GET', headers: originalHeaders = {}, body } = reqOptions || {};
+    const { method = 'GET', headers: originalHeaders = {}, body, cookies } = reqOptions || {};
+    // reset reqOptions
+    delete reqOptions.cookies;
     // 构造透传 headers
     const headers: Record<string, any> = {
       ...originalHeaders,
       'Cache-Control': 'no-cache',
       Accept: 'application/json',
       Credentials: 'include',
-      Cookie: originalHeaders.cookie || originalHeaders.Cookie || originalHeaders.cookies || originalHeaders.Cookies,
+      Cookie: cookies || originalHeaders.cookie || originalHeaders.Cookie || originalHeaders.cookies || originalHeaders.Cookies,
     };
     // 重置 headers['host'] 字段，如果有必要
     const targetUrl = new URL(target);
