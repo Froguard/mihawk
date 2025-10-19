@@ -1,6 +1,6 @@
 {
   "name": "mihawk",
-  "version": "0.1.0-v",
+  "version": "0.1.0-w",
   "description": "A tiny & simple mock server tool, support json,js,cjs,ts(typescript).",
   "author": "Froguard <figure_wf@163.com>",
   "engines": {
@@ -73,7 +73,7 @@
     "color-cc": "^0.0.8",
     "cosmiconfig": "^8.3.6",
     "deepmerge": "^4.3.1",
-    "free-dedupe": "^0.0.7",
+    "free-dedupe": "^0.0.8",
     "fs-extra": "^11.1.1",
     "json5": "^2.2.3",
     "koa": "^2.16.1",
