@@ -1,11 +1,5 @@
 'use strict';
-import debug from 'debug';
-import { PKG_NAME, LOG_FLAG } from '../consts';
-
-/**
- * debug 日志
- */
-export const Debugger = { log: debug(PKG_NAME) };
+import { LOG_FLAG } from '../consts';
 
 /**
  * console 的封装
