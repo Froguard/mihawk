@@ -3,7 +3,7 @@ import { join, basename, relative, resolve, isAbsolute, normalize } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
 import { DataFileExt, LoigicFileExt, MihawkRC } from '../com-types';
-import { Debugger } from './print';
+// import { Printer } from './print';
 
 /**
  * 获取与 CWD 的相对路径
@@ -88,7 +88,7 @@ export function getRootAbsPath() {
     // detect whether in dist or not
     const isInDist = ['cjs', 'esm', 'types'].some(distSubDir => curParentDirName == distSubDir);
     const rootPath = isInDist ? join(curParentDirPath, '../../') : curParentDirPath;
-    Debugger.log('getRootAbsPath', { __dirname, curDirPath, curParentDirPath, isInDist, rootPath });
+    // Printer.log('getRootAbsPath', { __dirname, curDirPath, curParentDirPath, isInDist, rootPath });
     _pkgRootAbsPath = resolve(rootPath);
   }
   return _pkgRootAbsPath;

@@ -1,7 +1,7 @@
 'use strict';
 import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
-import { Printer, Debugger } from '../utils/print';
+import { Printer } from '../utils/print';
 import { ASSET_TPL_HTML_404_PATH, ASSET_TPL_HTML_50X_PATH } from '../root';
 import type { KoaContext, KoaNext } from '../com-types';
 
@@ -9,7 +9,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * error 中间件生成器
  */
 export default function error() {
-  Debugger.log('mdw-err: init...');
+  // Printer.log('mdw-err: init...');
   const errHtml = readFileSync(ASSET_TPL_HTML_50X_PATH, 'utf-8');
   const notFoundHtml = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
@@ -21,7 +21,7 @@ export default function error() {
   return async function (ctx: KoaContext, next: KoaNext) {
     const { /*disableLogPrint, */ path, method } = ctx;
     const logPath = `${method} ${path}`;
-    Debugger.log('mdw-err: >>');
+    // Printer.log('mdw-err: >>');
     // !disableLogPrint && Printer.log('mdw-err:', logPath);
     // ================================================
     try {
@@ -48,6 +48,6 @@ export default function error() {
       }
     }
     // ================================================
-    Debugger.log('mdw-err: <<', logPath);
+    // Printer.log('mdw-err: <<', logPath);
   };
 }

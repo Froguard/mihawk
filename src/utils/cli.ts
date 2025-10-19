@@ -1,7 +1,7 @@
 'use strict';
 import prompts from 'prompts';
 import minimist from 'minimist';
-import { Printer, Debugger } from './print';
+import { Printer } from './print';
 import type { CliArgs } from '../com-types';
 
 //

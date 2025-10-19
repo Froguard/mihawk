@@ -1,5 +1,5 @@
 'use strict';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import { createDataResolver } from '../composites/resolve-data';
 import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
 
@@ -9,7 +9,7 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (options?: MihawkOptions) {
-  Debugger.log('mdw-mock: init...');
+  // Printer.log('mdw-mock: init...');
   const calcMockData = createDataResolver(options);
 
   /**
@@ -19,7 +19,7 @@ export default function (options?: MihawkOptions) {
    */
   return async function mock(ctx: KoaContext, next: KoaNext) {
     const { /*disableLogPrint,*/ mockRelPath, routePath } = ctx || {};
-    Debugger.log('mdw-mock: >>', routePath, `mockRelPath="${mockRelPath}"`);
+    // Printer.log('mdw-mock: >>', routePath, `mockRelPath="${mockRelPath}"`);
     const { skipDefaultMock } = ctx;
     // !disableLogPrint && Printer.log('mdw-mock:', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     if (skipDefaultMock) {
@@ -37,12 +37,12 @@ export default function (options?: MihawkOptions) {
       //
       const mockJson = await calcMockData(ctx);
       ctx.hitDefaultMock = true; // 打个标记，方便后续判断
-      Debugger.log('mdw-mock: mockData=', mockJson);
+      // Printer.log('mdw-mock: mockData=', mockJson);
       // 直接写 json 对象，不进行序列化，也能识别
       ctx.body = mockJson; // ctx.body = JSON.stringify(mockJson);
       //
     }
     //
-    Debugger.log('mdw-mock: <<', routePath);
+    // Printer.log('mdw-mock: <<', routePath);
   };
 }

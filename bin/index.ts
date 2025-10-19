@@ -6,7 +6,7 @@
 import Colors from 'color-cc';
 import { getCliArgs } from '../src/utils/cli';
 import { readPackageJson } from '../src/composites/loader';
-import { Printer, Debugger } from '../src/utils/print';
+import { Printer } from '../src/utils/print';
 import init from './sub-cmds/init';
 import start from './sub-cmds/start';
 import type { SubCmdCallback } from '../src/com-types';
@@ -60,7 +60,7 @@ const { name: pkgName, version: pkgVersion } = readPackageJson() || {};
           errorHandler(error);
         }
       } else {
-        Debugger.log('process.argv=', process.argv, 'args=', args);
+        // Printer.log('process.argv=', process.argv, 'args=', args);
         showPkgInfo();
         showHelp();
         process.exit(1); // quit

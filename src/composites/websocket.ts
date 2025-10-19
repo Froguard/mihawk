@@ -6,7 +6,7 @@ import Colors from 'color-cc';
 import * as WS from 'ws';
 import { PKG_NAME } from '../consts';
 import { parseStompMsg, StompMsg } from '../utils/parser';
-import { Debugger, Printer } from '../utils/print';
+import { Printer } from '../utils/print';
 import { getTimeNowStr } from '../utils/date';
 import { getAddrInfoByServer } from '../utils/server';
 import { getMyIp, supportLocalHost } from '../utils/net';
@@ -149,7 +149,7 @@ export default class WsCtrl {
 
     // 2.2.监听 headers 事件
     this._wsSvr.on('headers', function headers(headers, req) {
-      Debugger.log(LOGFLAG_WS, 'Headers:', headers);
+      // Printer.log(LOGFLAG_WS, 'Headers:', headers);
       headers.push(`X-Powered-By: ${PKG_NAME}`); // 添加或修改响应头
     });
 
@@ -192,7 +192,7 @@ export default class WsCtrl {
 
     // 2.5.监听 close 关闭事件
     this._wsSvr.on('close', function close() {
-      Debugger.log(LOGFLAG_WS, 'WebSocket server was closed!');
+      // Printer.log(LOGFLAG_WS, 'WebSocket server was closed!');
     });
     //
   }
@@ -226,7 +226,7 @@ export default class WsCtrl {
     try {
       await closeAsync();
       this._wsSvr = null; // 成功销毁之后需要进行置空处理
-      Debugger.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
+      // Printer.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
     } catch (error) {
       Printer.error(LOGFLAG_WS, `${forceClose ? 'Destory' : 'Close'} WebSocket server failed!\n`, error);
     }

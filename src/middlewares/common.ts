@@ -1,7 +1,7 @@
 'use strict';
 import { join } from 'path';
 import dedupe from 'free-dedupe';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { PKG_NAME } from '../consts';
 import { unixifyPath } from '../utils/path';
@@ -13,7 +13,7 @@ import type { KoaContext, KoaNext, MihawkOptions } from '../com-types';
  * @returns
  */
 export default function (options?: MihawkOptions) {
-  Debugger.log('mdw-com: init...', options);
+  // Printer.log('mdw-com: init...', options);
   const { logConfig } = options || {};
   let { ignoreRoutes } = logConfig || {};
   ignoreRoutes = dedupe(ignoreRoutes || []).map(ignRt => ignRt.trim().replace(/\s+/g, ' '));
@@ -29,7 +29,7 @@ export default function (options?: MihawkOptions) {
     const routePath = `${method.toUpperCase()} ${path}`;
     const disableLogPrint = needCheckIgnore && (isMatchPatterns(routePath, ignoreRoutes) || isMatchPatterns(path, ignoreRoutes));
     !disableLogPrint && console.log();
-    Debugger.log('mdw-com: >>', routePath);
+    // Printer.log('mdw-com: >>', routePath);
     // set common props to ctx
     /**
      * 是一个相对路径，以 data 文件夹为起始目录
@@ -59,6 +59,6 @@ export default function (options?: MihawkOptions) {
     ctx.set('X-Powered-By', PKG_NAME);
 
     //
-    Debugger.log(`mdw-com: << ${ctx.type}`, routePath);
+    // Printer.log(`mdw-com: << ${ctx.type}`, routePath);
   };
 }

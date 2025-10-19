@@ -1,7 +1,7 @@
 'use strict';
 // import Colors from 'color-cc';
 import { readFileSync } from 'fs-extra';
-import { /*Printer, */ Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import { ASSET_TPL_HTML_404_PATH } from '../root';
 import type { KoaContext, KoaNext } from '../com-types';
 
@@ -9,7 +9,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * 中间件生成器
  */
 export default function notFound() {
-  Debugger.log('mdw-404: init...');
+  // Printer.log('mdw-404: init...');
   const html = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
   /**
@@ -19,7 +19,7 @@ export default function notFound() {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { /*disableLogPrint,*/ routePath, mockRelPath, request, url } = ctx || {};
-    Debugger.log('mdw-404: >>', routePath);
+    // Printer.log('mdw-404: >>', routePath);
 
     // ================================================
     //
@@ -46,7 +46,7 @@ export default function notFound() {
       }
     }
 
-    Debugger.log('mdw-404: <<', routePath);
+    // Printer.log('mdw-404: <<', routePath);
     //
   };
 }

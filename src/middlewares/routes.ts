@@ -1,6 +1,6 @@
 'use strict';
 import Colors from 'color-cc';
-import { Printer, Debugger } from '../utils/print';
+import { Printer } from '../utils/print';
 import { isMatchPatterns } from '../utils/str';
 import { LOG_ARROW } from '../consts';
 import { unixifyPath } from '../utils/path';
@@ -12,7 +12,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function (routes: Record<string, string>) {
-  Debugger.log('mdw-routes: init...', routes);
+  // Printer.log('mdw-routes: init...', routes);
   const needCheckRoutes = Object.keys(routes)?.length > 0;
   const routeKvEntries = needCheckRoutes ? Object.entries(routes) : [];
 
@@ -23,7 +23,7 @@ export default function (routes: Record<string, string>) {
    */
   return async function (ctx: KoaContext, next: KoaNext) {
     const { /*disableLogPrint,*/ skipDefaultMock, mockRelPath, routePath, path } = ctx;
-    Debugger.log('mdw-routes: >>', routePath);
+    // Printer.log('mdw-routes: >>', routePath);
     // !disableLogPrint && Printer.log('mdw-routes:', routePath, Colors.gray(`skipDefaultMock=${!!skipDefaultMock}`));
     //
     if (skipDefaultMock || !needCheckRoutes) {
@@ -41,7 +41,7 @@ export default function (routes: Record<string, string>) {
       if (matched && matched.mockFile) {
         const newMockRelPath = unixifyPath(matched.mockFile);
         Printer.log('mdw-routes:', `Reset route-logic: ${Colors.cyan(mockRelPath)} ${LOG_ARROW} ${Colors.green(newMockRelPath)} ↩️`);
-        Debugger.log('mdw-routes:', `Reset mockRelPath: ${mockRelPath} -> ${newMockRelPath}`);
+        // Printer.log('mdw-routes:', `Reset mockRelPath: ${mockRelPath} -> ${newMockRelPath}`);
         ctx.mockRelPath = newMockRelPath;
       }
       // ================================================
@@ -51,6 +51,6 @@ export default function (routes: Record<string, string>) {
       // ================================================
     }
     //
-    Debugger.log('mdw-routes: <<', routePath);
+    // Printer.log('mdw-routes: <<', routePath);
   };
 }

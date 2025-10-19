@@ -2,7 +2,7 @@
 import Colors from 'color-cc';
 import deepmerge from 'deepmerge';
 import * as chokidar from 'chokidar';
-import { Debugger, Printer } from '../../src/utils/print';
+import { Printer } from '../../src/utils/print';
 import { getRcData } from '../../src/composites/rc';
 import { DEFAULT_RC, PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
@@ -21,11 +21,11 @@ interface Controller {
  * mihawk main
  */
 const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
-  Debugger.log('CliConfig:', args);
+  // Printer.log('CliConfig:', args);
   const rootConfig = await getRcData<MihawkRC>(`.${PKG_NAME}rc`, { initConfig: { ...DEFAULT_RC } });
-  Debugger.log('RootConfig:', rootConfig);
+  // Printer.log('RootConfig:', rootConfig);
   const finalConfig = deepmerge<Loosify<MihawkRC>>(rootConfig || {}, args);
-  Debugger.log('FinalConfig:', finalConfig);
+  // Printer.log('FinalConfig:', finalConfig);
   //
   const controller: Controller = { watcher: null, serverHandle: null };
   // 1.start a mock server

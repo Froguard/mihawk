@@ -4,7 +4,7 @@ import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
 import deepMerge from 'deepmerge';
 import { writeJSONSafeSync } from '../utils/file';
-import { Printer, Debugger } from '../utils/print';
+import { Printer } from '../utils/print';
 import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
@@ -112,7 +112,7 @@ export function createDataResolver(options: MihawkOptions) {
         finalInitData = remoteData;
         finalInitType = 'fallbackRemoteData';
       }
-      Debugger.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
+      // Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
       // Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, finalInitData);
       //
@@ -181,11 +181,11 @@ export function createDataResolver(options: MihawkOptions) {
 async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
   const { setJsonByRemote } = mhkOptions;
   if (typeof setJsonByRemote !== 'object') {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
+    // Printer.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
     return null;
   }
   if (!setJsonByRemote?.enable) {
-    Debugger.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote.enable != true, will skip remote data fetch!');
+    // Printer.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote.enable != true, will skip remote data fetch!');
     return null;
   }
   if (!setJsonByRemote?.target) {
@@ -216,7 +216,7 @@ async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>,
     const targetHost = targetUrl.host;
     if (changeOrigin && targetHost) {
       headers.Host = targetHost;
-      Debugger.log(LOGFLAG_RESOLVER, `Apply changeOrigin: ${Colors.cyan(headers.Host)}`);
+      // Printer.log(LOGFLAG_RESOLVER, `Apply changeOrigin: ${Colors.cyan(headers.Host)}`);
     }
     // delete headers['content-length'];
     // delete headers['authorization'];

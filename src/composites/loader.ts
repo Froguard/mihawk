@@ -8,7 +8,7 @@ import Colors from 'color-cc';
 import LRUCache from 'lru-cache';
 import { CWD } from '../consts';
 import { absifyPath, getRootAbsPath, isPathInDir, relPathToCWD, unixifyPath } from '../utils/path';
-import { Debugger, Printer } from '../utils/print';
+import { Printer } from '../utils/print';
 import { isNil, isNumStrict } from '../utils/is';
 import { getByteSize } from '../utils/str';
 import type { IPackageJson } from 'package-json-type';
@@ -270,7 +270,7 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
       fileName: tsFilePath,
     });
     const jsCode = result.outputText;
-    Debugger.log('jsCode:\n', jsCode, '\n');
+    // Printer.log('jsCode:\n', jsCode, '\n');
     // 方案一：直接 eval或者 new Function（不可取，不安全）
     // module.exports = eval(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
@@ -310,7 +310,7 @@ function _clearRequireCache(filename: string) {
   if (CWD === filename || !isPathInDir(filename, CWD)) {
     return;
   }
-  Debugger.log('_clearRequireCache:', filename);
+  // Printer.log('_clearRequireCache:', filename);
   filename = absifyPath(filename);
   const mod = require.cache[filename];
   if (!mod) {
@@ -320,7 +320,7 @@ function _clearRequireCache(filename: string) {
   // 1. 删除自己（确保 parent 已经获取到，才删除自己）
   mod.loaded = false;
   delete require.cache[filename];
-  Debugger.log('_clearRequireCache: √ clear require.cache success!', filename, 'parent:', parent?.filename);
+  // Printer.log('_clearRequireCache: √ clear require.cache success!', filename, 'parent:', parent?.filename);
   // 2. 删除父模块的引用
   if (parent && typeof parent === 'object') {
     try {
@@ -355,15 +355,15 @@ function _clearRequireCache(filename: string) {
  */
 function _clearSelfAndAncestorsCache(filename: string) {
   filename = absifyPath(filename);
-  Debugger.log('_clearSelfAndAncestorsCache:', filename);
+  // Printer.log('_clearSelfAndAncestorsCache:', filename);
   const PKG_ROOT = getRootAbsPath();
   if (!(filename === CWD || isPathInDir(filename, CWD) || filename === PKG_ROOT || isPathInDir(filename, PKG_ROOT))) {
-    Debugger.log('_clearSelfAndAncestorsCache Skip danger path:', filename);
+    // Printer.log('_clearSelfAndAncestorsCache Skip danger path:', filename);
     return;
   }
   const mod = require.cache[filename];
   if (!mod) {
-    Debugger.log('_clearSelfAndAncestorsCache Skip empty cache:', filename);
+    // Printer.log('_clearSelfAndAncestorsCache Skip empty cache:', filename);
     return;
   }
   const parent = mod?.parent;

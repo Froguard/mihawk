@@ -1,5 +1,5 @@
 'use strict';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**
@@ -8,7 +8,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function cache() {
-  Debugger.log('mdw-cache: init...');
+  // Printer.log('mdw-cache: init...');
 
   /**
    * koa 中间件：

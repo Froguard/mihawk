@@ -2,7 +2,7 @@
 import { readFileSync, existsSync } from 'fs-extra';
 import { absifyPath } from '../utils/path';
 import { isNil } from '../utils/is';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import { PKG_NAME } from '../consts';
 import type { KoaContext, KoaNext } from '../com-types';
 
@@ -27,7 +27,7 @@ interface FaviconOptions {
  * @returns
  */
 export default function favicon(faviconPath: string, options?: FaviconOptions) {
-  Debugger.log('mdw-favicon: init...');
+  // Printer.log('mdw-favicon: init...');
   //
   faviconPath = absifyPath(faviconPath);
   const isExisted = existsSync(faviconPath);

@@ -1,7 +1,7 @@
 'use strict';
 import { resolve } from 'path';
 import { createReadStream, readFileSync } from 'fs-extra';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import { PKG_NAME } from '../consts';
 import { ASSET_TPL_HTML_404_PATH, ASSET_DIR_PATH } from '../root';
 
@@ -14,7 +14,7 @@ const CA_ROOT_PATH = resolve(ASSET_DIR_PATH, './.cert/');
  * @returns
  */
 export default function certAuthFileDownload() {
-  Debugger.log('mdw-certificateAuthority: init...');
+  // Printer.log('mdw-certificateAuthority: init...');
   const html = readFileSync(ASSET_TPL_HTML_404_PATH, 'utf-8');
 
   /**

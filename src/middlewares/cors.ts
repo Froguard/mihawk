@@ -1,5 +1,5 @@
 'use strict';
-import { Debugger } from '../utils/print';
+// import { Printer } from '../utils/print';
 import type { KoaContext, KoaNext } from '../com-types';
 
 /**
@@ -8,7 +8,7 @@ import type { KoaContext, KoaNext } from '../com-types';
  * @returns
  */
 export default function cors() {
-  Debugger.log('mdw-cors: init...');
+  // Printer.log('mdw-cors: init...');
 
   /**
    * koa 中间件：

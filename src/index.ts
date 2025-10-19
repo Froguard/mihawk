@@ -10,7 +10,7 @@ import mdwSSL from 'koa-sslify';
 import mdwConnect from 'koa-connect';
 import { existsSync, ensureDirSync, readFileSync } from 'fs-extra';
 import dedupe from 'free-dedupe';
-import { Printer, Debugger } from './utils/print';
+import { Printer } from './utils/print';
 import { formatOptionsByConfig } from './composites/rc';
 import { enableRequireTsFile, loadJS, loadTS, loadJson } from './composites/loader';
 import { relPathToCWD, getRootAbsPath, unixifyPath, absifyPath } from './utils/path';
@@ -50,7 +50,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   delNillProps(config);
   !isRestart && Printer.log('config:', config);
   const options = formatOptionsByConfig(config);
-  Debugger.log('formated options:', options);
+  // Printer.log('formated options:', options);
   //
   const {
     // cache,
@@ -263,7 +263,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     //
     !isRestart && Printer.log('Mock directory: ', Colors.gray(unixifyPath(mockDir)));
     const existedRoutes = scanExistedRoutes(mockDataDirPath, dataFileExt) || [];
-    Debugger.log('Existed routes by scann:', existedRoutes);
+    // Printer.log('Existed routes by scann:', existedRoutes);
     //
     let existedRoutePaths = existedRoutes.map(({ method, path }) => `${method} ${path}`);
     existedRoutePaths.push(...Object.keys(routes));
@@ -328,7 +328,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       // 1.destory websocket server
       if (wsController) {
         //
-        Debugger.log('Detected websocket server existed, will destory it...');
+        // Printer.log('Detected websocket server existed, will destory it...');
         const destoryWsSvr = (wsController as WsCtrl)?.destory?.bind(wsController);
         if (typeof destoryWsSvr === 'function') {
           try {
@@ -345,7 +345,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       //
       // 2.destory http/https server
       if (server) {
-        Debugger.log('Detected http/https server existed, will destory it...');
+        // Printer.log('Detected http/https server existed, will destory it...');
         const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory?.bind(server);
         if (typeof destoryServer === 'function') {
           try {
@@ -365,7 +365,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     close: async () => {
       // 1.close websocket server
       if (wsController) {
-        Debugger.log('Detected websocket server existed, will close it...');
+        // Printer.log('Detected websocket server existed, will close it...');
         const closeWsSvr = wsController?.close?.bind(wsController);
         if (typeof closeWsSvr === 'function') {
           try {
@@ -382,7 +382,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       //
       // 2.close http/https Server
       if (server) {
-        Debugger.log('Detected http/https server existed, will destory it...');
+        // Printer.log('Detected http/https server existed, will destory it...');
         typeof server?.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
         typeof server?.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
         const closeServerAsync = promisify(server.close).bind(server);
