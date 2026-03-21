@@ -8,6 +8,22 @@
  * @description
  */
 export async function jsonRequest<R = Record<string, any>>(url: string, options?: Record<string, any>) {
+  // basic SSRF mitigation: only allow http/https URLs and block obvious loopback hosts
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error(`Invalid URL: ${url}`);
+  }
+  const protocol = parsedUrl.protocol;
+  if (protocol !== 'http:' && protocol !== 'https:') {
+    throw new Error(`Unsupported URL protocol: ${protocol}`);
+  }
+  const hostname = parsedUrl.hostname.toLowerCase();
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
+    throw new Error(`Blocked URL host: ${hostname}`);
+  }
+
   // format options
   const isHttps = url.startsWith('https://');
   options = formatOptions(options, isHttps);
