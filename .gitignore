@@ -176,3 +176,4 @@ index.d.ts
 /mocks/**
 !/mocks/**/.gitkeep
 package-lock.json
+*.local.json
