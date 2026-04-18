@@ -5,10 +5,10 @@
 import { join, basename } from 'path';
 import Colors from 'color-cc';
 import { cosmiconfig } from 'cosmiconfig';
-import { existsSync } from 'fs-extra';
+import { existsSync, readFileSync } from 'fs-extra';
 import deepmerge from 'deepmerge';
 import { writeFileSafeSync } from '../utils/file';
-import { CWD, DEFAULT_OPTIONS, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, PKG_NAME } from '../consts';
+import { CWD, DEFAULT_OPTIONS, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME, MOCK_TPL_DIR_NAME, PKG_NAME } from '../consts';
 import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
@@ -223,6 +223,14 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
 
   // - useRemoteData
   options.useRemoteData = typeof options.setJsonByRemote === 'object' && options.setJsonByRemote?.enable;
+
+  // - mockJsonTplPath & mockJsonTplContent
+  const mockJsonTplPath = join(options.mockDirPath, MOCK_TPL_DIR_NAME, 'json.tpl');
+  options.mockJsonTplPath = mockJsonTplPath;
+  if (existsSync(mockJsonTplPath)) {
+    options.mockJsonTplContent = readFileSync(mockJsonTplPath, 'utf-8');
+  }
+
   //
   //
   return options as MihawkOptions;

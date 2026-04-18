@@ -2,6 +2,7 @@
 import { join } from 'path';
 import Colors from 'color-cc';
 import { existsSync } from 'fs-extra';
+import { render } from 'ejs';
 import deepMerge from 'deepmerge';
 import { writeJSONSafeSync } from '../utils/file';
 import { Printer } from '../utils/print';
@@ -34,6 +35,7 @@ export function createDataResolver(options: MihawkOptions) {
     autoCreateMockLogicFile = false,
     setJsonByRemote,
     useRemoteData,
+    mockJsonTplContent,
   } = options || {};
   // load convert-function logic file
   const loadConvertLogicFile = isTypesctiptMode ? loadTS<MockDataConvertor> : loadJS<MockDataConvertor>;
@@ -99,7 +101,7 @@ export function createDataResolver(options: MihawkOptions) {
       mockJson = jsonData || initData;
     } else {
       let finalInitData: Record<string, any> = initData;
-      let finalInitType = 'default';
+      let finalInitType: 'default' | 'fallbackRemoteData' | 'template' = 'default';
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
@@ -111,8 +113,28 @@ export function createDataResolver(options: MihawkOptions) {
         loadRemote = true;
         finalInitData = remoteData;
         finalInitType = 'fallbackRemoteData';
+      } else if (mockJsonTplContent) {
+        // 尝试使用模板文件生成初始化数据
+        try {
+          const rendered = render(mockJsonTplContent, {
+            jsonPath,
+            jsonPath4log,
+            routePath,
+            mockRelPath: mockRelPathNoExt,
+            method,
+            url,
+          });
+          finalInitData = JSON.parse(rendered);
+          finalInitType = 'template';
+        } catch (error) {
+          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow('Render json.tpl failed, will use default initData!'), error);
+          finalInitData = initData;
+        }
+      } else {
+        finalInitData = initData;
+        finalInitType = 'default';
       }
-      // Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
+      Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
       // Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, finalInitData);
       //

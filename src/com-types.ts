@@ -343,6 +343,20 @@ export type MihawkOptions = MihawkRC & {
    * 是否启用远端拉取数据能力
    */
   useRemoteData?: boolean;
+
+  /**
+   * @extra
+   * mock json 模板文件路径
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
+   */
+  mockJsonTplPath: string;
+
+  /**
+   * @extra
+   * mock json 模板文件内容，仅在 mockJsonTplPath 对应文件存在时生效
+   * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
+   */
+  mockJsonTplContent?: string;
 };
 
 /**

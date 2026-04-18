@@ -39,6 +39,11 @@ export const MOCK_DIR_NAME = 'mocks';
 export const MOCK_DATA_DIR_NAME = 'data';
 
 /**
+ * 默认的 mock 模板目录 (其会作为mocks目录的子文件夹名称)
+ */
+export const MOCK_TPL_DIR_NAME = 'template';
+
+/**
  * 跟陌路配置文件，默认配置
  */
 export const DEFAULT_RC: MihawkRC = Object.freeze({
@@ -87,5 +92,7 @@ const defOpts: MihawkOptions = {
   useWS: false,
   // socketFilePath
   socketFilePath: null,
+  // mock json template file
+  mockJsonTplPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_TPL_DIR_NAME, 'json.tpl'),
 };
 export const DEFAULT_OPTIONS = Object.freeze(defOpts);
