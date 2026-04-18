@@ -134,6 +134,9 @@ local-*.*
 **/*/.local.*
 **/*/.local-*.*
 
+# omc
+.omc/
+
 .idea
 .DS_Store
 *.iml
