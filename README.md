@@ -290,10 +290,10 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 ### `mock-logic` file demo in ts
 
 ```ts
-'use strict;';
+'use strict';
 /**
  * GET /xxx
- * This file isn‘t mandatory. If it is not needed (such as when there is no need to modify response data), it can be deleted directly
+ * This file isn’t mandatory. If it is not needed (such as when there is no need to modify response data), it can be deleted directly
  */
 
 /**
@@ -304,10 +304,14 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
  */
 export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {
   // write your logic here...
-  originData.newProp = 'newPropXxx';
+  originData.newProp = ‘newPropXxx’;
   return originData; // return data, it is required
 }
 ```
+
+### JSON data template
+
+> Customize the initial content of auto-created JSON files via EJS templates, see [json-data-tpl.md](./docs/json-data-tpl.md)
 
 ## Differences from Mockjs?
 

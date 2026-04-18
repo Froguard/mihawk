@@ -289,7 +289,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 ### `mock-logic` 文件 ts 示例
 
 ```ts
-'use strict;';
+'use strict';
 /**
  * GET /xxx
  *
@@ -307,6 +307,10 @@ export default async function convertData(originData: Record<string, any>, extra
   return originData; // 需要进行显式 return
 }
 ```
+
+### JSON 数据模板
+
+> 通过 EJS 模板自定义自动创建的 JSON 文件的初始内容，详见 [json-data-tpl.zh_CN.md](./docs/json-data-tpl.zh_CN.md)
 
 ## 和 Mockjs 区别？
 
