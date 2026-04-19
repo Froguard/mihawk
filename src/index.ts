@@ -83,7 +83,9 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
 
   /**
-   * 0.ensure mock data dir exists, scan its json files to get routes
+   * 0.ensure necessary dir
+   * - make sure mock data dir exists, scan its json files to get routes
+   * - make sure mock tpl dir exists
    */
   ensureDirSync(mockDataDirPath);
   ensureDirSync(mockTplDirPath);

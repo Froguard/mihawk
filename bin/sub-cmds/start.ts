@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge';
 import * as chokidar from 'chokidar';
 import { Printer } from '../../src/utils/print';
 import { getRcData } from '../../src/composites/rc';
-import { DEFAULT_RC, PKG_NAME } from '../../src/consts';
+import { DEFAULT_RC, MOCK_TPL_DIR_NAME, PKG_NAME } from '../../src/consts';
 import mihawk from '../../src/index';
 import { createWatcher } from '../../src/composites/watcher';
 import { processExit } from '../../src/utils/process';
@@ -41,12 +41,16 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
           const [filePath, newFilePath] = args || [];
           // 1.对于 js,cjs,ts 等代码的更改，不仅仅会需要刷新模块，还需让server重启（以便于重新执行加载逻辑，载入最新模块）
           const isLogicFile = _isLogicFile(filePath);
-          // 2.对于 routes 文件，即便它可能是 json|json5, 也需要刷新 server 程序
-          const isRoutesFile = filePath.endsWith(`routes.${getRoutesFileExt(finalConfig.mockLogicFileType)}`);
-          // 3.对于 rename 的事件，参数除了 filePath 外，还有一个 newFilePath （即改名字：filePath -> newFilePath ）
+          // 2.对于 rename 的事件，参数除了 filePath 外，还有一个 newFilePath （即改名字：filePath -> newFilePath ）
           const isNewLigicFile = newFilePath && _isLogicFile(newFilePath);
-          // 综上三种情况，决定是否需要重启服务
-          const needReload = isLogicFile || isRoutesFile || isNewLigicFile;
+          // 3.对于模板文件，也需要重启服务
+          const isTplFile = _isTplFile(filePath);
+          // 4.对于 rename 的事件，模板文件，也需要重启服务
+          const isNewTplFile = newFilePath && _isTplFile(newFilePath);
+          // 5.对于 routes 文件，即便它可能是 json|json5, 也需要刷新 server 程序
+          const isRoutesFile = filePath.endsWith(`routes.${getRoutesFileExt(finalConfig.mockLogicFileType)}`);
+          // 综上几种情况，决定是否需要重启服务
+          const needReload = isLogicFile || isNewLigicFile || isTplFile || isNewTplFile || isRoutesFile;
           needReload && reload(controller, finalConfig);
         }
       });
@@ -69,6 +73,15 @@ const callback: SubCmdCallback<Loosify<MihawkRC>> = async function start(args) {
  */
 function _isLogicFile(filePath: string) {
   return filePath && ['.js', '.cjs', '.ts'].some(ext => filePath.endsWith(ext));
+}
+
+/**
+ * 检测文件是否为模板文件
+ * @param filePath 待判断的文件路径
+ * @returns
+ */
+function _isTplFile(filePath: string) {
+  return filePath && filePath.includes(MOCK_TPL_DIR_NAME) && filePath.endsWith('.tpl');
 }
 
 /**
