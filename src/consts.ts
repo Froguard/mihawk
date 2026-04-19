@@ -67,6 +67,13 @@ export const DEFAULT_RC: MihawkRC = Object.freeze({
   logConfig: null,
 });
 
+/** mocks */
+const DEFAULT_MOCKS_DIR = path.resolve(CWD, MOCK_DIR_NAME);
+/** mocks/data */
+const DEFAULT_MOCKS_DATA_DIR = path.resolve(DEFAULT_MOCKS_DIR, MOCK_DATA_DIR_NAME);
+/** mocks/template */
+const DEFAULT_MOCKS_TPL_DIR = path.resolve(DEFAULT_MOCKS_DIR, MOCK_TPL_DIR_NAME);
+
 /**
  * 默认的 mihawk options
  * - 在 rc 配置之上额外增加，方便逻辑计算，初始赋值逻辑详见 formatOptionsByConfig 方法
@@ -76,8 +83,9 @@ const defOpts: MihawkOptions = {
   // base
   useHttps: false,
   // paths
-  mockDirPath: path.resolve(CWD, MOCK_DIR_NAME),
-  mockDataDirPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_DATA_DIR_NAME),
+  mockDirPath: DEFAULT_MOCKS_DIR,
+  mockTplDirPath: DEFAULT_MOCKS_TPL_DIR,
+  mockDataDirPath: DEFAULT_MOCKS_DATA_DIR,
   // mock data file
   dataFileExt: 'json',
   // mock logic file
@@ -86,13 +94,13 @@ const defOpts: MihawkOptions = {
   // typescript
   isTypesctiptMode: false,
   // routes file
-  routesFilePath: path.resolve(CWD, MOCK_DIR_NAME, 'routes.json'),
+  routesFilePath: path.resolve(DEFAULT_MOCKS_DIR, 'routes.json'),
   // middleware file
-  middlewareFilePath: null, // path.resolve(CWD, MOCK_DIR_NAME, 'middleware.js'),
+  middlewareFilePath: null, // path.resolve(DEFAULT_MOCKS_DIR, 'middleware.js'),
   useWS: false,
   // socketFilePath
   socketFilePath: null,
   // mock json template file
-  mockJsonTplPath: path.resolve(CWD, MOCK_DIR_NAME, MOCK_TPL_DIR_NAME, 'json.tpl'),
+  mockJsonTplPath: path.resolve(DEFAULT_MOCKS_TPL_DIR, 'json.tpl'),
 };
 export const DEFAULT_OPTIONS = Object.freeze(defOpts);

@@ -346,6 +346,12 @@ export type MihawkOptions = MihawkRC & {
 
   /**
    * @extra
+   * mock 所需的模板文件目录
+   */
+  mockTplDirPath: string;
+
+  /**
+   * @extra
    * mock json 模板文件路径
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */

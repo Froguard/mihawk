@@ -82,7 +82,12 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   const loadRoutesFile = useLogicFile ? loadLogicFile : loadJson;
 
   /**
-   * 0.detect port in use
+   * 0.ensure mock data dir exists, scan its json files to get routes
+   */
+  ensureDirSync(mockDataDirPath);
+
+  /**
+   * 1.detect port in use
    */
   const isPortAlreadyInUse = await isPortInUse(port);
   if (isPortAlreadyInUse) {
@@ -90,11 +95,6 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     process.exit(1);
     // return;
   }
-
-  /**
-   * 1.ensure mock data dir exists, scan its json files to get routes
-   */
-  ensureDirSync(mockDataDirPath);
 
   /**
    * 2.detect if support typescript mode

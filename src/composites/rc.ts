@@ -166,10 +166,11 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
 
   // 3.reset | format speaially keys
   const { mockDataFileType, mockLogicFileType } = options || {};
-  // - port mockDirPath mockDataDirPath
+  // - port mockDirPath mockDataDirPath mockTplDirPath
   options.port = Number(options.port); // port: make sure it is a number
   options.mockDirPath = absifyPath(options.mockDir || MOCK_DIR_NAME); // mockDirPath
   options.mockDataDirPath = join(options.mockDirPath, MOCK_DATA_DIR_NAME); // mockDataDirPath
+  options.mockTplDirPath = join(options.mockDirPath, MOCK_TPL_DIR_NAME); // mockTplDirPath
 
   // - isTypesctiptMode
   const isTypesctiptMode = mockLogicFileType === 'ts' || mockLogicFileType === 'typescript';
@@ -225,7 +226,7 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
   options.useRemoteData = typeof options.setJsonByRemote === 'object' && options.setJsonByRemote?.enable;
 
   // - mockJsonTplPath & mockJsonTplContent
-  const mockJsonTplPath = join(options.mockDirPath, MOCK_TPL_DIR_NAME, 'json.tpl');
+  const mockJsonTplPath = join(options.mockTplDirPath, 'json.tpl');
   options.mockJsonTplPath = mockJsonTplPath;
   if (existsSync(mockJsonTplPath)) {
     options.mockJsonTplContent = readFileSync(mockJsonTplPath, 'utf-8');
