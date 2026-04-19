@@ -63,6 +63,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     mockDir,
     // mockDirPath: MOCKS_ROOT_PATH,
     mockDataDirPath,
+    mockTplDirPath,
     //
     dataFileExt,
     // logicFileExt,
@@ -85,6 +86,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
    * 0.ensure mock data dir exists, scan its json files to get routes
    */
   ensureDirSync(mockDataDirPath);
+  ensureDirSync(mockTplDirPath);
 
   /**
    * 1.detect port in use
