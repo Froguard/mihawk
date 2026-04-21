@@ -48,6 +48,7 @@ __docs__/
 .husky/
 .vscode/
 .omc/
+.claude/
 .commitlintrc.ts
 .commitlintrc.js
 .commitlintrc.json
