@@ -75,7 +75,7 @@ export function createDataResolver(options: MihawkOptions) {
       // 针对已经存在本地 json 文件的情况，根据配置中是否开启了 setJsonByRemote.coverExistedJson 去决定要不要从远端拉去数据之后对其进行覆盖
       if (useRemoteData && setJsonByRemote?.coverExistedJson) {
         // 🚀 send remote api
-        const remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
+        const remoteData = await safeFetchRemoteData(apiPath, { method, headers, body }, options);
         if (isObjStrict(remoteData)) {
           // 只有当拉取到的远端数据是正常数据时，才会更新到文件
           writeJSONSafeSync(mockJsonAbsPath, remoteData);
@@ -107,7 +107,7 @@ export function createDataResolver(options: MihawkOptions) {
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
         // 🚀 send remote api
-        remoteData = await fetchRemoteData(apiPath, { method, headers, body }, options);
+        remoteData = await safeFetchRemoteData(apiPath, { method, headers, body }, options);
       }
       // Use remote data if available, otherwise use default
       if (remoteData) {
@@ -202,7 +202,7 @@ export function createDataResolver(options: MihawkOptions) {
  * @param {MihawkOptions} mhkOptions
  * @returns {Promise<JSONObject | null>} json 数据内容 或者 null
  */
-async function fetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
+async function safeFetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
   const { setJsonByRemote } = mhkOptions;
   if (typeof setJsonByRemote !== 'object') {
     // Printer.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
