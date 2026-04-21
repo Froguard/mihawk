@@ -196,6 +196,7 @@ export function createDataResolver(options: MihawkOptions) {
 
 /**
  * 从远端获取 json 数据内容（该内容会用于初始化 mock 时候所需要的 json 文件）
+ * - 内部已经做了 try-catch，出错的时候返回 null
  * @param {string} reqPath
  * @param {Record<string, any>} reqOptions
  * @param {MihawkOptions} mhkOptions
