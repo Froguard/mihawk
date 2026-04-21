@@ -49,6 +49,8 @@ __docs__/
 .vscode/
 .omc/
 .claude/
+CLAUDE.md
+.claudeignore
 .commitlintrc.ts
 .commitlintrc.js
 .commitlintrc.json
