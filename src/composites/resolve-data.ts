@@ -100,8 +100,9 @@ export function createDataResolver(options: MihawkOptions) {
       // 采用备份形式
       mockJson = jsonData || initData;
     } else {
-      let finalInitData: Record<string, any> = initData;
-      let finalInitType: 'default' | 'fallbackRemoteData' | 'template' = 'default';
+      // 针对本地不存在 json 文件的情况，需要自动初始化内容，然后创建文件
+      let tmpInitData: Record<string, any> = initData;
+      let tmpInitType: 'default' | 'fallbackRemoteData' | 'template' | null = null;
       // Try fetch from remote if enabled
       let remoteData: Record<string, any> | null = null;
       if (useRemoteData) {
@@ -111,33 +112,33 @@ export function createDataResolver(options: MihawkOptions) {
       // Use remote data if available, otherwise use default
       if (remoteData) {
         loadRemote = true;
-        finalInitData = remoteData;
-        finalInitType = 'fallbackRemoteData';
+        tmpInitData = remoteData;
+        tmpInitType = 'fallbackRemoteData';
       } else if (mockJsonTplContent) {
         // 尝试使用模板文件生成初始化数据
         try {
-          const rendered = render(mockJsonTplContent, {
-            jsonPath,
-            jsonPath4log,
-            routePath,
-            mockRelPath: mockRelPathNoExt,
-            method,
-            url,
-          });
-          finalInitData = JSON.parse(rendered);
-          finalInitType = 'template';
-        } catch (error) {
-          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow('Render json.tpl failed, will use default initData!'), error);
-          finalInitData = initData;
+          // render template
+          const rendered = render(mockJsonTplContent, { jsonPath, jsonPath4log, routePath, mockRelPath, method, url });
+          try {
+            // parse json
+            tmpInitData = JSON.parse(rendered);
+            tmpInitType = 'template';
+          } catch (parseErr) {
+            Printer.warn(LOGFLAG_RESOLVER, Colors.yellow('Parse json data failed, will use default initData!'), parseErr);
+          }
+        } catch (tplError) {
+          Printer.warn(LOGFLAG_RESOLVER, Colors.yellow('Render json.tpl failed, will use default initData!'), tplError);
         }
-      } else {
-        finalInitData = initData;
-        finalInitType = 'default';
       }
-      Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${finalInitType}...`, jsonPath4log);
+      if (tmpInitType === null) {
+        tmpInitData = initData;
+        tmpInitType = 'default';
+      }
+      Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${tmpInitType}...`, jsonPath4log);
       // Auto create json file
-      writeJSONSafeSync(mockJsonAbsPath, finalInitData);
+      writeJSONSafeSync(mockJsonAbsPath, tmpInitData);
       //
+      mockJson = tmpInitData;
     }
     ctx.set('X-Mock-Use-Remote', loadRemote ? '1' : '0');
     ctx.set('X-Mock-Use-Default', mockJson === initData ? '1' : '0');
