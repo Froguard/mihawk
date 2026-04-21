@@ -134,7 +134,7 @@ export function createDataResolver(options: MihawkOptions) {
         tmpInitData = initData;
         tmpInitType = 'default';
       }
-      Printer.log(RESOLVER_NAME, `MockDataFile isn't exists, will auto create it with ${tmpInitType}...`, jsonPath4log);
+      Printer.log(LOGFLAG_RESOLVER, `MockDataFile isn't exists, will auto create it (from ${tmpInitType})...`, Colors.gray(jsonPath4log));
       // Auto create json file
       writeJSONSafeSync(mockJsonAbsPath, tmpInitData);
       //
