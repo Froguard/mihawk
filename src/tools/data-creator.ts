@@ -631,3 +631,35 @@ export function createRandCname() {
     return `${surName}${comb}`;
   }
 }
+
+/**
+ * 创建 STOMP 格式的消息字符串
+ * @param {string} command STOMP 命令（如 CONNECT, SEND, SUBSCRIBE 等）
+ * @param {Record<string, string>} headers 消息头键值对
+ * @param {string} [body] 消息体（可选）
+ * @returns {string} STOMP 格式的消息字符串，以 \0 结尾
+ * @example
+ *   createStompMsgStr('SEND', { destination: '/queue/test', 'content-type': 'text/plain' }, 'hello')
+ *   // => 'SEND\ndestination:/queue/test\ncontent-type:text/plain\n\nhello\0'
+ */
+export function createStompMsgStr(command: string, headers: Record<string, string>, body?: string) {
+  let msg = command + '\n';
+  for (const [key, value] of Object.entries(headers || {})) {
+    msg += `${key}:${escapeHeaderValue(value)}\n`;
+  }
+  msg += '\n';
+  if (body) {
+    msg += body;
+  }
+  msg += '\0';
+  return msg;
+}
+
+/**
+ * 转义 STOMP header 值中的特殊字符
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeHeaderValue(value: string) {
+  return value.replace(/\\/g, '\\\\').replace(/:/g, '\\c').replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+}

@@ -32,6 +32,7 @@ export {
   createRandIp,
   createRandName,
   createRandCname,
+  createStompMsgStr,
 } from './data-creator';
 
 /** mock data convertor */
