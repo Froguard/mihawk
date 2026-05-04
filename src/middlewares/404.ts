@@ -31,6 +31,7 @@ export default function notFound() {
     if (ctx.status === 404 && !ctx.body) {
       const { accept } = request.headers || {};
       // !disableLogPrint && Printer.log('mdw-404:', Colors.white.bgYellow.bold(' 404 Not found! '), Colors.yellow(routePath));
+      ctx.status = 404;
       if (accept.includes('text/html') || accept.includes('application/xhtml+xml')) {
         // html
         ctx.set('Content-Type', 'text/html');

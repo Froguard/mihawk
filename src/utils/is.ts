@@ -160,12 +160,17 @@ export const isEmptyList = isEmptyArr;
 export function isJsonStr(jsonStr: string, isJson5 = false): jsonStr is string {
   let isValidJsonCnt = false;
   try {
-    isValidJsonCnt = JSON.parse(jsonStr);
-    if (!isValidJsonCnt && isJson5) {
-      isValidJsonCnt = JSON5.parse(jsonStr);
-    }
+    JSON.parse(jsonStr);
+    isValidJsonCnt = true;
   } catch (e) {
-    isValidJsonCnt = false;
+    if (isJson5) {
+      try {
+        JSON5.parse(jsonStr);
+        isValidJsonCnt = true;
+      } catch {
+        isValidJsonCnt = false;
+      }
+    }
   }
   return isValidJsonCnt;
 }

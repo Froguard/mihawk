@@ -21,7 +21,7 @@
     /**
      * common build config:
      */
-    // "types": ["node"],
+    "types": ["node", "jest"],
     "lib": ["ES2022"], // 方便 ts 识别最新的 es 语法
     "moduleResolution": "node16", // 默认以 nodejs 模块的方式进行模块解析，需要同时设置 module=node16
     "esModuleInterop": true, // 确保在 CommonJS 环境中使用 ES Modules 导出时不会出现类型错误或导入问题
@@ -56,9 +56,15 @@
     "./bin/**/*.ts",
     "./bin/**/*.d.ts",
     "./src/**/*.ts",
-    "./src/**/*.d.ts"
-    // "jest.config.ts",
-    // "./__tests__/**/*.ts",
+    "./src/**/*.d.ts",
+    /**
+     * 测试用例
+     * 加到 include 中仅是为了让 vscode 能够正常识别 *.test.ts 文件不报错
+     * 而其他几个 tsconfig.{cjs,esm,type}.json 是打包文件，需要排除掉它（测试用例无需打包）
+     */
+    "./__tests__/**/*.ts",
+    "jest.config.ts",
+    "jest.setup.ts"
   ],
-  "exclude": ["node_modules", "__tests__", "__coverage__"],
+  "exclude": ["node_modules", "__coverage__"]
 }

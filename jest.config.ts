@@ -24,6 +24,7 @@ export default async (): Promise<Config.InitialOptions> => {
     testPathIgnorePatterns: ['/node_modules/'],
     moduleFileExtensions: ['ts', 'js', 'json', 'node'],
     transform: { '^.+\\.ts$': 'ts-jest' },
+    setupFiles: ['<rootDir>/jest.setup.ts'],
     transformIgnorePatterns: ['node_modules/(?!variables/.*)'],
     // coverage
     collectCoverage: !!process.env.coverage,
