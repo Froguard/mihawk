@@ -2,11 +2,12 @@
 
 /**
  * 验证 src/tools/index.ts 的导出是否完整且可用
- * - 本文件主要做集成验证，每个函数的具体逻辑已在对应模块的测试文件中覆盖
+ * - 仅覆盖 tools 特有导出（data-creator、data-resolver、别名、detectPort、Colors）
+ * - 从 utils 重导出的函数已在 __tests__/src/utils/ 中独立测试，此处不再重复
  */
 
-// data-creator
 import {
+  // data-creator
   creataRandBool,
   createRandNum,
   createRandChar,
@@ -25,67 +26,26 @@ import {
   createRandName,
   createRandCname,
   createStompMsgStr,
-} from '../../../src/tools';
-
-// data-resolver
-import { pickRand, dedupe, deepmerge, getListByPagination, shuffleList, shuffleString } from '../../../src/tools';
-
-// type detect
-import {
-  getType,
-  isType,
-  isNil,
-  isPrimitvieType,
-  isSimpleJsonPropType,
-  isJsonStr,
-  isNumStrict,
-  isNaNStrict,
-  isObjStrict,
-  isEmptyObj,
-  isEmptyArr,
+  // data-resolver
+  pickRand,
+  dedupe,
+  deepmerge,
+  getListByPagination,
+  shuffleList,
+  shuffleString,
+  // type detect aliases
   isNullOrUndefined,
   isUndefinedOrNull,
   isEmptyList,
+  // net
+  detectPort,
+  // server aliases
+  getPort,
+  getAddress,
+  getAddrInfo,
+  // Colors
+  Colors,
 } from '../../../src/tools';
-
-// date
-import { dateFormat, ensureDate, getTimeNowStr } from '../../../src/tools';
-
-// obj
-import { delNillProps, deepFreeze } from '../../../src/tools';
-
-// str
-import { fuzzyIncludes, shallowEqual, isMatchPatterns, formatPatterns, delAddrProtocol } from '../../../src/tools';
-
-// num
-import { getSafeNum } from '../../../src/tools';
-
-// async
-import { sleep, timeoutPromise } from '../../../src/tools';
-
-// path
-import { formatPath, isExistedSync, absifyPath, unixifyPath, relPathToCWD } from '../../../src/tools';
-
-// file
-import { readFileSafeSync, readJsonSafeSync, writeFileSafeSync, writeJSONSafeSync } from '../../../src/tools';
-
-// request
-import { jsonRequest } from '../../../src/tools';
-
-// parser
-import { parseStompMsg } from '../../../src/tools';
-
-// printer
-import { Printer } from '../../../src/tools';
-
-// net
-import { supportLocalHost, isPortInUse, isLocalHost, getMyIp, detectPort } from '../../../src/tools';
-
-// server
-import { getPort, getAddress, getAddrInfo } from '../../../src/tools';
-
-// 3rd-Colors
-import { Colors } from '../../../src/tools';
 
 describe('tools/index 导出验证', () => {
   describe('data-creator', () => {
@@ -166,6 +126,11 @@ describe('tools/index 导出验证', () => {
       expect(msg).toContain('hello');
       expect(msg).toContain('\0');
     });
+
+    it('createRandImage 应返回 picsum 图片地址', () => {
+      const url = createRandImage({ width: 200, height: 300 });
+      expect(url).toMatch(/^https:\/\/picsum\.photos\/200\/300/);
+    });
   });
 
   describe('data-resolver', () => {
@@ -200,221 +165,42 @@ describe('tools/index 导出验证', () => {
     });
   });
 
-  describe('type detect', () => {
-    it('getType 应返回类型字符串', () => {
-      expect(getType({})).toBe('object');
-      expect(getType([])).toBe('array');
-    });
-
-    it('isType 应判断类型', () => {
-      expect(isType({}, 'object')).toBe(true);
-      expect(isType(123, 'number')).toBe(true);
-    });
-
-    it('isNil 应判定 null 和 undefined', () => {
-      expect(isNil(null)).toBe(true);
-      expect(isNil(undefined)).toBe(true);
-      expect(isNil(0)).toBe(false);
-    });
-
-    it('isPrimitvieType 应判定基础类型', () => {
-      expect(isPrimitvieType(123)).toBe(true);
-      expect(isPrimitvieType({})).toBe(false);
-    });
-
-    it('isSimpleJsonPropType 应判定简单 JSON 值', () => {
-      expect(isSimpleJsonPropType('str')).toBe(true);
-      expect(isSimpleJsonPropType({})).toBe(false);
-    });
-
-    it('isJsonStr 应判定 JSON 字符串', () => {
-      expect(isJsonStr('{"a":1}')).toBe(true);
-      expect(isJsonStr('not json')).toBe(false);
-    });
-
-    it('isNumStrict 应判定有效数字', () => {
-      expect(isNumStrict(123)).toBe(true);
-      expect(isNumStrict(NaN)).toBe(false);
-    });
-
-    it('isNaNStrict 应仅判定 NaN', () => {
-      expect(isNaNStrict(NaN)).toBe(true);
-      expect(isNaNStrict(0)).toBe(false);
-    });
-
-    it('isObjStrict 应判定纯对象', () => {
-      expect(isObjStrict({})).toBe(true);
-      expect(isObjStrict([])).toBe(false);
-    });
-
-    it('isEmptyObj 应判定空对象', () => {
-      expect(isEmptyObj({})).toBe(true);
-      expect(isEmptyObj({ a: 1 })).toBe(false);
-    });
-
-    it('isEmptyArr 应判定空数组', () => {
-      expect(isEmptyArr([])).toBe(true);
-      expect(isEmptyArr([1])).toBe(false);
-    });
-
-    it('别名函数应正常工作', () => {
+  describe('type detect aliases', () => {
+    it('isNullOrUndefined 应判定 null 和 undefined', () => {
       expect(isNullOrUndefined(null)).toBe(true);
+      expect(isNullOrUndefined(undefined)).toBe(true);
+      expect(isNullOrUndefined(0)).toBe(false);
+    });
+
+    it('isUndefinedOrNull 应判定 null 和 undefined', () => {
+      expect(isUndefinedOrNull(null)).toBe(true);
       expect(isUndefinedOrNull(undefined)).toBe(true);
+      expect(isUndefinedOrNull('')).toBe(false);
+    });
+
+    it('isEmptyList 应判定空数组', () => {
       expect(isEmptyList([])).toBe(true);
-    });
-  });
-
-  describe('date', () => {
-    it('dateFormat 应格式化日期', () => {
-      const d = new Date(2025, 4, 3, 14, 25, 41);
-      expect(dateFormat(d, 'yyyy-MM-dd')).toBe('2025-05-03');
-    });
-
-    it('getTimeNowStr 应返回当前时间字符串', () => {
-      expect(typeof getTimeNowStr()).toBe('string');
-    });
-
-    it('ensureDate 应返回 Date 实例', () => {
-      expect(ensureDate('2025-05-03') instanceof Date).toBe(true);
-      expect(ensureDate(Date.now()) instanceof Date).toBe(true);
-    });
-  });
-
-  describe('obj', () => {
-    it('delNillProps 应删除 null/undefined', () => {
-      const obj: Record<string, any> = { a: 1, b: null, c: undefined };
-      delNillProps(obj);
-      expect(obj).toEqual({ a: 1 });
-    });
-
-    it('deepFreeze 应冻结对象', () => {
-      const obj = { a: { b: 1 } };
-      deepFreeze(obj);
-      expect(Object.isFrozen(obj)).toBe(true);
-      expect(Object.isFrozen(obj.a)).toBe(true);
-    });
-  });
-
-  describe('str', () => {
-    it('fuzzyIncludes 应支持模糊匹配', () => {
-      expect(fuzzyIncludes(['abc', 'def'], 'bc')).toBe(true);
-      expect(fuzzyIncludes(['abc', 'def'], 'xyz')).toBe(false);
-    });
-
-    it('shallowEqual 应忽略大小写', () => {
-      expect(shallowEqual('abc', 'ABC')).toBe(true);
-      expect(shallowEqual('abc', 'def')).toBe(false);
-    });
-
-    it('isMatchPatterns 应支持 glob', () => {
-      expect(isMatchPatterns('a/b/c', 'a/b/*')).toBe(true);
-    });
-
-    it('formatPatterns 应过滤空值', () => {
-      expect(formatPatterns(['a', null, 'b'])).toEqual(['a', 'b']);
-    });
-
-    it('delAddrProtocol 应删除协议头', () => {
-      expect(delAddrProtocol('http://example.com')).toBe('example.com');
-    });
-  });
-
-  describe('num', () => {
-    it('getSafeNum 应限制范围', () => {
-      expect(getSafeNum(5, { min: 0, max: 10 })).toBe(5);
-      expect(getSafeNum(-1, { min: 0, max: 10 })).toBe(0);
-      expect(getSafeNum(15, { min: 0, max: 10 })).toBe(10);
-    });
-  });
-
-  describe('async', () => {
-    it('sleep 应等待指定时间', async () => {
-      const start = Date.now();
-      await sleep(10);
-      expect(Date.now() - start).toBeGreaterThanOrEqual(5);
-    });
-
-    it('timeoutPromise 应支持超时', async () => {
-      const result = await timeoutPromise(new Promise(resolve => setTimeout(() => resolve('ok'), 10)), 5);
-      expect(result).toBeUndefined();
-    });
-  });
-
-  describe('path', () => {
-    it('absifyPath 应转为绝对路径', () => {
-      expect(absifyPath('/absolute')).toBe('/absolute');
-      expect(typeof absifyPath('relative')).toBe('string');
-    });
-
-    it('isExistedSync 应判定文件存在性', () => {
-      expect(isExistedSync(__filename)).toBe(true);
-      expect(isExistedSync('/not/exist')).toBe(false);
-    });
-  });
-
-  describe('file', () => {
-    it('readFileSafeSync 应安全读取', () => {
-      expect(typeof readFileSafeSync(__filename)).toBe('string');
-      expect(readFileSafeSync('')).toBe('');
-    });
-
-    it('readJsonSafeSync 应安全解析', () => {
-      expect(readJsonSafeSync('not-exist.json')).toBeNull();
-    });
-  });
-
-  describe('parser', () => {
-    it('parseStompMsg 应解析 STOMP 消息', () => {
-      const raw = 'SEND\ndestination:/queue/test\n\nhello\n';
-      const msg = parseStompMsg(raw);
-      expect(msg.command).toBe('SEND');
-      expect(msg.headers.destination).toBe('/queue/test');
-      expect(msg.body).toBe('hello');
-    });
-  });
-
-  describe('printer', () => {
-    it('Printer.log 应可调用', () => {
-      expect(typeof Printer.log).toBe('function');
-    });
-    it('Printer.warn 应可调用', () => {
-      expect(typeof Printer.warn).toBe('function');
-    });
-    it('Printer.error 应可调用', () => {
-      expect(typeof Printer.error).toBe('function');
+      expect(isEmptyList([1])).toBe(false);
+      expect(isEmptyList({})).toBe(false);
     });
   });
 
   describe('net', () => {
-    it('isLocalHost 应判定 localhost', () => {
-      expect(isLocalHost('localhost')).toBe(true);
-      expect(isLocalHost('example.com')).toBe(false);
-    });
-
-    it('supportLocalHost 应支持 localhost 变体', () => {
-      expect(supportLocalHost('127.0.0.1')).toBe(true);
-    });
-
-    it('getMyIp 应返回字符串', () => {
-      expect(typeof getMyIp()).toBe('string');
-    });
-
     it('detectPort 应返回端口检测结果', async () => {
       const result = await detectPort(0);
       expect(typeof result.isInUse).toBe('boolean');
     });
   });
 
-  describe('server', () => {
+  describe('server aliases', () => {
     it('getPort, getAddress, getAddrInfo 应可调用', () => {
-      // 这些函数需要真实 server 实例，仅验证导出可用
       expect(typeof getPort).toBe('function');
       expect(typeof getAddress).toBe('function');
       expect(typeof getAddrInfo).toBe('function');
     });
   });
 
-  describe('3rd Colors', () => {
+  describe('Colors', () => {
     it('Colors 应被导出', () => {
       expect(typeof Colors).toBe('object');
       expect(typeof Colors.red).toBe('function');
