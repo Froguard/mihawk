@@ -9,3 +9,5 @@
 tsconfig.json
 tsconfig.*.json
 .omc/
+_example_/
+__example__/
