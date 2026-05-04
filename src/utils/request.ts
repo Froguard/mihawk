@@ -35,7 +35,7 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
     headers: {
       ...options?.headers, // overwrite
       'Content-Type': 'application/json', // force set json type
-      Cookie: options.headers.Cookie,
+      Cookie: options.headers?.Cookie,
     },
   });
 

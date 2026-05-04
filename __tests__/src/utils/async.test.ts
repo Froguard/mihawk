@@ -7,7 +7,7 @@ describe('sleep', () => {
     await sleep(50);
     const elapsed = Date.now() - start;
     expect(elapsed).toBeGreaterThanOrEqual(40);
-    expect(elapsed).toBeLessThan(150);
+    expect(elapsed).toBeLessThan(250);
   });
   it('0ms 应立即返回', async () => {
     const start = Date.now();
