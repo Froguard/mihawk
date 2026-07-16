@@ -19,7 +19,8 @@ export default function cors() {
     // 允许跨域
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,HEAD,OPTIONS,TRACE'); // *
-    ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Content-Range,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
+    ctx.set('Access-Control-Allow-Headers', '*'); // 防止用户有添加一些自定义的 headers，这里直接暴力为 * 即可
+    // ctx.set('Access-Control-Allow-Headers', 'Content-Type,Content-Length,Content-Range,Authorization,Accept,X-Requested-With,Range,Accept-Ranges'); // *
     // ctx.set('Access-Control-Allow-Credentials', 'true'); // 当设置为 true 时，Access-Control-Allow-Origin 不能为 *
 
     if (ctx.method === 'OPTIONS') {
