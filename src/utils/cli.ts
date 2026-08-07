@@ -55,6 +55,24 @@ export function getCliArgs<T extends Record<string, any> = any>(processArgv: str
 }
 
 /**
+ * 获取 cli 参数中的 boolean 类型
+ * eg: 避免 --watch=false 被解析成 'false' 之后直接为 true
+ * @param {unknown} param
+ * @returns {boolean} true|false
+ */
+export function getCliBool(param: unknown): boolean {
+  if (typeof param === 'string') {
+    const _param = param.trim();
+    if (['true', '1'].includes(_param)) {
+      return true;
+    } else if (['false', '0', 'null', 'undefined', ''].includes(_param)) {
+      return false;
+    }
+  }
+  return !!param;
+}
+
+/**
  * 命令行交互：确认提示
  * @param {string} question 问题文案
  * @returns {Promise<boolean>} 默认确认？

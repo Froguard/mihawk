@@ -153,10 +153,10 @@ export function formatPath(targetPath: string) {
  * - 对于 `/test/a/b.xxx`，会返回 `/test/a/b`
  * - 对于 `/test/a/b.json5`，会返回 `/test/a/b`
  * - 👉🏼 对于 `/test/a/`，会返回 `/test/a/index` 【特别注意】这里的末尾/或转化增加一个 index 后缀
- * - 返回的内容，回事 normalize 的效果，即删除 . 和 .. 等内容
+ * - 返回的内容，会是 normalize 的效果，即删除 . 和 .. 等内容
  * @private
- * @param mockPath
- * @returns
+ * @param {string} mockPath
+ * @returns {string} pathString
  */
 export function formatMockPath(mockPath: string) {
   let newPath = formatPath(removeSpecialExt(mockPath));

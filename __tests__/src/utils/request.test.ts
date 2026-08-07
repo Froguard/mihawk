@@ -48,6 +48,42 @@ describe('jsonRequest', () => {
     expect(callArgs[1].body).toBeUndefined();
   });
 
+  it('请求超时后应中断请求并抛出 TimeoutError', async () => {
+    fetchMock.mockImplementation((_url, init) => {
+      return new Promise((_resolve, reject) => {
+        init.signal.addEventListener('abort', () => reject(new Error('aborted')));
+      });
+    });
+
+    const request = jsonRequest('https://example.com/api', { timeout: 10 });
+    await expect(request).rejects.toMatchObject({
+      name: 'TimeoutError',
+      message: 'Request timeout after 10ms',
+    });
+
+    const fetchOptions = fetchMock.mock.calls[0][1];
+    expect(fetchOptions.timeout).toBeUndefined();
+    expect(fetchOptions.signal.aborted).toBe(true);
+  });
+
+  it('请求完成后应清理 timeout 定时器', async () => {
+    jest.useFakeTimers();
+    fetchMock.mockResolvedValue({
+      ok: true,
+      headers: { get: () => 'application/json' },
+      json: async () => ({ success: true }),
+    });
+
+    try {
+      await expect(jsonRequest('https://example.com/api', { timeout: 1000 })).resolves.toEqual({ success: true });
+      const fetchOptions = fetchMock.mock.calls[0][1];
+      jest.advanceTimersByTime(1000);
+      expect(fetchOptions.signal.aborted).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('无效 URL 应抛出错误', async () => {
     await expect(jsonRequest('not-a-url')).rejects.toThrow('Invalid URL');
   });

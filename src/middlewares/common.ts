@@ -32,7 +32,7 @@ export default function (options?: MihawkOptions) {
     // Printer.log('mdw-com: >>', routePath);
     // set common props to ctx
     /**
-     * 是一个相对路径，以 data 文件夹为起始目录
+     * 是一个相对路径，以 data 文件夹为起始目录(但不包含data作为开头)；如：GET/a/b/c
      */
     ctx.mockRelPath = unixifyPath(join(method, path));
     /**

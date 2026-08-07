@@ -13,6 +13,7 @@ import { Loosify, MihawkRC, MihawkOptions } from '../com-types';
 import { Printer } from '../utils/print';
 import { absifyPath, getLogicFileExt } from '../utils/path';
 import { isObjStrict } from '../utils/is';
+import { getCliBool } from '../utils/cli';
 
 interface InitOptions<T = any> {
   fileType?: 'json' | 'js' | 'ts';
@@ -147,7 +148,7 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
   // 1.remove invalid keys
   ['_', '--', 'h', 'H', 'help', 'v', 'V', 'version'].forEach(key => delete options[key]);
 
-  // 2.resolve alias
+  // 2.resolve short alias
   if (options.p !== undefined) {
     // p alias for port
     options.port = options.p;
@@ -163,6 +164,7 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
     options.watch = options.w;
     delete options.w;
   }
+  options.watch = getCliBool(options.watch);
 
   // 3.reset | format speaially keys
   const { mockDataFileType, mockLogicFileType } = options || {};
@@ -204,10 +206,10 @@ export function formatOptionsByConfig(config: Loosify<MihawkRC>) {
   options.routesFilePath = join(options.mockDirPath, `./routes.${logicFileExt || dataFileExt}`);
 
   // - useHttps
-  options.useHttps = !!options.https || isObjStrict(options.https); // https 为 true，或者为一个对象 { key,cert }
+  options.useHttps = getCliBool(options.https) || isObjStrict(options.https); // https 为 true，或者为一个对象 { key,cert }
 
   // - useWS (useWebSocket)
-  options.useWS = !!options.socketConfig;
+  options.useWS = getCliBool(options.socketConfig);
   if (options.useWS) {
     // - socketConfig
     if (typeof options.socketConfig !== 'object') {

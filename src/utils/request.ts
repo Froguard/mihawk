@@ -1,5 +1,3 @@
-// import { fetch } from 'undici';
-
 /**
  * 接口的响应为 json 格式的请求
  * @param {string} url
@@ -27,30 +25,55 @@ export async function jsonRequest<R = Record<string, any>>(url: string, options?
   // format options
   const isHttps = url.startsWith('https://');
   options = formatOptions(options, isHttps);
+  const { timeout, ...fetchOptions } = options;
+  const hasTimeout = typeof timeout === 'number' && Number.isFinite(timeout) && timeout > 0;
+  const abortController = hasTimeout ? new AbortController() : null;
+  let timeoutTimer: ReturnType<typeof setTimeout> | null = null;
+  let didTimeout = false;
 
-  // send api
-  const apiRes = await fetch(url, {
-    // const apiRes = await crossFetch(url, {
-    ...options, // overwrite
-    headers: {
-      ...options?.headers, // overwrite
-      'Content-Type': 'application/json', // force set json type
-      Cookie: options.headers?.Cookie,
-    },
-  });
-
-  // resolve exceptions
-  // if (!apiRes.ok) {
-  //   throw new Error(`HTTP Error: ${apiRes.status}`);
-  // }
-  const resContentType = apiRes.headers.get('content-type') || apiRes.headers.get('Content-Type') || '';
-  if (!resContentType || (!resContentType.includes('application/json') && !resContentType.includes('json') && !resContentType.includes('text'))) {
-    throw new Error(`Invalid content-type: ${resContentType || 'unknown'}`);
+  if (abortController) {
+    timeoutTimer = setTimeout(() => {
+      didTimeout = true;
+      abortController.abort();
+    }, timeout);
   }
 
-  // parse to json
-  const res = await apiRes.json();
-  return res as R;
+  try {
+    // send api
+    const apiRes = await fetch(url, {
+      ...fetchOptions, // overwrite
+      signal: abortController?.signal,
+      headers: {
+        ...fetchOptions?.headers, // overwrite
+        'Content-Type': 'application/json', // force set json type
+        Cookie: fetchOptions.headers?.Cookie,
+      },
+    });
+
+    // resolve exceptions
+    // if (!apiRes.ok) {
+    //   throw new Error(`HTTP Error: ${apiRes.status}`);
+    // }
+    const resContentType = apiRes.headers.get('content-type') || apiRes.headers.get('Content-Type') || '';
+    if (!resContentType || (!resContentType.includes('application/json') && !resContentType.includes('json') && !resContentType.includes('text'))) {
+      throw new Error(`Invalid content-type: ${resContentType || 'unknown'}`);
+    }
+
+    // parse to json
+    const res = await apiRes.json();
+    return res as R;
+  } catch (error) {
+    if (didTimeout) {
+      const timeoutError = new Error(`Request timeout after ${timeout}ms`);
+      timeoutError.name = 'TimeoutError';
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    if (timeoutTimer) {
+      clearTimeout(timeoutTimer);
+    }
+  }
 }
 
 /**
