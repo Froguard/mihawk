@@ -180,3 +180,6 @@ index.d.ts
 !/mocks/**/.gitkeep
 package-lock.json
 *.local.json
+
+# superpowers
+/docs/superpowers
