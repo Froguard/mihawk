@@ -1,5 +1,5 @@
 'use strict';
-import { jsonRequest } from '../../../src/utils/request';
+import { buildRemoteRequestUrl, jsonRequest } from '../../../src/utils/request';
 
 describe('jsonRequest', () => {
   let fetchMock: jest.Mock;
@@ -107,5 +107,52 @@ describe('jsonRequest', () => {
       json: async () => ({}),
     });
     await expect(jsonRequest('https://example.com/image.png')).rejects.toThrow('Invalid content-type');
+  });
+});
+
+describe('buildRemoteRequestUrl', () => {
+  it('应保留 target origin、base path 和正常 query 语义', () => {
+    expect(buildRemoteRequestUrl('https://api.example.com:8443/v1', '/users?id=1&name=Jane+Doe')).toBe('https://api.example.com:8443/v1/users?id=1&name=Jane+Doe');
+  });
+
+  it('应规范化已编码的 path segment 和重复 query', () => {
+    expect(buildRemoteRequestUrl('https://api.example.com/v1/', '/users/a%2Fb?tag=a%2Fb&tag=%E4%B8%AD%E6%96%87')).toBe(
+      'https://api.example.com/v1/users/a%2Fb?tag=a%2Fb&tag=%E4%B8%AD%E6%96%87',
+    );
+    expect(buildRemoteRequestUrl('https://api.example.com/v1/', '/rates/100%25')).toBe('https://api.example.com/v1/rates/100%25');
+  });
+
+  it.each(['/../admin', '/%2e%2e/admin', '/.%2e/admin'])('应拒绝路径逃逸：%s', reqPath => {
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', reqPath)).toThrow('Remote request path traversal is not allowed');
+  });
+
+  it.each(['/%2e%2e%2fadmin', '/%2e%2e%5cadmin', '/safe%2f..%2fadmin', '/%252e%252e%252fadmin'])('应拒绝编码分隔符和多重编码形成的路径逃逸：%s', reqPath => {
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', reqPath)).toThrow('Remote request path traversal is not allowed');
+  });
+
+  it.each(['/%252e%252e%252fadmin%25', '/%252e%252e%252fadmin%25zz'])('尾随无效百分号不应掩盖路径逃逸：%s', reqPath => {
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', reqPath)).toThrow('Remote request path traversal is not allowed');
+  });
+
+  it('应保守拒绝超过安全解码层数的路径', () => {
+    let deeplyEncodedPath = 'safe/value';
+    for (let depth = 0; depth < 7; depth += 1) {
+      deeplyEncodedPath = encodeURIComponent(deeplyEncodedPath);
+    }
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', `/${deeplyEncodedPath}`)).toThrow('Remote request path traversal is not allowed');
+  });
+
+  it.each(['/users/%ZZ', '/users?name=%ZZ'])('应拒绝不合法的百分号编码：%s', reqPath => {
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', reqPath)).toThrow(URIError);
+  });
+
+  it.each(['//evil.example/path', 'https://evil.example/path', '\\\\evil.example/path'])('应拒绝绝对或协议相对路径：%s', reqPath => {
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1', reqPath)).toThrow('Remote request path must be relative');
+  });
+
+  it('应拒绝 target 中的凭据、query 或 fragment', () => {
+    expect(() => buildRemoteRequestUrl('https://user:pass@api.example.com/v1', '/users')).toThrow('Remote target URL must not include credentials, query, or fragment');
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1?token=secret', '/users')).toThrow('Remote target URL must not include credentials, query, or fragment');
+    expect(() => buildRemoteRequestUrl('https://api.example.com/v1#users', '/users')).toThrow('Remote target URL must not include credentials, query, or fragment');
   });
 });

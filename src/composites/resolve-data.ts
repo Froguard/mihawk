@@ -10,7 +10,7 @@ import { absifyPath, formatPath, formatMockPath } from '../utils/path';
 import { loadJS, loadJson, loadTS } from '../composites/loader';
 import { isObjStrict } from '../utils/is';
 import { LOG_ARROW, MOCK_DATA_DIR_NAME } from '../consts';
-import { jsonRequest } from '../utils/request';
+import { buildRemoteRequestUrl, jsonRequest } from '../utils/request';
 import { initMockLogicFile } from './init-file';
 import type { MhkCvtrExtra, KoaContext, MihawkOptions, MockDataConvertor } from '../com-types';
 
@@ -197,12 +197,14 @@ export function createDataResolver(options: MihawkOptions) {
 /**
  * 从远端获取 json 数据内容（该内容会用于初始化 mock 时候所需要的 json 文件）
  * - 内部已经做了 try-catch，出错的时候返回 null
- * @param {string} reqPath
- * @param {Record<string, any>} reqOptions
- * @param {MihawkOptions} mhkOptions
+ * - 请求地址会限制在配置目标的 origin 和基础路径下，并禁止自动重定向
+ *
+ * @param {string} reqPath 当前请求的相对路径和查询参数
+ * @param {Record<string, any>} reqOptions 当前请求的方法、请求头和请求体
+ * @param {MihawkOptions} mhkOptions Mihawk 配置
  * @returns {Promise<JSONObject | null>} json 数据内容 或者 null
  */
-async function safeFetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
+export async function safeFetchRemoteData(reqPath: string, reqOptions: Record<string, any>, mhkOptions: MihawkOptions) {
   const { setJsonByRemote } = mhkOptions;
   if (typeof setJsonByRemote !== 'object') {
     // Printer.log(LOGFLAG_RESOLVER, 'FetchRemoteData: setJsonByRemote isnot a object, will skip remote data fetch!');
@@ -223,7 +225,7 @@ async function safeFetchRemoteData(reqPath: string, reqOptions: Record<string, a
     if (typeof rewrite === 'function') {
       reqPath = rewrite(reqPath);
     }
-    const requestPath = `${target}/${reqPath.replace(/^[/]+/g, '')}`;
+    const requestPath = buildRemoteRequestUrl(target, reqPath);
     const { method = 'GET', headers: originalHeaders = {}, body } = reqOptions || {};
     // reset reqOptions
     // delete reqOptions.cookies;
@@ -246,7 +248,7 @@ async function safeFetchRemoteData(reqPath: string, reqOptions: Record<string, a
     // delete headers['authorization'];
     // 执行请求
     Printer.log(LOGFLAG_RESOLVER, `FetchRemoteData: Fetching remote data from ${Colors.cyan(requestPath)}`);
-    const data = await jsonRequest(requestPath, { method, timeout, headers, body });
+    const data = await jsonRequest(requestPath, { method, timeout, headers, body, redirect: 'error' });
     if (isObjStrict(data)) {
       data.mihawkMessage = `Auto init json data from remote: ${requestPath}`;
       return data;
