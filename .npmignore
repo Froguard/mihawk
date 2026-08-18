@@ -50,6 +50,8 @@ __docs__/
 .omc/
 .claude/
 CLAUDE.md
+.codex/
+AGENTS.md
 .claudeignore
 .commitlintrc.ts
 .commitlintrc.js

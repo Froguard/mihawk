@@ -16,7 +16,7 @@ describe('mdwCors', () => {
     expect(res.headers['access-control-allow-origin']).toBe('*');
     expect(res.headers['access-control-allow-methods']).toContain('GET');
     expect(res.headers['access-control-allow-methods']).toContain('POST');
-    expect(res.headers['access-control-allow-headers']).toContain('Content-Type');
+    expect(res.headers['access-control-allow-headers']).toBe('*');
   });
 
   it('OPTIONS 请求应返回 204', async () => {
