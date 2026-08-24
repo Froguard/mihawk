@@ -5,9 +5,9 @@
 > 使用 koa2 风格中间件
 
 ```ts
-import type { Context, Next } from 'koa'; // 需要 koa@v2.0.0+ (例如：koa@^2.15.3)
+import type { Context, Next } from 'koa'; // need koa@v2.0.0+ (eg: koa@^2.15.3)
 import Compose from 'koa-compose';
-import Router from 'koa-router';
+import Router from '@koa/router'; // 弃用 koa-router （v9 开始改用 @koa/router）
 
 /**
  * 初始化 koa-router 实例

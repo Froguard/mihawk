@@ -5,9 +5,9 @@
 > use koa2-styled middleware
 
 ```ts
-import type { Context, Next } from 'koa'; // need koa@v2.0.0+ (eg: koa@^2.15.3)
+import type { Context, Next } from 'koa'; // require koa@v2.0.0+ (eg: koa@^2.15.3)
 import Compose from 'koa-compose';
-import Router from 'koa-router';
+import Router from '@koa/router'; // koa-router deprecated (use @koa/router since v9)
 
 /**
  * init a koa-router instance
