@@ -20,7 +20,7 @@ jest.mock('../../../src/utils/async', () => ({
 describe('start 子命令', () => {
   const serverHandle = {
     close: jest.fn(),
-    destory: jest.fn(),
+    destroy: jest.fn(),
   };
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('start 子命令', () => {
     (getRcData as jest.Mock).mockResolvedValue({ port: 8000, watch: false });
     (sleep as jest.Mock).mockResolvedValue(undefined);
     serverHandle.close.mockResolvedValue(undefined);
-    serverHandle.destory.mockResolvedValue(undefined);
+    serverHandle.destroy.mockResolvedValue(undefined);
   });
 
   afterEach(() => {

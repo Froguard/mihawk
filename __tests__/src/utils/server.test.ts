@@ -8,8 +8,8 @@ describe('server utils', () => {
 
   afterEach(async () => {
     if (server?.listening) {
-      if (enhanced?.destory) {
-        await enhanced.destory();
+      if (enhanced?.destroy) {
+        await enhanced.destroy();
       } else {
         server.close();
       }
@@ -19,27 +19,27 @@ describe('server utils', () => {
   });
 
   describe('enhanceServer', () => {
-    it('应为 server 添加 destory 方法', () => {
+    it('应为 server 添加 destroy 方法', () => {
       server = http.createServer();
       enhanced = enhanceServer(server);
-      expect(typeof enhanced.destory).toBe('function');
+      expect(typeof enhanced.destroy).toBe('function');
     });
 
-    it('destory 应关闭服务器', async () => {
+    it('destroy 应关闭服务器', async () => {
       server = http.createServer();
       enhanced = enhanceServer(server);
       await new Promise<void>(res => server.listen(0, res));
       expect(server.listening).toBe(true);
-      await enhanced.destory();
+      await enhanced.destroy();
       expect(server.listening).toBe(false);
     });
 
-    it('destory 应执行回调', async () => {
+    it('destroy 应执行回调', async () => {
       server = http.createServer();
       enhanced = enhanceServer(server);
       await new Promise<void>(res => server.listen(0, res));
       const callback = jest.fn();
-      await enhanced.destory(callback);
+      await enhanced.destroy(callback);
       expect(callback).toHaveBeenCalledTimes(1);
     });
   });

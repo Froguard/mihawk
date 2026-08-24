@@ -94,7 +94,7 @@ describe('mihawk server integration', () => {
       unlinkSync(autoInitFile);
     }
     if (serverHandle) {
-      await serverHandle.destory();
+      await serverHandle.destroy();
       serverHandle = null;
     }
   }, 10000);

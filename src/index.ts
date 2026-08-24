@@ -290,7 +290,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
     !wsController && console.log();
   });
 
-  // enhance server: add server.destory() method
+  // enhance server: add server.destroy() method
   server = enhanceServer(server);
 
   // start
@@ -321,43 +321,43 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   }
 
   /**
-   * return handle obj with "destory" & "close" method props
+   * return handle obj with "destroy" & "close" method props
    */
   return {
     /**
-     * destory server
+     * destroy server
      * - use during error caught
      */
-    destory: async () => {
-      // 1.destory websocket server
+    destroy: async () => {
+      // 1.destroy websocket server
       if (wsController) {
         //
-        // Printer.log('Detected websocket server existed, will destory it...');
-        const destoryWsSvr = (wsController as WsCtrl)?.destory?.bind(wsController);
-        if (typeof destoryWsSvr === 'function') {
+        // Printer.log('Detected websocket server existed, will destroy it...');
+        const destroyWsSvr = (wsController as WsCtrl)?.destroy?.bind(wsController);
+        if (typeof destroyWsSvr === 'function') {
           try {
-            await destoryWsSvr();
+            await destroyWsSvr();
             wsController = null; // set null
-            Printer.log('Websocket server has been destoryed.');
+            Printer.log('Websocket server has been destroyed.');
           } catch (error) {
-            Printer.error(`Destory websocket server failed!\n`, error);
+            Printer.error(`Destroy websocket server failed!\n`, error);
           }
         }
       }
       //
       await sleep(0);
       //
-      // 2.destory http/https server
+      // 2.destroy http/https server
       if (server) {
-        // Printer.log('Detected http/https server existed, will destory it...');
-        const destoryServer = (server as EnhancedServer<http.Server | https.Server>)?.destory?.bind(server);
-        if (typeof destoryServer === 'function') {
+        // Printer.log('Detected http/https server existed, will destroy it...');
+        const destroyServer = (server as EnhancedServer<http.Server | https.Server>)?.destroy?.bind(server);
+        if (typeof destroyServer === 'function') {
           try {
-            await destoryServer();
+            await destroyServer();
             server = null; // set null
-            Printer.log(Colors.success(`Destory mock-server(${Colors.gray(addr1)}) success!`));
+            Printer.log(Colors.success(`Destroy mock-server(${Colors.gray(addr1)}) success!`));
           } catch (error) {
-            Printer.error(`Destory Server Failed!\n`, error);
+            Printer.error(`Destroy Server Failed!\n`, error);
           }
         }
       }
@@ -386,7 +386,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
       //
       // 2.close http/https Server
       if (server) {
-        // Printer.log('Detected http/https server existed, will destory it...');
+        // Printer.log('Detected http/https server existed, will destroy it...');
         typeof server?.closeAllConnections === 'function' && server.closeAllConnections(); // v18.2.0+
         typeof server?.closeIdleConnections === 'function' && server.closeIdleConnections(); // v18.2.0+
         const closeServerAsync = promisify(server.close).bind(server);

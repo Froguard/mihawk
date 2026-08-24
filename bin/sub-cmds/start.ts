@@ -110,12 +110,12 @@ async function _start(ctrl: Controller, config: Loosify<MihawkRC>, isRestart?: b
       }
     }
     // destroy server
-    if (typeof ctrl.serverHandle?.destory === 'function') {
-      Printer.log('Will destory server...');
+    if (typeof ctrl.serverHandle?.destroy === 'function') {
+      Printer.log('Will destroy server...');
       try {
-        await ctrl.serverHandle?.destory();
+        await ctrl.serverHandle?.destroy();
       } catch (error) {
-        Printer.warn('Error occurs during destory server:', error);
+        Printer.warn('Error occurs during destroy server:', error);
       }
     }
     Printer.warn(Colors.yellow('Will exit process...'));

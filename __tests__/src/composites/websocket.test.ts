@@ -44,7 +44,7 @@ describe('WsCtrl', () => {
       client.terminate();
     }
     if (ctrl) {
-      await ctrl.destory();
+      await ctrl.destroy();
     }
     await closeServer(server);
     jest.restoreAllMocks();

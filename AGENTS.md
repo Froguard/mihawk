@@ -1,6 +1,6 @@
 # Mihawk
 
-轻量级 Mock 服务器，基于 Koa2，支持 HTTP/HTTPS 和 WebSocket。基于 typescript 开发
+轻量级 Mock 服务器，基于 Koa3，支持 HTTP/HTTPS 和 WebSocket。基于 typescript 开发
 
 ## 常用命令
 

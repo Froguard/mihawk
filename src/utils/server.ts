@@ -13,7 +13,7 @@ export type HttpOrHttpsServer = HttpServer | HttpsServer;
  * 增强版服务实例
  */
 export type EnhancedServer<S extends HttpOrHttpsServer = HttpOrHttpsServer> = S & {
-  destory: (callback?: (...args: any[]) => any) => Promise<void>;
+  destroy: (callback?: (...args: any[]) => any) => Promise<void>;
 };
 
 /**
@@ -40,9 +40,9 @@ export function enhanceServer<T extends HttpOrHttpsServer>(server: T) {
     });
   });
   /**
-   * add a destory method
+   * add a destroy method
    */
-  (server as EnhancedServer<T>).destory = async (callback: (...args: any[]) => any) => {
+  (server as EnhancedServer<T>).destroy = async (callback: (...args: any[]) => any) => {
     // 0.close all connections
     server.closeAllConnections();
     server.closeIdleConnections();

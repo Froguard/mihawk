@@ -49,9 +49,9 @@ __docs__/
 .vscode/
 .omc/
 .claude/
-CLAUDE.md
+# CLAUDE.md
 .codex/
-AGENTS.md
+# AGENTS.md
 .claudeignore
 .commitlintrc.ts
 .commitlintrc.js

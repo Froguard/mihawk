@@ -212,7 +212,7 @@ export default class WsCtrl {
     try {
       if (clients?.size) {
         if (forceClose) {
-          clients?.forEach(client => client?.terminate()); // destory
+          clients?.forEach(client => client?.terminate()); // destroy
         } else {
           clients?.forEach(client => client?.close()); // close
         }
@@ -226,9 +226,9 @@ export default class WsCtrl {
     try {
       await closeAsync();
       this._wsSvr = null; // 成功销毁之后需要进行置空处理
-      // Printer.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destoryed' : 'closed'}.`);
+      // Printer.log(LOGFLAG_WS, `WebSocket server was already ${forceClose ? 'destroyed' : 'closed'}.`);
     } catch (error) {
-      Printer.error(LOGFLAG_WS, `${forceClose ? 'Destory' : 'Close'} WebSocket server failed!\n`, error);
+      Printer.error(LOGFLAG_WS, `${forceClose ? 'Destroy' : 'Close'} WebSocket server failed!\n`, error);
     }
   }
   /**
@@ -243,14 +243,14 @@ export default class WsCtrl {
   }
 
   /**
-   * destory 函数
+   * destroy 函数
    * 强行/强制的关闭一个打开的套接字，并释放所有相关资源，且不考虑进行正常的关闭握手过程
    * - 立即关闭连接，不等待未发送的数据被发送或接收
    * - 释放所有与套接字关联的资源
    * - 关闭连接后，会触发 wsSvr 的 close 事件
    * - 如果有未处理的错误，可能会触发 wsSvr 的 error 事件
    */
-  public async destory() {
+  public async destroy() {
     return await this._close(true);
   }
 }
