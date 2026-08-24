@@ -1,8 +1,16 @@
-# custom your middleware
+# Custom middleware
 
-## 1、compley custom middleware demo
+Mihawk loads `mocks/middleware.<ext>` only when `mockLogicFileType` is `js`, `cjs`, or `ts`; the extension must match that setting. The middleware runs after body parsing and route mapping, and before the default file-based mock. It can therefore read `ctx.request.body` and either:
 
-> use koa2-styled middleware
+- call `await next()` to continue to the default mock;
+- return without calling `next()` to stop the chain; or
+- set `ctx.skipDefaultMock = true` before calling `next()` to continue while explicitly skipping the default mock.
+
+## 1. Complete custom middleware example
+
+> Uses Koa middleware. Mihawk currently runs on Koa 3.
+
+The router example requires `@koa/router` and `koa-compose` in the project that owns the mock files.
 
 ```ts
 import type { Context, Next } from 'koa'; // require koa@v2.0.0+ (eg: koa@^2.15.3)
@@ -37,23 +45,24 @@ export default Compose([
 ]);
 ```
 
-## 2、use express middleware
+## 2. Express middleware
+
+This example requires `express` in the project that owns the mock files.
 
 ```ts
-import express from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 /**
  * a normal express middleware
  */
-function expressMiddlware(req, res, next) {
+function expressMiddleware(_req: Request, res: Response, _next: NextFunction) {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('From the Express middleware');
-  next();
 }
 
 // 🚀 The explicit definition here is necessary, to identify it as an express middleware, so mihawk can resolve in right way!
-expressMiddlware.isExpress = true; // set before export
+expressMiddleware.isExpress = true; // set before export
 
 // exports a default middleware
-export default expressMiddlware;
+export default expressMiddleware;
 ```

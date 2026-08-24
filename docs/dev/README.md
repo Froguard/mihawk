@@ -4,6 +4,8 @@
 
 ## prepare
 
+> Node.js `>=18.13.0` is required.
+
 > ensure you have installed frogagu, then you are able to commit your code
 
 ```sh
@@ -26,36 +28,40 @@ then create a new root config file `.frogagurc.json`
 ## Install
 
 ```sh
-yarn install --regitry=https://registry.npmmirror.com # install from npm mirror (china-mirror)
+npm install --registry=https://registry.npmmirror.com # install from npm mirror (china-mirror)
 ```
 
-> yarn install --regitry=https://registry.npmjs.org
+> `npm install --registry=https://registry.npmjs.org` uses the official npm registry.
 
 ## Dev
 
 ### main:
 
 ```sh
-yarn dev
+npm run dev
 ```
 
 ### :bin:
 
 ```sh
-yarn dev:bin
-yarn dev:bin -h # yarn dev:bin --help
-yarn dev:bin -v # yarn dev:bin --version
-yarn dev:bin:init
+npm run dev:bin
+npm run dev:bin -- -h
+npm run dev:bin -- -v
+npm run dev:bin:init
 ```
-
-````
 
 ## Test
 
 ```sh
-yarn test
-yarn test:cover
-````
+npm test
+npm run test:cover
+```
+
+## Lint
+
+```sh
+npm run lint:fix
+```
 
 ## Build
 
@@ -64,7 +70,7 @@ yarn test:cover
 > build esmodule files(\*.js without comment code) → `./dist/esm`
 
 ```sh
-yarn build:esm
+npm run build:esm
 ```
 
 ### build cjs
@@ -72,7 +78,7 @@ yarn build:esm
 > build commonjs files(\*.js without comment code) → `./dist/cjs`
 
 ```sh
-yarn build:cjs
+npm run build:cjs
 ```
 
 ### build types
@@ -80,7 +86,7 @@ yarn build:cjs
 > build types files (\*.d.ts with comment code) → `./dist/types`
 
 ```sh
-yarn build:types
+npm run build:types
 ```
 
 ### build all
@@ -88,14 +94,14 @@ yarn build:types
 > build all files → `./dist`
 
 ```sh
-yarn build
+npm run build
 ```
 
 ---
 
 ## problems
 
-> See more detail → [problems.md](./problems.md)
+> See more detail → [常见问题记录.md](./常见问题记录.md)
 
 ## warning
 

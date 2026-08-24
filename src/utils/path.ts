@@ -2,7 +2,7 @@
 import { join, basename, relative, resolve, isAbsolute, normalize } from 'path';
 import { existsSync } from 'fs-extra';
 import { CWD } from '../consts';
-import { DataFileExt, LoigicFileExt, MihawkRC } from '../com-types';
+import { DataFileExt, LogicFileExt, MihawkRC } from '../com-types';
 // import { Printer } from './print';
 
 /**
@@ -100,7 +100,7 @@ export function getRootAbsPath() {
  * @param {string} defaultExt 默认的后缀，当 fileType 为 none 的时候，会返回此默认的后缀
  * @returns {string} 文件后缀，不带.点 js|cjs|ts|
  */
-export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType']): LoigicFileExt {
+export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType']): LogicFileExt {
   switch (fileType) {
     case 'js':
     case 'javascript':
@@ -122,7 +122,7 @@ export function getLogicFileExt(fileType: MihawkRC['mockLogicFileType']): Loigic
  * @returns {string} 文件后缀，不带.点  js|cjs|ts|json
  */
 export function getRoutesFileExt(fileType: MihawkRC['mockLogicFileType']) {
-  return (getLogicFileExt(fileType) || 'json') as LoigicFileExt | 'json';
+  return (getLogicFileExt(fileType) || 'json') as LogicFileExt | 'json';
 }
 
 /**

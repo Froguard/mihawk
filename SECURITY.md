@@ -21,7 +21,7 @@ We recommend always using the latest stable release to ensure your project remai
 If you discover a security vulnerability in Mihawk, we ask that you responsibly disclose it to us before making it public. You can report vulnerabilities through the following channels:
 
 - 🛡️ [GitHub Security Advisory](https://github.com/Froguard/mihawk/security/advisories) (preferred)
-- 📧 Email: [security@mihawk.dev](mailto:figure_wf@163.com)
+- 📧 Email: [figure_wf@163.com](mailto:figure_wf@163.com)
 
 Please do **not** file public GitHub issues for security vulnerabilities.
 

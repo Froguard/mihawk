@@ -207,15 +207,15 @@ export interface MihawkRC {
   mockLogicFileType?: 'none' | 'js' | 'cjs' | 'javascript' | 'ts' | 'typescript';
 
   /**
-   * 是否自动创建 mock 文件，默认 true
+   * 是否自动创建 mock 逻辑文件，默认 false
    */
   autoCreateMockLogicFile?: boolean;
 
   /**
    * tsconfig.json 的路径
    * - 当且仅当 mockLogicFileType 为 ts|typescript 时有效
-   * - 默认不写则为空字符串，即采用内置的 ts 配置
-   *   - 可以写为 `./mocks/tsconfig.json`(建议和工程中的 tsconfig.json 区分开来，因为 mockTs 并不需要进行打包输出)
+   * - 未配置时优先读取 `<mockDir>/tsconfig.json`，文件不存在则采用内置的 ts 配置
+   * - 可以显式指定其他 tsconfig.json 路径
    */
   tsconfigPath?: string | null;
 
@@ -240,10 +240,10 @@ export interface MihawkRC {
     enable: boolean; // required
     target: string; // required
     timeout?: number;
-    changeOrigin?: boolean; // 转发请求到远端时，是否修改请求头中的 origin 保持与远端一致？
+    changeOrigin?: boolean; // 转发时添加目标 host；当前仍会保留原始的小写 host 请求头
     rewrite?: (path: string) => string;
     // 是否修改（覆盖）已存在的 json 文件
-    coverExistedJson?: boolean; // 待实现，当文件存在的时候，通过远端拉取到的数据会强制更新掉本地的 json 文件
+    coverExistedJson?: boolean; // 当文件存在时，是否通过远端拉取数据并覆盖本地 json 文件
   } | null;
 }
 
@@ -255,7 +255,7 @@ export type DataFileExt = 'json' | 'json5';
 /**
  * mock 逻辑文件后缀
  */
-export type LoigicFileExt = 'js' | 'cjs' | 'ts' | '';
+export type LogicFileExt = 'js' | 'cjs' | 'ts' | '';
 
 /**
  * Mihawk 启动参数, 在 MihawkRC 之上封装一些额外的参数，方便后续逻辑处理
@@ -284,7 +284,7 @@ export type MihawkOptions = MihawkRC & {
 
   /**
    * @extra
-   * 是否开启 https，当且仅当 https 属性是一个对象时开启
+   * 是否开启 https，当 https 为 true 或证书配置对象时开启
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
   useHttps: boolean;
@@ -302,7 +302,7 @@ export type MihawkOptions = MihawkRC & {
    * - 值不包含 . 前缀，eg: ts | js | cjs
    * - 初始化详见 rc.ts 中的 formatOptionsByConfig 方法
    */
-  logicFileExt?: LoigicFileExt | null; //
+  logicFileExt?: LogicFileExt | null; //
 
   /**
    * @extra

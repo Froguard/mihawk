@@ -95,6 +95,7 @@ When the JSON file does not exist, the initialization source is determined in th
 
 ## Notes
 
+- The template is used only when the local JSON file does not exist; it never replaces an existing local file
 - The template file must be valid JSON after EJS rendering, otherwise it falls back to the default `initData`
 - Template rendering errors are logged as warnings but do not block the request
-- The template path is resolved once at startup and cached; changes require a server restart to take effect
+- The template content is loaded once at server startup. In the default CLI watch mode, changing `json.tpl` triggers an automatic restart; with `watch: false`, restart Mihawk manually

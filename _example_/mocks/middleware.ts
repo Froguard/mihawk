@@ -16,7 +16,7 @@ import { KoaContext, KoaNext } from 'mihawk/com-types';
 export default async function middleware(ctx: KoaContext, next: KoaNext) {
   // do something here
   console.log(ctx.url);
-  if (ctx.peth === '/diy') {
+  if (ctx.path === '/diy') {
     ctx.body = 'it is my diy logic';
   } else {
     await next(); // default logic (such like mock json logic)

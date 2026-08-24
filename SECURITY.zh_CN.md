@@ -21,7 +21,7 @@
 如果您发现了 Mihawk 的安全漏洞，请在公开之前通过以下方式向我们负责任地披露：
 
 - 🛡️ [GitHub Security Advisory](https://github.com/Froguard/mihawk/security/advisories)（推荐）
-- 📧 邮箱：[security@mihawk.dev](mailto:figure_wf@163.com)
+- 📧 邮箱：[figure_wf@163.com](mailto:figure_wf@163.com)
 
 请**不要**在 GitHub 上提交公开 issue 来报告安全漏洞。
 

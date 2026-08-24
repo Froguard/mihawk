@@ -17,10 +17,10 @@ Make a easy mock-server to mock api, with `GET /a/b/c` → `./mocks/data/GET/a/b
 - ✔️ Support https protocol
 - ✔️ Support all methods, like `GET`, `POST`, `PUT`, `DELETE` etc.
 - ✔️ Support mock data file type: `json` | `json5`
-- ✔️ Support custom your middleware in `middleware.{js|cjs|ts}`, write as `koa2 middleware` (or `express-middleware` both ok with `func.isExpress=true`)
-- ✔️ Support custom special routes mapping in `routes.json`, mapping multiple request to same resolve file。 routes key align `glob` expression
+- ✔️ Support custom middleware in `middleware.{js|cjs|ts}` using Koa middleware (the current runtime is Koa 3); Express middleware is also supported with `func.isExpress=true`
+- ✔️ Support custom route mappings in `routes.{json|json5|js|cjs|ts}`; route keys support glob patterns, so multiple requests can reuse the same mock file
 - ✔️ Support mock logic file type: `js` | `cjs` | `ts`
-- ✔️ Slightly support for `socket` simulations
+- ✔️ Support WebSocket simulations, including optional custom logic in `socket.{js|cjs|ts}`
 - ✔️ Support the generation of some simple simulation data, in `mihawk/tools`, eg: `createRandPhone`、`createRandEmail`
 
 ## Install
@@ -46,32 +46,33 @@ mihawk --port=8888
     ├── /data
     │   │
     │   ├── DELETE
-    │   │     ├──/*.js    DELETE request resolve logic
-    │   │     └──/*.json  DELETE request resolve data
+    │   │     ├──/*.{js|cjs|ts} DELETE request resolve logic
+    │   │     └──/*.{json|json5} DELETE request resolve data
     │   │
     │   ├── GET
-    │   │     ├──/*.js    GET request resolve logic
-    │   │     └──/*.json  GET request resolve data
+    │   │     ├──/*.{js|cjs|ts} GET request resolve logic
+    │   │     └──/*.{json|json5} GET request resolve data
     │   │
     │   ├── POST
-    │   │     ├──/*.js    POST request resolve logic
-    │   │     └──/*.json  POST request resolve data
+    │   │     ├──/*.{js|cjs|ts} POST request resolve logic
+    │   │     └──/*.{json|json5} POST request resolve data
     │   │
     │   └── PUT
-    │         ├──/*.js    PUT request resolve logic
-    │         └──/*.json  PUt request resolve data
+    │         ├──/*.{js|cjs|ts} PUT request resolve logic
+    │         └──/*.{json|json5} PUT request resolve data
     │
-    ├── middleware.js    [optional] resolve middleware
+    ├── middleware.{js|cjs|ts}       [optional] custom middleware
+    ├── socket.{js|cjs|ts}           [optional] custom WebSocket logic
     │
-    └── routes.json   [optional] common routes
+    └── routes.{json|json5|js|cjs|ts} [optional] route mappings
 ```
 
 > mapping：
 
 ```sh
 request    ： GET http://localhost:8888/a/b/c/d
-JSON-file  ： data/get/a/b/c/d.json
-mock-file  :  data/get/a/b/c/d.js
+JSON-file  ： data/GET/a/b/c/d.json
+mock-file  :  data/GET/a/b/c/d.js
 ```
 
 - `request`: mock request url
@@ -100,11 +101,12 @@ mihawk init
   "port": 8888,
   "https": false,
   "cors": true,
-  "cache": true,
+  "cache": false,
   "watch": true,
   "mockDir": "mocks",
   "mockDataFileType": "json",
-  "mockLogicFileType": "none"
+  "mockLogicFileType": "none",
+  "autoCreateMockLogicFile": false
 }
 ```
 
@@ -112,24 +114,75 @@ About root config props:
 
 - `host`: string, default `0.0.0.0`, server listen on this host
 - `port`: number, default `8888`, server listen on this port
-- `https`: boolean, default `false`, if `true`, will use https protocol
+- `https`: boolean | { key: string; cert: string; ca?: string }, default `false`. Set it to `true` to use the bundled development certificate, or provide certificate file paths. If `key` or `cert` is omitted or its path does not exist, Mihawk falls back to the bundled certificate; other file read errors are propagated
 - `cors`: boolean, default `true`, if `true`, will add `Access-Control-Allow-Origin: *` (and other necessary cors props in headers ) to the response headers
-- `cache`: boolean, default `true`, if `true`, will cache the mock data and return the cached data when the request is the same
-- `watch`: boolean, default `true`, if `true`, will watch the mock data directory and reload when changed
+- `cache`: boolean, default `false`. If `true`, loaded mock data and logic modules may be reused until their caches are refreshed
+- `watch`: boolean, default `true`. When started through the CLI, Mihawk watches `mockDir`; JSON changes refresh data caches, while logic, template, and `routes.{json|js|cjs|ts}` changes restart the server. With `mockLogicFileType: "none"` and `mockDataFileType: "json5"`, changes to `routes.json5` currently require a manual restart
 - `mockDir`: string, default `mocks`, the directory of mock data
 - `mockDataFileType`: string `json` | `json5`, default `json`, the file type of mock data
-- `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic
-- `setJsonByRemote`: { enable: boolean; target: string; timeout?: number; rewrite?: (path: string) => string } | null
+- `mockLogicFileType`: string `js` | `cjs` | `ts` | `none`, default `none`, the file type of mock logic (`javascript` and `typescript` are also accepted aliases)
+- `autoCreateMockLogicFile`: boolean, default `false`. When logic mode is enabled, create a missing logic file when its route is requested
+- `tsconfigPath`: string | null, only used in TypeScript logic mode. If omitted, Mihawk checks `<mockDir>/tsconfig.json` and otherwise uses its built-in TypeScript configuration
+- `logConfig`: { ignoreRoutes?: string[] } | null, default `null`; matching paths or `METHOD /path` patterns are excluded from request logs
+- `socketConfig`: boolean | { stomp?: boolean } | null, disabled by default. `true` enables WebSocket on the same HTTP/HTTPS server and port. `stomp` enables STOMP parsing in the built-in handler; a custom socket resolver receives the flag and handles messages itself
+- `setJsonByRemote`: { enable: boolean; target: string; timeout?: number; changeOrigin?: boolean; rewrite?: (path: string) => string; coverExistedJson?: boolean } | null
   - Default: `undefined`
-  - When local mock file not found:
-    1. If set to proxy object with `{enable:true, target:'xxx' }` to fetch from remote proxy
-    2. If set to `null`/`undefined` to disable
+  - When the local JSON file is missing, `{ enable: true, target: 'https://...' }` fetches initial data from the remote service
+  - When the local JSON file already exists, remote data is requested and written only when `coverExistedJson: true`; otherwise the local file is used directly
+  - Set it to `null`/`undefined`, or set `enable: false`, to disable remote loading
   - Proxy config requires:
     - `target`(required): remote server URL, **required**
-    - `rewrite`: optional path rewrite function
-    - `timeout`: request timeout in milliseconds
+    - `rewrite`: optional path rewrite function; use a JavaScript or TypeScript RC file because JSON cannot contain functions
+    - `timeout`: request timeout in milliseconds, default `10000`
+    - `changeOrigin`: when `true`, add the target host as a forwarded `Host` value. The original lowercase `host` header is currently retained, so Fetch may combine both values
+    - `coverExistedJson`: when `true`, try to overwrite an existing local JSON file on every request; a failed remote request falls back to the local file
+
+> Remote responses must be JSON objects. Invalid responses and request failures fall back to the JSON template or built-in initial data when the local file is missing. See [fallback-remote.md](./docs/fallback-remote.md) for the exact flow and URL restrictions.
 
 > More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
+
+### Config-driven files
+
+Mihawk loads file extensions from the configured data and logic modes:
+
+| `mockLogicFileType` | Routes file                 | Custom middleware | Per-route logic | Custom WebSocket logic |
+| ------------------- | --------------------------- | ----------------- | --------------- | ---------------------- |
+| `none`              | `routes.<mockDataFileType>` | Not loaded        | Not loaded      | Not loaded             |
+| `js`                | `routes.js`                 | `middleware.js`   | `data/**/*.js`  | `socket.js`            |
+| `cjs`               | `routes.cjs`                | `middleware.cjs`  | `data/**/*.cjs` | `socket.cjs`           |
+| `ts`                | `routes.ts`                 | `middleware.ts`   | `data/**/*.ts`  | `socket.ts`            |
+
+Custom WebSocket logic is loaded only when `socketConfig` is enabled. WebSocket itself can still run with its built-in handler when `mockLogicFileType` is `none`.
+
+Route keys can match either a path such as `/users/*` or a method-qualified path such as `GET /users/*`. Rules are checked in declaration order and the first match wins. Route values are paths relative to `<mockDir>/data`.
+
+### WebSocket logic
+
+Set `socketConfig` to `true` to use Mihawk's built-in WebSocket greeting and echo handler. The following TypeScript example also requires `mockLogicFileType: "ts"` and a `mocks/socket.ts` file:
+
+```ts
+import type { SocketResolveFunc } from 'mihawk/com-types';
+
+const resolveSocket: SocketResolveFunc = (socket, request, options) => {
+  socket.on('message', message => {
+    socket.send(message.toString());
+  });
+
+  console.log(request.url, options?.clientId, options?.stomp);
+};
+
+export default resolveSocket;
+```
+
+WebSocket always shares the root `host`, `port`, and HTTPS setting. The `socketConfig` object currently reads only `stomp`; separate socket host/port settings are not used.
+
+### Debug response headers
+
+- `X-Mock-Hit`: `1` when the default file-based mock handled the request; `0` when `skipDefaultMock` reaches it. The header is absent if an earlier middleware ends the response without calling `next()`
+- `X-Mock-Use-Remote`: `1` when remote data was used
+- `X-Mock-Use-Default`: `1` when built-in initial data was used
+- `X-Mock-Use-Logic`: the logic extension (`js`, `cjs`, or `ts`) after the converter completes successfully; otherwise `none`
+- `X-Mock-Time`: downstream processing time measured from the `common` middleware; absent if the request completes before reaching `common`
 
 ## Config with Build tools
 
@@ -221,7 +274,9 @@ For request `GET /api/fetch_a_random_number`，it return response with random nu
 
 Now, if request `GET /api/fetch_a_random_number`，return data is `123456`, it is fixed data
 
-### 2.create `mocks/data/GET/api/fetch_a_random_number.js` file, content as below
+### 2.Enable JavaScript logic mode and create `mocks/data/GET/api/fetch_a_random_number.js`
+
+First set `mockLogicFileType` to `js` in `.mihawkrc.json`; otherwise Mihawk does not load `.js` logic files. Then create the file with the following content:
 
 ```js
 module.exports = async function (oldJson) {
@@ -235,12 +290,14 @@ Start `mihawk` server now, if request `GET /api/fetch_a_random_number`，return 
 > About MockLogic File:
 >
 > - Both support `js` | `cjs` | `ts`, the process is same。Attention to `export default` is necessary in `ts` file!
-> - Recommend to set `autoCreateMockLogicFile` to `true` in `.mihawkrc.json`, then, if request a not exists mock data file, it will auto create a mock logic file for you
+> - `autoCreateMockLogicFile` defaults to `false`. When logic mode is enabled, set it to `true` to create a missing mock logic file when its route is requested
 > - Of course, it is worth mentioning that **MockLogic files aren't necessary files**. If there is no logical demand for data processing, **using only JSON files can also simulate the request**
 
 ## More example of mocks files
 
 ### `routes` file demo in ts
+
+This example requires `mockLogicFileType: "ts"` and the file name `mocks/routes.ts`.
 
 ```ts
 /**
@@ -256,13 +313,14 @@ export default routes;
 
 ### `middleware` file demo in ts
 
+This example requires `mockLogicFileType: "ts"` and the file name `mocks/middleware.ts`.
+
 ```ts
 /**
  * mihawk's middleware file:
- * - just a Koa2 Middleware
+ * - a Koa middleware (Mihawk currently uses Koa 3)
  */
-import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.0+ (eg: koa@^2.15.3)
-// import type { KoaContext, KoaNext } from 'mihawk/con-types';
+import type { KoaContext, KoaNext } from 'mihawk/com-types';
 
 /**
  * Middleware functions, to implement some special data deal logic,
@@ -276,7 +334,7 @@ import type { Context: KoaContext, Next: KoaNext } from 'koa'; // need koa@v2.0.
 export default async function middleware(ctx: KoaContext, next: KoaNext) {
   // do something here
   console.log(ctx.url);
-  if (ctx.peth === '/diy') {
+  if (ctx.path === '/diy') {
     ctx.body = 'it is my diy logic';
   } else {
     await next(); // default logic (such like mock json logic)
@@ -285,7 +343,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
 ```
 
 > Set `middleware.isExpress=true` to explicit definition a express middleware function before export, if you write in express-stype
-> Other complex diy middleware demo, base on koa-router & koa-compose, [middleware.md](./docs/middleware.md)
+> Other complex custom middleware examples based on `@koa/router` and `koa-compose`: [middleware.md](./docs/middleware.md)
 
 ### `mock-logic` file demo in ts
 
@@ -304,7 +362,7 @@ export default async function middleware(ctx: KoaContext, next: KoaNext) {
  */
 export default async function convertData(originData: Record<string, any>, extra: Record<string, any>) {
   // write your logic here...
-  originData.newProp = ‘newPropXxx’;
+  originData.newProp = 'newPropXxx';
   return originData; // return data, it is required
 }
 ```
@@ -323,13 +381,13 @@ export default async function convertData(originData: Record<string, any>, extra
 ### 2. Different implementation methods
 
 - Mockjs intercepts requests and returns simulated data by hijacking xhr/fetch, etc., which requires certain modifications to front-end engineering code, and there are some differences in the request sending/receiving process compared to the real online environment
-- Mihawk intercepts requests and returns simulated data through Koa2 middleware format, without requiring any modifications to front-end engineering code, and the request sending/receiving process is identical to the real online environment
+- Mihawk handles requests through a local Koa server (the current runtime is Koa 3) without modifying front-end request code. Requests use the normal HTTP/WebSocket transport, while response status, headers, and data still follow the configured mock behavior
 
 ### 3. Common usage scenarios
 
 - Mockjs is used for simulated data production, generating corresponding fake data through its specific syntax
-- Mihawk is used to simulate BackendServer based on Nodejs, such as Socket, httpServer, etc., combined with simple data generation functions to complete fake data generation
-  - `mhiawk/tools`: Built-in utility functions like `creatRandXxx` for generating fake data; this functionality is not as powerful as Mockjs
+- Mihawk is used to simulate a BackendServer based on Node.js, such as WebSocket and HTTP servers, combined with simple data generation functions to create fake data
+  - `mihawk/tools`: Built-in utility functions like `createRandXxx` for generating fake data; this functionality is not as powerful as Mockjs
     - Consider using both mockjs's `data generate` and mihawk's `server mock` together; they are not mutually exclusive
   - `your_project/mocks/middleware.ts`: Simulate backend services, such as httpServer
   - `your_project/mocks/socket.ts`: Simulate backend services, such as socketServer

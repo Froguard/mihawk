@@ -10,6 +10,7 @@
         { "type": "boolean" },
         {
           "type": "object",
+          "required": ["key", "cert"],
           "properties": {
             "key": { "type": "string", "description": "key 文件路径" },
             "cert": {"type": "string", "description": "cert 文件路径"},
@@ -34,30 +35,53 @@
       "default": "none", 
       "description": "mock 逻辑文件类型，默认 none" 
     },
-    "autoCreateMockLogicFile": { "description": "是否自动创建 mock 文件，默认 false", "type": "boolean", "default": false },
+    "autoCreateMockLogicFile": { "description": "是否自动创建缺失的 mock 逻辑文件，默认 false", "type": "boolean", "default": false },
     "tsconfigPath": {
-      "description": "tsconfig.json 的路径\n- 当且仅当 mockLogicFileType 为 ts|typescript 时有效\n- 默认不写则为空字符串，即采用内置的 ts 配置\n  - 可以写为 `./mocks/tsconfig.json`(建议和工程中的 tsconfig.json 区分开来，因为 mockTs 并不需要进行打包输出)",
-      "type": "string"
+      "description": "tsconfig.json 的路径\n- 当且仅当 mockLogicFileType 为 ts|typescript 时有效\n- 未配置或为 null 时，先尝试 `<mockDir>/tsconfig.json`，文件不存在则采用内置 TypeScript 配置",
+      "type": ["string", "null"]
     },
     "logConfig": {
-      "description": "日志打印，配置项",
-      "type": "object",
-      "properties": {
-        "ignoreRoutes": {
-          "description": "指定路由对应日志忽略不打印",
-          "type": "array",
-          "items": { "type": "string" }
+      "description": "日志打印配置，默认 null",
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "properties": {
+            "ignoreRoutes": {
+              "description": "指定 path 或 `METHOD /path` 模式，对应请求日志忽略不打印",
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
         }
-      }
+      ]
     },
     "socketConfig": {
       "description": "是否开启 websocket，默认 false",
       "anyOf": [
         { "type": "boolean" },
+        { "type": "null" },
         {
           "type": "object",
           "properties": {
-            "stomp": { "type": "boolean", "description": "是否开启 stomp 消息解析（本字段暂时无用）" }
+            "stomp": { "type": "boolean", "default": false, "description": "是否让内置 WebSocket 处理逻辑解析 STOMP；自定义 resolver 只会收到该标记，默认 false" }
+          }
+        }
+      ]
+    },
+    "setJsonByRemote": {
+      "description": "从远端服务初始化本地 JSON；coverExistedJson 为 true 时也可覆盖已有本地 JSON",
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["enable", "target"],
+          "properties": {
+            "enable": { "type": "boolean", "description": "是否启用远端数据加载" },
+            "target": { "type": "string", "description": "远端 HTTP(S) 服务地址" },
+            "timeout": { "type": "number", "default": 10000, "description": "请求超时时间，单位毫秒，默认 10000" },
+            "changeOrigin": { "type": "boolean", "default": false, "description": "是否将目标 host 添加为转发的 Host 值；当前仍会保留原始的小写 host 请求头" },
+            "coverExistedJson": { "type": "boolean", "default": false, "description": "是否请求远端并覆盖已有本地 JSON，默认 false" }
           }
         }
       ]
