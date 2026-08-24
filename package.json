@@ -131,7 +131,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:Froguard/mihawk.git"
+    "url": "git+ssh://git@github.com/Froguard/mihawk.git"
   },
   "bugs": {
     "url": "https://github.com/Froguard/mihawk/issues"
