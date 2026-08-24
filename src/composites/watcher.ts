@@ -3,7 +3,7 @@ import Colors from 'color-cc';
 import * as chokidar from 'chokidar';
 import { Printer } from '../../src/utils/print';
 import { absifyPath, getLogicFileExt, relPathToCWD, unixifyPath } from '../../src/utils/path';
-import { refreshJson, refreshTsOrJs } from '../../src/composites/loader';
+import { refreshJson, refreshMockModuleGraph } from '../../src/composites/loader';
 import { LOG_ARROW } from '../consts';
 import type { MihawkRC, Loosify } from '../../src/com-types';
 
@@ -65,14 +65,15 @@ const LOGFLAG_WATCHER = `${Colors.cyan('[watcher]')}${Colors.gray(':')}`;
 /**
  * 刷新模块的 require cache
  * @param {string} filePath 需要被刷新的模块的绝对路径
+ * @param {string} mockDir Mock 根目录的绝对路径
  */
-export function refreshModule(filePath: string, allowLogicFileExt: 'js' | 'cjs' | 'ts' | '') {
+export function refreshModule(filePath: string, allowLogicFileExt: 'js' | 'cjs' | 'ts' | '', mockDir: string) {
   if (!filePath) return;
   filePath = absifyPath(filePath);
   const fileRelPath4log = Colors.gray(unixifyPath(relPathToCWD(filePath)));
   try {
     if (allowLogicFileExt && filePath.endsWith(`.${allowLogicFileExt}`)) {
-      refreshTsOrJs(filePath);
+      refreshMockModuleGraph(filePath, { mockDir });
       Printer.log(LOGFLAG_WATCHER, Colors.success('Refresh script module!'), fileRelPath4log);
       //
     } else if (filePath.endsWith('.json') || filePath.endsWith('.json5')) {
@@ -118,14 +119,14 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
         // listen file's change event
         console.log();
         Printer.log(LOGFLAG_WATCHER, 'File has been changed!', fileRelPath4log);
-        refreshModule(filePath, logicFileExt);
+        refreshModule(filePath, logicFileExt, watchTargetPath);
         break;
       }
       case 'unlink': {
         // listen file's unlink event
         console.log();
         Printer.log(LOGFLAG_WATCHER, 'File has been deleted!', fileRelPath4log);
-        refreshModule(filePath, logicFileExt);
+        refreshModule(filePath, logicFileExt, watchTargetPath);
         break;
       }
       case 'unlinkDir': // listen dir's unlink event
@@ -144,8 +145,8 @@ export function createWatcher(config: Loosify<MihawkRC>, callback?: (eventName: 
     const oldFilePath4Log = Colors.gray(unixifyPath(relPathToCWD(oldFilePath)));
     const newFilePath4log = Colors.gray(unixifyPath(relPathToCWD(newFilePath)));
     Printer.log(LOGFLAG_WATCHER, 'File has been rename!', `${oldFilePath4Log} ${LOG_ARROW} ${newFilePath4log}`);
-    refreshModule(oldFilePath, logicFileExt);
-    refreshModule(newFilePath, logicFileExt);
+    refreshModule(oldFilePath, logicFileExt, watchTargetPath);
+    refreshModule(newFilePath, logicFileExt, watchTargetPath);
     cb('rename', oldFilePath, newFilePath);
   });
 

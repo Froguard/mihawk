@@ -24,6 +24,10 @@ interface BaseLoadOption {
   noLogPrint?: boolean;
 }
 
+interface RefreshMockModuleGraphOptions {
+  mockDir: string;
+}
+
 /**
  * 加载 & 执行 json 文件，返回数据
  * @param {string} jsonFilePath
@@ -129,6 +133,80 @@ export function refreshJson(jsonFilePath: string) {
 export function refreshTsOrJs(filePath: string) {
   return _clearSelfAndAncestorsCache(filePath);
   // return _clearRequireCache(filePath);
+}
+
+/**
+ * 清理变更 Mock 模块及 mockDir 内所有反向依赖模块的 require cache。
+ * @param {string} filePath 发生变更的 Mock 模块路径
+ * @param {RefreshMockModuleGraphOptions} options 清理范围配置
+ * @returns {string[]} 已标记为失效的模块路径
+ */
+export function refreshMockModuleGraph(filePath: string, options: RefreshMockModuleGraphOptions) {
+  const mockDir = absifyPath(options.mockDir);
+  const changedModuleId = absifyPath(filePath);
+  if (!_isManagedMockModule(changedModuleId, mockDir)) {
+    return [];
+  }
+
+  const cachedModules = Object.values(require.cache).filter((cachedModule): cachedModule is NodeJS.Module => Boolean(cachedModule));
+  const reverseDependencies = new Map<string, Set<string>>();
+
+  for (const parentModule of cachedModules) {
+    const parentId = absifyPath(parentModule.filename);
+    if (!_isManagedMockModule(parentId, mockDir)) {
+      continue;
+    }
+    for (const childModule of parentModule.children) {
+      const childId = absifyPath(childModule.filename);
+      if (!_isManagedMockModule(childId, mockDir)) {
+        continue;
+      }
+      const parentIds = reverseDependencies.get(childId) || new Set<string>();
+      parentIds.add(parentId);
+      reverseDependencies.set(childId, parentIds);
+    }
+  }
+
+  const staleModuleIds = new Set<string>();
+  const pendingModuleIds = [changedModuleId];
+  while (pendingModuleIds.length > 0) {
+    const currentModuleId = pendingModuleIds.pop();
+    if (!currentModuleId || staleModuleIds.has(currentModuleId)) {
+      continue;
+    }
+    staleModuleIds.add(currentModuleId);
+    for (const parentId of reverseDependencies.get(currentModuleId) || []) {
+      pendingModuleIds.push(parentId);
+    }
+  }
+
+  for (const parentModule of cachedModules) {
+    for (let index = parentModule.children.length - 1; index >= 0; index -= 1) {
+      if (staleModuleIds.has(absifyPath(parentModule.children[index].filename))) {
+        parentModule.children.splice(index, 1);
+      }
+    }
+  }
+
+  for (const staleModuleId of staleModuleIds) {
+    const staleModule = require.cache[staleModuleId];
+    if (staleModule) {
+      staleModule.loaded = false;
+    }
+    delete require.cache[staleModuleId];
+  }
+
+  const pathCache = (module?.constructor as any)?._pathCache;
+  if (pathCache && typeof pathCache === 'object') {
+    const staleModuleIdList = [...staleModuleIds];
+    Object.keys(pathCache).forEach(key => {
+      if (staleModuleIdList.some(staleModuleId => pathCache[key]?.includes(staleModuleId))) {
+        delete pathCache[key];
+      }
+    });
+  }
+
+  return [...staleModuleIds];
 }
 
 /**
@@ -379,4 +457,18 @@ function _clearSelfAndAncestorsCache(filename: string) {
   _clearRequireCache(filename);
   // clear parent
   parentId && _clearSelfAndAncestorsCache(parentId);
+}
+
+/**
+ * 判断模块是否属于 Mihawk 管理的 mockDir，且不位于其中的 node_modules。
+ * @param {string} filename 模块绝对路径
+ * @param {string} mockDir Mock 根目录绝对路径
+ * @returns {boolean}
+ */
+function _isManagedMockModule(filename: string, mockDir: string) {
+  const relativePath = path.relative(mockDir, filename);
+  if (relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    return false;
+  }
+  return !relativePath.split(path.sep).includes('node_modules');
 }
