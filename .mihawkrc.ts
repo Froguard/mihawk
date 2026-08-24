@@ -18,9 +18,6 @@ export default {
   autoCreateMockLogicFile: true,
   logConfig: null,
   socketConfig: {
-    port,
-    host,
-    secure: false,
     stomps: false,
   },
 };
