@@ -1,6 +1,7 @@
 'use strict';
 import vm from 'vm';
 import path from 'path';
+import { createRequire } from 'module';
 import { transpileModule, ModuleKind, ScriptTarget, type TranspileOptions } from 'typescript';
 import { existsSync, readFileSync } from 'fs-extra';
 import * as json5 from 'json5';
@@ -271,13 +272,19 @@ function _genTsFileRequireHandle(tsconfig: TsConfig) {
     });
     const jsCode = result.outputText;
     // Printer.log('jsCode:\n', jsCode, '\n');
-    // 方案一：直接 eval或者 new Function（不可取，不安全）
-    // module.exports = eval(jsCode);
+    // 方案一：直接 module._compile（不可取，不安全）
+    // module.exports = module._compile(jsCode);
     // 方案二：使用 vm 沙箱进行执行 jsCode 代码
     // 创建一个执行上下文，继承自 global
     const vmContext = vm.createContext({ ...global });
+    const requireFromTsFile = createRequire(tsFilePath);
+    const moduleRequire = module.require.bind(module) as NodeRequire;
+    moduleRequire.resolve = requireFromTsFile.resolve;
+    moduleRequire.cache = requireFromTsFile.cache;
+    moduleRequire.extensions = requireFromTsFile.extensions;
+    moduleRequire.main = requireFromTsFile.main;
     vmContext.global = global;
-    vmContext.require = require;
+    vmContext.require = moduleRequire;
     vmContext.module = module;
     vmContext.exports = module.exports;
     vmContext.__dirname = path.dirname(tsFilePath);
