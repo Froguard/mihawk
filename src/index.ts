@@ -5,7 +5,6 @@ import https from 'https';
 import { promisify } from 'util';
 import Koa from 'koa';
 import Colors from 'color-cc';
-import mdwBodyParser from 'koa-bodyparser';
 import mdwSSL from 'koa-sslify';
 import mdwConnect from 'koa-connect';
 import { existsSync, ensureDirSync, readFileSync } from 'fs-extra';
@@ -21,6 +20,7 @@ import mdwError from './middlewares/error';
 import mdwCors from './middlewares/cors';
 import mdwHdCache from './middlewares/cache';
 import mdw404 from './middlewares/404';
+import mdwBodyParser from './middlewares/body-parser';
 import mdwRoutes from './middlewares/routes';
 import mdwMock from './middlewares/mock';
 import { isPortInUse, getMyIp, supportLocalHost } from './utils/net';
@@ -44,6 +44,7 @@ const PKG_ROOT_PATH = getRootAbsPath();
  * @returns {Promise<any>}
  */
 export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boolean = false) {
+  const parseBody = mdwBodyParser(config);
   delete config._;
   delete config['--'];
   delete config.$schema;
@@ -171,24 +172,7 @@ export default async function mihawk(config: Loosify<MihawkRC>, isRestart: boole
   app.use(mdw404());
 
   // middleware: body parser
-  app.use(
-    mdwBodyParser({
-      // the complex api like PUT or POST, if the passed body parameter isnot standard JSON
-      // an error will occur. Here, we make it compatible.
-      onerror: (err, ctx) => {
-        const invalidBody = (err as any)?.body;
-        Printer.error(
-          'mdw-body-parser:',
-          Colors.yellow('Occurs error with code'),
-          `${Colors.yellow.bold(`JSON.parse(${invalidBody})`)}${Colors.yellow(', will skip parse it!')}\n`,
-          Colors.yellow(`${err.message}\n`),
-          err,
-        );
-        ctx.status = 200;
-        ctx.request.body = invalidBody; // reset
-      },
-    }),
-  );
+  app.use(parseBody);
 
   // middleware: special routes mapping
   app.use(mdwRoutes(routes));

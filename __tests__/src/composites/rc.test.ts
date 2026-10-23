@@ -99,4 +99,16 @@ describe('rc', () => {
       useRemoteData: true,
     });
   });
+
+  it.each([{ jsonLimit: '2mb' }, { formLimit: 4096 }])('应透传局部 bodyParser 配置 %p 和错误回调，保持输入不变', bodyParser => {
+    const onBodyParserError = jest.fn();
+    const config = Object.freeze({ bodyParser: Object.freeze(bodyParser), onBodyParserError });
+
+    const options = formatOptionsByConfig(config);
+
+    expect(options.bodyParser).toEqual(bodyParser);
+    expect(options.bodyParser).not.toBe(bodyParser);
+    expect(options.onBodyParserError).toBe(onBodyParserError);
+    expect(config).toEqual({ bodyParser, onBodyParserError });
+  });
 });

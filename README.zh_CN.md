@@ -124,6 +124,8 @@ mihawk init
 - `autoCreateMockLogicFile`: boolean，默认值为 `false`。启用逻辑模式后，请求对应路由时可自动创建缺失的逻辑文件
 - `tsconfigPath`: string | null，仅在 TypeScript 逻辑模式下生效。未配置时先检查 `<mockDir>/tsconfig.json`，文件不存在则使用内置 TypeScript 配置
 - `logConfig`: { ignoreRoutes?: string[] } | null，默认值为 `null`；匹配 path 或 `METHOD /path` 模式的请求不会打印请求日志
+- `bodyParser`: { jsonLimit?: string | number; formLimit?: string | number }，请求体大小限制；JSON 默认 `1mb`，URL 编码表单默认 `56kb`
+- `onBodyParserError`: (error: unknown, ctx: KoaContext) => void | Promise<void>，可选的请求体解析错误回调，详见下文
 - `socketConfig`: boolean | { stomp?: boolean } | null，默认关闭。设置为 `true` 时在同一个 HTTP/HTTPS 服务和端口上启用 WebSocket；`stomp` 会让内置处理逻辑解析 STOMP，自定义 socket resolver 只会收到该标记并自行处理消息
 - `setJsonByRemote`: { enable: boolean; target: string; timeout?: number; changeOrigin?: boolean; rewrite?: (path: string) => string; coverExistedJson?: boolean } | null
   - 默认值: `undefined`
@@ -140,6 +142,33 @@ mihawk init
 > 远端响应必须是 JSON 对象。本地文件不存在时，如果远端请求失败或响应无效，会继续回退到 JSON 模板或内置初始数据。完整流程和 URL 限制见 [fallback-remote.zh_CN.md](./docs/fallback-remote.zh_CN.md)。
 
 > 更多说明，详见 ts 定义文件 → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC 定义了所有配置项
+
+### 请求体解析
+
+`bodyParser` 仅开放 `jsonLimit` 和 `formLimit`。数字表示字节数，必须为正安全整数；字符串接受数字及可选的 `b`、`kb`、`mb`、`gb` 单位，忽略大小写，数字与单位之间可以有空白，无单位时按字节计算。`"1.5mb"` 等小数仅在换算结果为正安全整数字节数时有效，单位按 1024 进制换算。无效限制和未知的 `bodyParser` 字段会在启动时报错。JSON、URL 编码表单的解析种类和 JSON 严格模式保持现有行为。
+
+例如，在 `.mihawkrc.json` 中添加 `"bodyParser": { "jsonLimit": "2mb", "formLimit": 131072 }`。
+
+JSON 格式错误或请求体超限时，请求会直接终止，不再进入路由逻辑、自定义中间件和默认 mock。默认 JSON 响应包含错误状态码及标准 HTTP 描述，例如 `{ "code": 400, "msg": "Bad Request" }` 或 `{ "code": 413, "msg": "Payload Too Large" }`；未知错误返回 `{ "code": 500, "msg": "Internal Server Error" }`，不会返回原始请求体或解析器错误信息。如果失败请求尚未读取完毕，Mihawk 会丢弃剩余请求数据而不缓存，再返回完整错误响应，连接仍可复用。
+
+旧版本可能在解析失败后将原始请求体传给业务逻辑继续执行，此行为已移除。如需在自定义中间件中读取原始请求流，请使用 `application/octet-stream` 等解析器不处理的 Content-Type。在解析器之前设置的 `ctx.disableBodyParser = true` 仍可跳过解析。
+
+`onBodyParserError` 需要通过 JavaScript、TypeScript RC 文件或程序 API 配置；JSON 文件只能配置大小限制。回调收到原始错误，调用前已设置默认错误状态码和响应体，可以修改 `ctx.status`、`ctx.body`，异步回调会被等待。回调抛错或 Promise 拒绝时返回上述通用 JSON 500 响应。业务逻辑异常仍使用原有错误处理。
+
+```ts
+// .mihawkrc.ts
+import type { MihawkRC } from 'mihawk/com-types';
+
+const config: MihawkRC = {
+  bodyParser: { jsonLimit: '2mb', formLimit: '128kb' },
+  // 也支持同步回调。
+  onBodyParserError: async (_error, ctx) => {
+    ctx.body = { error: { status: ctx.status, message: 'Invalid request body' } };
+  },
+};
+
+export default config;
+```
 
 ### 配置决定的文件
 

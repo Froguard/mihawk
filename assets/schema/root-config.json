@@ -40,6 +40,27 @@
       "description": "tsconfig.json 的路径\n- 当且仅当 mockLogicFileType 为 ts|typescript 时有效\n- 未配置或为 null 时，先尝试 `<mockDir>/tsconfig.json`，文件不存在则采用内置 TypeScript 配置",
       "type": ["string", "null"]
     },
+    "bodyParser": {
+      "description": "请求体解析大小限制；仅开放 jsonLimit 和 formLimit，单位按 1024 进制换算",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "jsonLimit": {
+          "description": "JSON 请求体上限，默认 1mb；数字为字节，字符串单位可省略或使用 b/kb/mb/gb（忽略大小写），换算结果必须为正安全整数字节数",
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+            { "type": "string", "pattern": "^\\s*[0-9]+(?:\\.[0-9]+)?\\s*(?:[bB]|[kKmMgG][bB])?\\s*$" }
+          ]
+        },
+        "formLimit": {
+          "description": "URL 编码表单请求体上限，默认 56kb；数字为字节，字符串单位可省略或使用 b/kb/mb/gb（忽略大小写），换算结果必须为正安全整数字节数",
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+            { "type": "string", "pattern": "^\\s*[0-9]+(?:\\.[0-9]+)?\\s*(?:[bB]|[kKmMgG][bB])?\\s*$" }
+          ]
+        }
+      }
+    },
     "logConfig": {
       "description": "日志打印配置，默认 null",
       "anyOf": [

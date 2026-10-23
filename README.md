@@ -124,6 +124,8 @@ About root config props:
 - `autoCreateMockLogicFile`: boolean, default `false`. When logic mode is enabled, create a missing logic file when its route is requested
 - `tsconfigPath`: string | null, only used in TypeScript logic mode. If omitted, Mihawk checks `<mockDir>/tsconfig.json` and otherwise uses its built-in TypeScript configuration
 - `logConfig`: { ignoreRoutes?: string[] } | null, default `null`; matching paths or `METHOD /path` patterns are excluded from request logs
+- `bodyParser`: { jsonLimit?: string | number; formLimit?: string | number }, request body size limits; defaults are `1mb` for JSON and `56kb` for URL-encoded forms
+- `onBodyParserError`: (error: unknown, ctx: KoaContext) => void | Promise<void>, optional request body parsing error handler; see below
 - `socketConfig`: boolean | { stomp?: boolean } | null, disabled by default. `true` enables WebSocket on the same HTTP/HTTPS server and port. `stomp` enables STOMP parsing in the built-in handler; a custom socket resolver receives the flag and handles messages itself
 - `setJsonByRemote`: { enable: boolean; target: string; timeout?: number; changeOrigin?: boolean; rewrite?: (path: string) => string; coverExistedJson?: boolean } | null
   - Default: `undefined`
@@ -140,6 +142,33 @@ About root config props:
 > Remote responses must be JSON objects. Invalid responses and request failures fall back to the JSON template or built-in initial data when the local file is missing. See [fallback-remote.md](./docs/fallback-remote.md) for the exact flow and URL restrictions.
 
 > More detail → [src/com-types.ts](https://github.com/Froguard/mihawk/blob/master/src/com-types.ts), interface MihawkRC define the config props
+
+### Request body parsing
+
+`bodyParser` exposes only `jsonLimit` and `formLimit`. Numbers are bytes and must be positive safe integers. Strings accept a number with an optional `b`, `kb`, `mb`, or `gb` unit (case-insensitive, with optional whitespace between the number and unit); no unit means bytes. Decimal values such as `"1.5mb"` are accepted only when the resulting byte count is a positive safe integer. Units use powers of 1024. Invalid limits and unknown `bodyParser` fields are rejected at startup. JSON and URL-encoded form parsing remain enabled; parser selection and strict JSON behavior are unchanged.
+
+For example, add `"bodyParser": { "jsonLimit": "2mb", "formLimit": 131072 }` to `.mihawkrc.json`.
+
+Malformed JSON and oversized bodies stop request processing before route logic, custom middleware, or default mocks. The default JSON response contains the error status and its standard HTTP description, such as `{ "code": 400, "msg": "Bad Request" }` or `{ "code": 413, "msg": "Payload Too Large" }`. Unknown errors return `{ "code": 500, "msg": "Internal Server Error" }`. Raw request bodies and parser error messages are not included. If a failed request has not been fully read, Mihawk discards the remaining request data without buffering it, then returns the complete error response so the connection can be reused.
+
+Earlier versions could pass a failed parse through to business logic with the raw body. That behavior is no longer supported. To consume a raw request stream in custom middleware, send a content type that the parser does not handle, such as `application/octet-stream`. An existing `ctx.disableBodyParser = true` set before the parser still skips parsing.
+
+Use a JavaScript or TypeScript RC file, or the programmatic API, for `onBodyParserError`; JSON files can configure only the limits. The callback receives the original error after the default error status and body have been set. It may customize `ctx.status` and `ctx.body`, and is awaited. A thrown error or rejected promise returns the generic JSON 500 response above. Business logic exceptions keep their existing error handling.
+
+```ts
+// .mihawkrc.ts
+import type { MihawkRC } from 'mihawk/com-types';
+
+const config: MihawkRC = {
+  bodyParser: { jsonLimit: '2mb', formLimit: '128kb' },
+  // Synchronous callbacks are also supported.
+  onBodyParserError: async (_error, ctx) => {
+    ctx.body = { error: { status: ctx.status, message: 'Invalid request body' } };
+  },
+};
+
+export default config;
+```
 
 ### Config-driven files
 

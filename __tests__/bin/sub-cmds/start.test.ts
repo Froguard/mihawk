@@ -42,16 +42,28 @@ describe('start 子命令', () => {
   });
 
   it('应合并 RC 与 CLI 参数并启动 mihawk', async () => {
-    await start({ _: [], port: 9000, mockDir: './api-mocks', watch: false });
+    const onBodyParserError = jest.fn();
+    const rootConfig = { port: 8000, watch: false, bodyParser: { jsonLimit: '2mb', formLimit: '128kb' }, onBodyParserError };
+    const args = { _: [] as string[], port: 9000, mockDir: './api-mocks', watch: false, bodyParser: { jsonLimit: '3mb' } };
+    (getRcData as jest.Mock).mockResolvedValue(rootConfig);
+
+    await start(args);
 
     expect(getRcData).toHaveBeenCalledWith('.mihawkrc', { initConfig: expect.objectContaining({ port: 8888 }) });
     expect(mihawk).toHaveBeenCalledWith(expect.objectContaining({ port: 9000, mockDir: './api-mocks', watch: false }), undefined);
+    const finalConfig = (mihawk as jest.Mock).mock.calls[0][0];
+    expect(finalConfig.bodyParser).toEqual({ jsonLimit: '3mb', formLimit: '128kb' });
+    expect(finalConfig.onBodyParserError).toBe(onBodyParserError);
+    expect(rootConfig.bodyParser).toEqual({ jsonLimit: '2mb', formLimit: '128kb' });
+    expect(args.bodyParser).toEqual({ jsonLimit: '3mb' });
     expect(createWatcher).not.toHaveBeenCalled();
   });
 
   it('watch 开启时应监听逻辑文件并重启服务', async () => {
     jest.useFakeTimers();
-    (getRcData as jest.Mock).mockResolvedValue({ watch: true, mockDir: './mocks', mockLogicFileType: 'ts' });
+    const onBodyParserError = jest.fn();
+    const bodyParser = { jsonLimit: '2mb', formLimit: '128kb' };
+    (getRcData as jest.Mock).mockResolvedValue({ watch: true, mockDir: './mocks', mockLogicFileType: 'ts', bodyParser, onBodyParserError });
     let watcherCallback: ((eventName: string, ...args: any[]) => void) | undefined;
     (createWatcher as jest.Mock).mockImplementation((_config, callback) => {
       watcherCallback = callback;
@@ -71,6 +83,11 @@ describe('start 子命令', () => {
     expect(serverHandle.close).toHaveBeenCalledTimes(1);
     expect(sleep).toHaveBeenCalledWith(0);
     expect(mihawk).toHaveBeenLastCalledWith(expect.objectContaining({ watch: true }), true);
+    expect(mihawk).toHaveBeenCalledTimes(2);
+    for (const [config] of (mihawk as jest.Mock).mock.calls) {
+      expect(config.bodyParser).toEqual(bodyParser);
+      expect(config.onBodyParserError).toBe(onBodyParserError);
+    }
   });
 
   it('启动失败时应记录错误并退出', async () => {

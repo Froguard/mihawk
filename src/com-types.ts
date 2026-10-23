@@ -170,6 +170,21 @@ export interface MihawkRC {
   cors?: boolean;
 
   /**
+   * 请求体解析上限，默认 jsonLimit='1mb'、formLimit='56kb'
+   * - 正整数字节数，或使用 b/kb/mb/gb 单位的字符串
+   */
+  bodyParser?: {
+    jsonLimit?: string | number;
+    formLimit?: string | number;
+  };
+
+  /**
+   * 自定义解析错误响应，支持异步；调用前已设置默认错误状态与 JSON 响应
+   * - 解析失败不会执行后续 middleware；回调失败返回通用 500 JSON
+   */
+  onBodyParserError?: (error: unknown, ctx: KoaContext) => void | Promise<void>;
+
+  /**
    * 是否开启 watch（mock 文件变化的时候，进行刷新），默认 true
    * - watch=true 时，无论是否设置 cache，文件变化必然触发缓存刷新
    * - watch=false 时，是否走缓存，则完全看 cache 字段的逻辑

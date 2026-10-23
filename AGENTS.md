@@ -66,6 +66,8 @@ interface MihawkRC {
   autoCreateMockLogicFile?: boolean; // 默认 false
   tsconfigPath?: string | null; // 仅 TypeScript 逻辑模式生效
   logConfig?: { ignoreRoutes?: string[] } | null;
+  bodyParser?: { jsonLimit?: string | number; formLimit?: string | number }; // 默认 1mb / 56kb
+  onBodyParserError?: (error: unknown, ctx: KoaContext) => void | Promise<void>;
   socketConfig?: { stomp?: boolean } | boolean | null; // 默认关闭
   setJsonByRemote?: {
     enable: boolean;
@@ -77,6 +79,10 @@ interface MihawkRC {
   } | null;
 }
 ```
+
+`bodyParser` 仅配置 JSON 和 URL 编码表单大小限制；数字为字节，字符串支持 b/kb/mb/gb（忽略大小写、1024 进制），换算后必须为正安全整数字节数，无效值和未知字段在启动时拒绝。未配置时使用解析器默认值，不在 `DEFAULT_RC` 中重复定义。
+
+解析失败会停止下游处理，默认返回 `{ code: status, msg: HTTP标准描述 }`，不包含原始请求体或错误信息。`onBodyParserError` 在默认响应设置后收到原始错误，支持同步或异步修改响应；回调失败返回通用 JSON 500。该回调仅可通过 JS/TS RC 或程序 API 配置，不进入 JSON Schema。未读取完整的失败请求会先流式丢弃剩余请求数据而不缓存，再返回完整错误响应，保留连接复用。旧版解析失败后继续执行业务的行为已移除；读取原始请求流可用 `application/octet-stream`，已有 `ctx.disableBodyParser` 行为保留。
 
 `mockLogicFileType` 为 `none` 时不加载 middleware、单路由逻辑或自定义 socket 逻辑；routes 后缀与 `mockDataFileType` 一致。设置为 `js`、`cjs` 或 `ts` 时，routes、middleware、data 逻辑和 socket 逻辑使用对应后缀。
 
