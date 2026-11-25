@@ -1,0 +1,27 @@
+# Mihawk
+
+> Mihawk (npm package `mihawk`) is a lightweight Node.js mock server for frontend development. It serves local JSON or JSON5 files over HTTP or HTTPS. A single server can also handle WebSocket messages and run custom TypeScript or JavaScript response logic.
+
+To mock an API before the backend is ready, save its response in `mocks/data/GET/api/users.json`, install the CLI with `npm install -g mihawk`, and run `mihawk` in the project directory. A `GET` request to `http://localhost:8888/api/users` returns that file's data. A Vite or webpack dev server can proxy `/api` to Mihawk so the frontend keeps its usual request URLs.
+
+To vary the response by query parameter, set `mockLogicFileType` to `"ts"` in `.mihawkrc.json` and export a default handler from `mocks/data/GET/api/users.ts`. To reuse one response across several URLs in the default JSON mode, add glob route mappings to `mocks/routes.json`.
+
+To mock a real-time API, set `socketConfig` to `true` in `.mihawkrc.json`. WebSocket clients can then connect to `ws://localhost:8888` on the same port as the HTTP API.
+
+## Getting started
+
+- [English guide to installation, file-based API mocks, and Vite and webpack proxy setup](https://raw.githubusercontent.com/Froguard/mihawk/master/README.md)
+- [前端本地 Mock 服务中文指南（API 接口模拟、WebSocket 与开发代理配置）](https://raw.githubusercontent.com/Froguard/mihawk/master/README.zh_CN.md)
+
+## Guides and examples
+
+- [Reuse one response file for multiple URLs with glob route mappings](https://raw.githubusercontent.com/Froguard/mihawk/master/_example_/mocks/routes.ts)
+- [Handle requests with Koa middleware or adapt Express middleware](https://raw.githubusercontent.com/Froguard/mihawk/master/docs/middleware.md)
+- [Initialize a missing local mock file from a remote API's JSON response](https://raw.githubusercontent.com/Froguard/mihawk/master/docs/fallback-remote.md)
+- [Set the initial contents of generated JSON files with an EJS template](https://raw.githubusercontent.com/Froguard/mihawk/master/docs/json-data-tpl.md)
+- [Receive and reply to WebSocket messages in a TypeScript handler](https://raw.githubusercontent.com/Froguard/mihawk/master/_example_/mocks/socket.ts)
+
+## Optional
+
+- [TypeScript definitions for MihawkRC and handler arguments](https://raw.githubusercontent.com/Froguard/mihawk/master/src/com-types.ts)
+- [Published npm package metadata and Node.js requirements](https://registry.npmjs.org/mihawk/latest)
